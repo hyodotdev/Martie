@@ -1,0 +1,29 @@
+diff --git a/build/getNode.js b/build/getNode.js
+--- a/build/getNode.js
++++ b/build/getNode.js
+@@ -1,17 +1,20 @@
+-// @ts-ignore
+-import { findDOMNode } from 'react-dom';
+ import getNativeNode from './getNode.native';
++function isDOMNode(node) {
++    return !!node && typeof node.addEventListener === 'function';
++}
+ function getNode(ref) {
+     try {
+         let node = getNativeNode(ref);
+-        if (node)
+-            node = findDOMNode(node);
+-        return node;
++        if (isDOMNode(node))
++            return node;
++        if (node && isDOMNode(node._touchableNode))
++            return node._touchableNode;
++        return null;
+     }
+     catch (error) {
+         console.error(`Couldn't find node`, error, { ref });
+         return null;
+     }
+ }
+ export default getNode;
+ //# sourceMappingURL=getNode.js.map

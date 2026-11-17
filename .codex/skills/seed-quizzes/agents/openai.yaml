@@ -1,0 +1,4 @@
+interface:
+  display_name: "Seed Quizzes"
+  short_description: "Create and seed Martie quiz content"
+  default_prompt: "Use $seed-quizzes to generate and seed multilingual Martie quizzes."

@@ -1,0 +1,239 @@
+@font-face {
+  font-family: 'NanumSquareRound';
+  src: url('fonts/NanumSquareRoundOTFB.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --bg: #fffdf6;
+  --paper: #f3f2e5;
+  --card: #ffffff;
+  --text: #37140b;
+  --muted: #7a5d55;
+  --primary: #ff5b50;
+  --primary-text: #ffffff;
+  --border: #ece9da;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1716;
+    --paper: #26201e;
+    --card: #2d2624;
+    --text: #f4f1e8;
+    --muted: #c9bdb5;
+    --border: #3d3532;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+.hero {
+  text-align: center;
+  padding: 64px 16px 40px;
+  background: radial-gradient(circle at 50% 0%, var(--paper), var(--bg) 70%);
+}
+
+.hero-icon {
+  display: block;
+  margin: 0 auto 12px;
+  filter: drop-shadow(0 12px 24px rgb(55 20 11 / 0.15));
+}
+
+.wordmark {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+h2,
+h3,
+.button {
+  font-family:
+    'NanumSquareRound',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}
+
+h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  line-height: 1.25;
+  margin: 24px auto 12px;
+  max-width: 640px;
+}
+
+.lead {
+  color: var(--muted);
+  font-size: 1.1rem;
+  max-width: 560px;
+  margin: 0 auto 28px;
+}
+
+.stores {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stores img {
+  display: block;
+}
+
+.web-play {
+  margin: 20px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.web-play span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.mascots {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 36px;
+}
+
+.mascots img {
+  width: clamp(56px, 18vw, 88px);
+  height: auto;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+section {
+  padding: 48px 0;
+}
+
+h2 {
+  text-align: center;
+  font-size: 1.6rem;
+  margin: 0 0 28px;
+}
+
+.cards {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.cards li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px;
+}
+
+.cards h3 {
+  margin: 8px 0 6px;
+  font-size: 1.1rem;
+}
+
+.cards p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.emoji {
+  font-size: 1.8rem;
+}
+
+.languages {
+  text-align: center;
+  color: var(--muted);
+  margin-top: 24px;
+}
+
+.open {
+  text-align: center;
+  background: var(--paper);
+  border-radius: 28px;
+  padding: 40px 24px;
+  margin-bottom: 48px;
+}
+
+.open p {
+  max-width: 620px;
+  margin: 0 auto 20px;
+}
+
+.links {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.button {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.button.secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+footer {
+  text-align: center;
+  padding: 24px 16px 48px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+footer p {
+  margin: 4px 0;
+}
+
+footer a {
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+.fineprint {
+  font-size: 0.85rem;
+}

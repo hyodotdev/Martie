@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update Version"
+  short_description: "Update app version and force-update state"
+  default_prompt: "Use $update-version to bump Martie app version and optionally configure force update."

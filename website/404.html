@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Page not found — Martie</title>
+    <link rel="icon" href="/images/favicon.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script>
+      // Deep links into the web app (/app/...) boot the app shell so the
+      // router can resolve the path on the client.
+      if (location.pathname.indexOf('/app/') === 0) {
+        fetch('/app/index.html')
+          .then(function (res) {
+            return res.text();
+          })
+          .then(function (html) {
+            document.open();
+            document.write(html);
+            document.close();
+          });
+      }
+    </script>
+  </head>
+  <body>
+    <header class="hero">
+      <img
+        class="hero-icon"
+        src="/images/martie_sweat.png"
+        width="120"
+        height="120"
+        alt=""
+      />
+      <h1>Oops, Martie couldn't find that page.</h1>
+      <p class="links"><a class="button" href="/">Back to Martie</a></p>
+    </header>
+  </body>
+</html>

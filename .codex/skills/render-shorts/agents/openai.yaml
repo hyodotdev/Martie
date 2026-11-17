@@ -1,0 +1,4 @@
+interface:
+  display_name: "Render Shorts"
+  short_description: "Render Martie quiz shorts assets"
+  default_prompt: "Use $render-shorts to generate Martie quiz short videos and upload metadata."

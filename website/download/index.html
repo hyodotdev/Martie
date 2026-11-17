@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Get Martie</title>
+    <meta name="robots" content="noindex" />
+    <script>
+      (function () {
+        var ua = navigator.userAgent || '';
+        var ios = 'https://apps.apple.com/app/id6740057833';
+        var android =
+          'https://play.google.com/store/apps/details?id=dev.hyo.martie';
+        if (/android/i.test(ua)) location.replace(android);
+        else if (
+          /iphone|ipad|ipod|macintosh/i.test(ua) &&
+          'ontouchend' in document
+        )
+          location.replace(ios);
+        else if (/iphone|ipad|ipod/i.test(ua)) location.replace(ios);
+        else location.replace('/');
+      })();
+    </script>
+  </head>
+  <body>
+    <p>
+      Get Martie on the
+      <a href="https://apps.apple.com/app/id6740057833">App Store</a> or
+      <a href="https://play.google.com/store/apps/details?id=dev.hyo.martie"
+        >Google Play</a
+      >.
+    </p>
+  </body>
+</html>

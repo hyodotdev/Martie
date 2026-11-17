@@ -1,0 +1,4 @@
+interface:
+  display_name: "Grow"
+  short_description: "Run one metric-driven growth round"
+  default_prompt: "Use $grow to run one Martie growth round: read the ledger, refresh the metrics, ship the highest-leverage lever, and record the hypothesis."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Loop Review"
+  short_description: "Run the Martie change-to-merge review loop"
+  default_prompt: "Use $loop-review to take the current Martie change from main through review-self, PR, review polling, and a verified merge."

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    # Runs on the public repository and public forks. The private operations
+    # mirror carries the same code and has no Actions budget.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.14.0
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+
+      - name: Install modules
+        run: bun install --immutable
+
+      - name: Check linting
+        run: bun lint:all
+
+      - name: Build typescript
+        run: bun tsc
+
+      - name: Build shorts typescript
+        run: |
+          cd programs/shorts
+          bun install --immutable
+          bun run typecheck
+
+      - name: Remove dist
+        run: rm -rf ./dist
+
+      - name: Test
+        run: bun run test --coverage --silent

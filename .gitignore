@@ -1,0 +1,69 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+bun.lockb
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# Test coverage
+coverage/
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*
+!.env.sample
+
+# typescript
+*.tsbuildinfo
+
+app-example
+.jest
+
+/ios
+/android
+
+# google services
+google-services.json
+GoogleService-Info.plist
+
+.claude/**local.json
+
+# programs (separate tools, not part of the app)
+programs/*/node_modules/
+programs/*/out/
+programs/*/.cache/
+programs/*/secrets/
+# Licensed audio is kept out of the public repository; add your own files.
+programs/shorts/public/*.mp3
+
+# Vega app build outputs
+apps/vega/build/
+apps/vega/bundle/
+apps/vega/dist/
+apps/vega/generated/
+apps/vega/kepler-build/
+apps/vega/buildinfo.json

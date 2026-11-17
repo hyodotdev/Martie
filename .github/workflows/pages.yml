@@ -1,0 +1,70 @@
+name: Website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'hyodotdev/Martie'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.14.0
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+
+      - name: Install modules
+        run: bun install --immutable
+
+      # Public values: they ship in every app binary as well.
+      - name: Build web app
+        run: bunx expo export --platform web --output-dir _site/app
+        env:
+          EXPO_NO_DOTENV: '1'
+          STAGE: production
+          EXPO_WEB_BASE_URL: /app
+          EXPO_PUBLIC_CONVEX_URL: https://martie-server.hyo.dev
+          EXPO_PUBLIC_CONVEX_SITE_URL: https://martie-api.hyo.dev
+          EXPO_PUBLIC_PAYMENT_MODE: iap_only
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site/images _site/fonts
+          cp -R website/. _site/
+          cp assets/icon_round.png assets/favicon.png _site/images/
+          cp assets/icons/wordmark@3x.png _site/images/wordmark.png
+          for name in smart smile impressed sweat; do
+            cp "assets/icons/martie_${name}@2x.png" "_site/images/martie_${name}.png"
+          done
+          cp assets/fonts/NanumSquareRoundOTFB.otf _site/fonts/
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

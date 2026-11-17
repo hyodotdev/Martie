@@ -1,0 +1,1623 @@
+export const basicQuizzes = [
+  // ===== 사막, 빙하, 극한 환경 (Deserts, ice caps, extreme environments) =====
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 1,
+    key: '20260419_0001_key',
+    description: '세계에서 가장 뜨거운 기온이 기록된 곳은 어디일까요?',
+    answerKey: '20260419_0001_answer',
+    answerDescription:
+      '미국 캘리포니아의 데스밸리(Death Valley)에서 1913년 56.7°C가 기록되었어요. 문자 그대로 "죽음의 계곡"이죠!',
+    indexes: ['데스밸리', '기온'],
+    options: [
+      { key: '20260419_0001_opt1', description: '사하라 사막', isAnswer: false },
+      { key: '20260419_0001_opt2', description: '데스밸리', isAnswer: true },
+      { key: '20260419_0001_opt3', description: '아라비아 사막', isAnswer: false },
+      { key: '20260419_0001_opt4', description: '루트 사막', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 2,
+    key: '20260419_0002_key',
+    description: '남극 대륙의 얼음은 지구 전체 담수의 약 몇 %를 차지할까요?',
+    answerKey: '20260419_0002_answer',
+    answerDescription:
+      '남극 빙상은 지구 전체 담수의 약 70%를 보유하고 있어요. 만약 다 녹으면 해수면이 약 60m 상승해요!',
+    indexes: ['남극', '담수'],
+    options: [
+      { key: '20260419_0002_opt1', description: '약 30%', isAnswer: false },
+      { key: '20260419_0002_opt2', description: '약 50%', isAnswer: false },
+      { key: '20260419_0002_opt3', description: '약 70%', isAnswer: true },
+      { key: '20260419_0002_opt4', description: '약 90%', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ENVIRONMENT_AND_CLIMATE',
+    level: 2,
+    key: '20260419_0003_key',
+    description: '아타카마 사막은 지구에서 가장 건조한 곳으로 유명한데, 어느 대륙에 있을까요?',
+    answerKey: '20260419_0003_answer',
+    answerDescription:
+      '아타카마 사막은 남아메리카 칠레에 있어요. 일부 지역은 수백 년간 비가 한 방울도 내리지 않았답니다!',
+    indexes: ['아타카마', '사막'],
+    options: [
+      { key: '20260419_0003_opt1', description: '아프리카', isAnswer: false },
+      { key: '20260419_0003_opt2', description: '남아메리카', isAnswer: true },
+      { key: '20260419_0003_opt3', description: '아시아', isAnswer: false },
+      { key: '20260419_0003_opt4', description: '오세아니아', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'BASIC_SCIENCE',
+    level: 3,
+    key: '20260419_0004_key',
+    description: '심해 열수공(hydrothermal vent) 주변의 수온은 최대 약 몇 도까지 올라갈까요?',
+    answerKey: '20260419_0004_answer',
+    answerDescription:
+      '심해 열수공에서 분출되는 물은 최대 약 400°C에 달해요. 높은 수압 때문에 끓지 않고 액체 상태를 유지하죠!',
+    indexes: ['열수공', '심해'],
+    options: [
+      { key: '20260419_0004_opt1', description: '약 100°C', isAnswer: false },
+      { key: '20260419_0004_opt2', description: '약 200°C', isAnswer: false },
+      { key: '20260419_0004_opt3', description: '약 400°C', isAnswer: true },
+      { key: '20260419_0004_opt4', description: '약 600°C', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 1,
+    key: '20260419_0005_key',
+    description: '지구에서 가장 추운 기온이 기록된 곳은 어디일까요?',
+    answerKey: '20260419_0005_answer',
+    answerDescription:
+      '남극의 보스토크 기지에서 1983년 -89.2°C가 기록되었어요. 인간이 밖에서 버틸 수 없는 극한의 추위죠!',
+    indexes: ['보스토크', '기온'],
+    options: [
+      { key: '20260419_0005_opt1', description: '시베리아 오이먀콘', isAnswer: false },
+      { key: '20260419_0005_opt2', description: '남극 보스토크 기지', isAnswer: true },
+      { key: '20260419_0005_opt3', description: '그린란드 서밋 캠프', isAnswer: false },
+      { key: '20260419_0005_opt4', description: '알래스카 페어뱅크스', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 2,
+    key: '20260419_0006_key',
+    description: '지구에서 비가 가장 많이 내리는 곳은 어디일까요?',
+    answerKey: '20260419_0006_answer',
+    answerDescription:
+      '인도 메가라야주의 마우신람(Mawsynram)은 연 평균 강수량이 약 11,871mm로 세계에서 가장 비가 많이 내리는 곳이에요!',
+    indexes: ['마우신람', '강수량'],
+    options: [
+      { key: '20260419_0006_opt1', description: '아마존 열대우림', isAnswer: false },
+      { key: '20260419_0006_opt2', description: '인도 마우신람', isAnswer: true },
+      { key: '20260419_0006_opt3', description: '콜롬비아 요로', isAnswer: false },
+      { key: '20260419_0006_opt4', description: '하와이 와이알레알레산', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ENVIRONMENT_AND_CLIMATE',
+    level: 2,
+    key: '20260419_0007_key',
+    description: '영구동토층(permafrost)이 녹으면 대기로 방출되는 온실가스는 무엇일까요?',
+    answerKey: '20260419_0007_answer',
+    answerDescription:
+      '영구동토층이 녹으면 얼어있던 유기물이 분해되면서 메탄이 방출돼요. 메탄은 이산화탄소보다 온실효과가 약 80배 강해요!',
+    indexes: ['영구동토층', '메탄'],
+    options: [
+      { key: '20260419_0007_opt1', description: '산소', isAnswer: false },
+      { key: '20260419_0007_opt2', description: '메탄', isAnswer: true },
+      { key: '20260419_0007_opt3', description: '질소', isAnswer: false },
+      { key: '20260419_0007_opt4', description: '수소', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 2,
+    key: '20260419_0008_key',
+    description: '사하라 사막에 눈이 내린 적이 있을까요?',
+    answerKey: '20260419_0008_answer',
+    answerDescription:
+      '사하라 사막의 알제리 아인세프라 지역에는 실제로 눈이 내린 적이 여러 번 있어요. 2018년에도 눈이 내렸답니다!',
+    indexes: ['사하라', '눈'],
+    options: [
+      { key: '20260419_0008_opt1', description: '한 번도 없다', isAnswer: false },
+      { key: '20260419_0008_opt2', description: '실제로 여러 번 있다', isAnswer: true },
+      { key: '20260419_0008_opt3', description: '1만 년 전에만 있었다', isAnswer: false },
+      { key: '20260419_0008_opt4', description: '우박만 내린 적 있다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 1,
+    key: '20260419_0009_key',
+    description: '북극곰의 피부색은 실제로 무슨 색일까요?',
+    answerKey: '20260419_0009_answer',
+    answerDescription:
+      '북극곰의 털은 투명하고 피부는 검은색이에요. 검은 피부가 태양열을 잘 흡수해서 추운 환경에서 체온을 유지하죠!',
+    indexes: ['북극곰', '피부'],
+    options: [
+      { key: '20260419_0009_opt1', description: '흰색', isAnswer: false },
+      { key: '20260419_0009_opt2', description: '검은색', isAnswer: true },
+      { key: '20260419_0009_opt3', description: '갈색', isAnswer: false },
+      { key: '20260419_0009_opt4', description: '분홍색', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 3,
+    key: '20260419_0010_key',
+    description: '"사막 장미"란 무엇을 뜻할까요?',
+    answerKey: '20260419_0010_answer',
+    answerDescription:
+      '사막 장미는 사막에서 모래와 석고가 결합하여 장미꽃 모양으로 형성된 광물 결정이에요. 자연이 만든 예술 작품이죠!',
+    indexes: ['사막장미', '광물'],
+    options: [
+      { key: '20260419_0010_opt1', description: '사막에 피는 꽃 이름', isAnswer: false },
+      { key: '20260419_0010_opt2', description: '장미 모양의 광물 결정', isAnswer: true },
+      { key: '20260419_0010_opt3', description: '오아시스 주변의 식물', isAnswer: false },
+      { key: '20260419_0010_opt4', description: '사막 동물의 별명', isAnswer: false },
+    ],
+  },
+
+  // ===== 종이, 인쇄, 우편 역사 (Paper, printing, postal history) =====
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 1,
+    key: '20260419_0011_key',
+    description: '양피지(Parchment)는 무엇으로 만들어졌을까요?',
+    answerKey: '20260419_0011_answer',
+    answerDescription:
+      '양피지는 양, 염소, 송아지 등의 가죽을 얇게 가공하여 만든 필기 재료예요. 중세 유럽에서 종이 대신 널리 사용되었죠!',
+    indexes: ['양피지', '가죽'],
+    options: [
+      { key: '20260419_0011_opt1', description: '나무 껍질', isAnswer: false },
+      { key: '20260419_0011_opt2', description: '동물 가죽', isAnswer: true },
+      { key: '20260419_0011_opt3', description: '갈대 줄기', isAnswer: false },
+      { key: '20260419_0011_opt4', description: '풀잎', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0012_key',
+    description: '구텐베르크의 금속활자 인쇄기로 처음 대량 인쇄된 책은 무엇일까요?',
+    answerKey: '20260419_0012_answer',
+    answerDescription:
+      '1455년경 구텐베르크가 금속활자로 처음 대량 인쇄한 것은 성경(구텐베르크 성경)이에요. 인쇄 혁명의 시작이었죠!',
+    indexes: ['구텐베르크', '성경'],
+    options: [
+      { key: '20260419_0012_opt1', description: '백과사전', isAnswer: false },
+      { key: '20260419_0012_opt2', description: '성경', isAnswer: true },
+      { key: '20260419_0012_opt3', description: '법전', isAnswer: false },
+      { key: '20260419_0012_opt4', description: '소설', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 2,
+    key: '20260419_0013_key',
+    description: '세계 최초의 우표 이름은 무엇이었을까요?',
+    answerKey: '20260419_0013_answer',
+    answerDescription:
+      '1840년 영국에서 발행된 "페니 블랙"이 세계 최초의 접착식 우표예요. 빅토리아 여왕의 초상이 그려져 있었죠!',
+    indexes: ['우표', '페니블랙'],
+    options: [
+      { key: '20260419_0013_opt1', description: '페니 블랙', isAnswer: true },
+      { key: '20260419_0013_opt2', description: '블루 모리셔스', isAnswer: false },
+      { key: '20260419_0013_opt3', description: '레드 머큐리', isAnswer: false },
+      { key: '20260419_0013_opt4', description: '골든 스탬프', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 3,
+    key: '20260419_0014_key',
+    description: '고대 이집트에서 종이 대신 사용한 필기 재료의 이름은 무엇일까요?',
+    answerKey: '20260419_0014_answer',
+    answerDescription:
+      '파피루스는 나일강 유역에 자라는 갈대의 일종으로 만든 필기 재료예요. "paper"라는 영어 단어도 여기서 유래했어요!',
+    indexes: ['파피루스', '이집트'],
+    options: [
+      { key: '20260419_0014_opt1', description: '양피지', isAnswer: false },
+      { key: '20260419_0014_opt2', description: '파피루스', isAnswer: true },
+      { key: '20260419_0014_opt3', description: '점토판', isAnswer: false },
+      { key: '20260419_0014_opt4', description: '대나무 간', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0015_key',
+    description: '세계 최초의 근대적 우편 제도를 만든 나라는 어디일까요?',
+    answerKey: '20260419_0015_answer',
+    answerDescription:
+      '1840년 영국에서 로랜드 힐이 균일 요금 우편 제도를 도입했어요. 거리에 상관없이 1페니로 편지를 보낼 수 있었죠!',
+    indexes: ['우편제도', '영국'],
+    options: [
+      { key: '20260419_0015_opt1', description: '프랑스', isAnswer: false },
+      { key: '20260419_0015_opt2', description: '영국', isAnswer: true },
+      { key: '20260419_0015_opt3', description: '미국', isAnswer: false },
+      { key: '20260419_0015_opt4', description: '독일', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0016_key',
+    description: 'A4 용지의 가로세로 비율은 어떤 특별한 수와 관련이 있을까요?',
+    answerKey: '20260419_0016_answer',
+    answerDescription:
+      'A4 용지는 가로세로 비율이 1:√2(약 1:1.414)예요. 반으로 접어도 같은 비율이 유지되는 신기한 특성이 있죠!',
+    indexes: ['A4', '용지'],
+    options: [
+      { key: '20260419_0016_opt1', description: '황금비 (1:1.618)', isAnswer: false },
+      { key: '20260419_0016_opt2', description: '루트 2 (1:1.414)', isAnswer: true },
+      { key: '20260419_0016_opt3', description: '원주율 (1:3.14)', isAnswer: false },
+      { key: '20260419_0016_opt4', description: '자연 상수 (1:2.718)', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 3,
+    key: '20260419_0017_key',
+    description: '한국의 직지심체요절은 구텐베르크보다 약 몇 년 앞서 인쇄되었을까요?',
+    answerKey: '20260419_0017_answer',
+    answerDescription:
+      '직지심체요절은 1377년에 금속활자로 인쇄되었고, 구텐베르크 성경은 1455년이에요. 약 78년 앞서 있죠!',
+    indexes: ['직지심체요절', '금속활자'],
+    options: [
+      { key: '20260419_0017_opt1', description: '약 30년', isAnswer: false },
+      { key: '20260419_0017_opt2', description: '약 78년', isAnswer: true },
+      { key: '20260419_0017_opt3', description: '약 150년', isAnswer: false },
+      { key: '20260419_0017_opt4', description: '약 200년', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0018_key',
+    description: '신문이 처음 등장한 나라는 어디일까요?',
+    answerKey: '20260419_0018_answer',
+    answerDescription:
+      '세계 최초의 정기 발행 신문은 1605년 독일 스트라스부르에서 발행된 "렐라치온"이에요!',
+    indexes: ['신문', '독일'],
+    options: [
+      { key: '20260419_0018_opt1', description: '영국', isAnswer: false },
+      { key: '20260419_0018_opt2', description: '독일', isAnswer: true },
+      { key: '20260419_0018_opt3', description: '프랑스', isAnswer: false },
+      { key: '20260419_0018_opt4', description: '이탈리아', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 2,
+    key: '20260419_0019_key',
+    description: '엽서(Postcard)가 처음 발명된 나라는 어디일까요?',
+    answerKey: '20260419_0019_answer',
+    answerDescription:
+      '1869년 오스트리아에서 세계 최초의 공식 엽서가 발행되었어요. 편지보다 저렴한 소통 수단으로 큰 인기를 끌었죠!',
+    indexes: ['엽서', '오스트리아'],
+    options: [
+      { key: '20260419_0019_opt1', description: '영국', isAnswer: false },
+      { key: '20260419_0019_opt2', description: '오스트리아', isAnswer: true },
+      { key: '20260419_0019_opt3', description: '미국', isAnswer: false },
+      { key: '20260419_0019_opt4', description: '스위스', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 2,
+    key: '20260419_0020_key',
+    description: '비행기를 이용한 항공우편이 처음 시작된 나라는 어디일까요?',
+    answerKey: '20260419_0020_answer',
+    answerDescription:
+      '1911년 인도에서 세계 최초의 공식 항공우편이 시작되었어요. 알라하바드에서 나이니까지 약 10km를 비행했죠!',
+    indexes: ['항공우편', '인도'],
+    options: [
+      { key: '20260419_0020_opt1', description: '미국', isAnswer: false },
+      { key: '20260419_0020_opt2', description: '영국', isAnswer: false },
+      { key: '20260419_0020_opt3', description: '인도', isAnswer: true },
+      { key: '20260419_0020_opt4', description: '프랑스', isAnswer: false },
+    ],
+  },
+
+  // ===== 시계, 시간 측정, 달력 (Clocks, timekeeping, calendars) =====
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0021_key',
+    description: '하루를 24시간으로 나눈 것은 어느 고대 문명에서 시작되었을까요?',
+    answerKey: '20260419_0021_answer',
+    answerDescription:
+      '고대 이집트인들이 낮 12시간, 밤 12시간으로 나누어 하루를 24시간 체계로 만들었어요!',
+    indexes: ['24시간', '이집트'],
+    options: [
+      { key: '20260419_0021_opt1', description: '고대 그리스', isAnswer: false },
+      { key: '20260419_0021_opt2', description: '고대 이집트', isAnswer: true },
+      { key: '20260419_0021_opt3', description: '고대 중국', isAnswer: false },
+      { key: '20260419_0021_opt4', description: '고대 로마', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 2,
+    key: '20260419_0022_key',
+    description: '"윤년"은 몇 년에 한 번 돌아올까요?',
+    answerKey: '20260419_0022_answer',
+    answerDescription:
+      '윤년은 보통 4년에 한 번이지만, 100으로 나누어지면 윤년이 아니고, 400으로 나누어지면 다시 윤년이에요!',
+    indexes: ['윤년', '달력'],
+    options: [
+      { key: '20260419_0022_opt1', description: '2년', isAnswer: false },
+      { key: '20260419_0022_opt2', description: '4년', isAnswer: true },
+      { key: '20260419_0022_opt3', description: '5년', isAnswer: false },
+      { key: '20260419_0022_opt4', description: '10년', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0023_key',
+    description: '해시계(sundial)는 무엇을 이용해서 시간을 측정할까요?',
+    answerKey: '20260419_0023_answer',
+    answerDescription:
+      '해시계는 태양의 그림자 위치로 시간을 알 수 있어요. 인류가 만든 가장 오래된 시간 측정 도구 중 하나죠!',
+    indexes: ['해시계', '그림자'],
+    options: [
+      { key: '20260419_0023_opt1', description: '물의 흐름', isAnswer: false },
+      { key: '20260419_0023_opt2', description: '태양의 그림자', isAnswer: true },
+      { key: '20260419_0023_opt3', description: '모래의 낙하', isAnswer: false },
+      { key: '20260419_0023_opt4', description: '별의 위치', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 3,
+    key: '20260419_0024_key',
+    description: '현재 전 세계에서 사용하는 양력 달력의 이름은 무엇일까요?',
+    answerKey: '20260419_0024_answer',
+    answerDescription:
+      '그레고리력은 1582년 교황 그레고리오 13세가 율리우스력을 개정하여 만든 달력으로, 현재 세계 표준이에요!',
+    indexes: ['그레고리력', '달력'],
+    options: [
+      { key: '20260419_0024_opt1', description: '율리우스력', isAnswer: false },
+      { key: '20260419_0024_opt2', description: '그레고리력', isAnswer: true },
+      { key: '20260419_0024_opt3', description: '히브리력', isAnswer: false },
+      { key: '20260419_0024_opt4', description: '이슬람력', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'TECHNOLOGY_AND_AI',
+    level: 2,
+    key: '20260419_0025_key',
+    description: '원자시계의 오차는 약 몇 년에 1초 정도일까요?',
+    answerKey: '20260419_0025_answer',
+    answerDescription:
+      '세슘 원자시계는 약 1억 년에 1초의 오차를 보여요. 현대 문명의 GPS, 통신 등이 이 정밀한 시간에 의존하고 있죠!',
+    indexes: ['원자시계', '정밀도'],
+    options: [
+      { key: '20260419_0025_opt1', description: '약 100년', isAnswer: false },
+      { key: '20260419_0025_opt2', description: '약 1만 년', isAnswer: false },
+      { key: '20260419_0025_opt3', description: '약 1억 년', isAnswer: true },
+      { key: '20260419_0025_opt4', description: '약 10억 년', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0026_key',
+    description: '뻐꾸기시계(Cuckoo Clock)는 어느 나라에서 유래했을까요?',
+    answerKey: '20260419_0026_answer',
+    answerDescription:
+      '뻐꾸기시계는 17세기 독일 흑림(슈바르츠발트) 지역에서 시작되었어요. 매시 정각에 뻐꾸기가 나와 울어요!',
+    indexes: ['뻐꾸기시계', '독일'],
+    options: [
+      { key: '20260419_0026_opt1', description: '스위스', isAnswer: false },
+      { key: '20260419_0026_opt2', description: '독일', isAnswer: true },
+      { key: '20260419_0026_opt3', description: '오스트리아', isAnswer: false },
+      { key: '20260419_0026_opt4', description: '체코', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0027_key',
+    description: '모래시계는 주로 무엇을 측정하는 데 사용되었을까요?',
+    answerKey: '20260419_0027_answer',
+    answerDescription:
+      '모래시계는 일정 시간을 측정하는 데 사용되었어요. 특히 배 위에서 항해 시간을 재는 데 많이 쓰였답니다!',
+    indexes: ['모래시계', '시간'],
+    options: [
+      { key: '20260419_0027_opt1', description: '온도', isAnswer: false },
+      { key: '20260419_0027_opt2', description: '일정 시간', isAnswer: true },
+      { key: '20260419_0027_opt3', description: '무게', isAnswer: false },
+      { key: '20260419_0027_opt4', description: '풍속', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 3,
+    key: '20260419_0028_key',
+    description: '마야 달력은 한 순환 주기가 약 몇 년이었을까요?',
+    answerKey: '20260419_0028_answer',
+    answerDescription:
+      '마야의 장기 달력은 약 5,125년을 한 순환으로 보았어요. 2012년에 한 순환이 끝나 "종말론"이 유행하기도 했죠!',
+    indexes: ['마야달력', '순환'],
+    options: [
+      { key: '20260419_0028_opt1', description: '약 365년', isAnswer: false },
+      { key: '20260419_0028_opt2', description: '약 1,000년', isAnswer: false },
+      { key: '20260419_0028_opt3', description: '약 5,125년', isAnswer: true },
+      { key: '20260419_0028_opt4', description: '약 10,000년', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0029_key',
+    description: '시계 바늘이 오른쪽으로 도는 이유는 무엇일까요?',
+    answerKey: '20260419_0029_answer',
+    answerDescription:
+      '해시계의 그림자가 북반구에서 오른쪽으로 이동하는 것을 본떠 시계 바늘 방향이 정해졌어요!',
+    indexes: ['시계', '해시계'],
+    options: [
+      { key: '20260419_0029_opt1', description: '해시계 그림자의 이동 방향을 따라서', isAnswer: true },
+      { key: '20260419_0029_opt2', description: '오른손잡이가 많아서', isAnswer: false },
+      { key: '20260419_0029_opt3', description: '기계적으로 더 효율적이라서', isAnswer: false },
+      { key: '20260419_0029_opt4', description: '특별한 이유 없이 관습적으로', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 2,
+    key: '20260419_0030_key',
+    description: '"서머타임(Daylight Saving Time)"을 처음 제안한 사람의 직업은 무엇이었을까요?',
+    answerKey: '20260419_0030_answer',
+    answerDescription:
+      '1895년 뉴질랜드의 곤충학자 조지 허드슨이 곤충 채집 시간을 늘리기 위해 처음 제안했어요!',
+    indexes: ['서머타임', '곤충학자'],
+    options: [
+      { key: '20260419_0030_opt1', description: '정치인', isAnswer: false },
+      { key: '20260419_0030_opt2', description: '곤충학자', isAnswer: true },
+      { key: '20260419_0030_opt3', description: '농부', isAnswer: false },
+      { key: '20260419_0030_opt4', description: '천문학자', isAnswer: false },
+    ],
+  },
+
+  // ===== 해적, 탐험가, 해양 역사 (Pirates, explorers, maritime history) =====
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 1,
+    key: '20260419_0031_key',
+    description: '아메리카 대륙에 처음 도달한 유럽 탐험가는 누구일까요?',
+    answerKey: '20260419_0031_answer',
+    answerDescription:
+      '크리스토퍼 콜럼버스가 1492년에 아메리카 대륙에 도달했어요. 사실 인도라고 착각했답니다!',
+    indexes: ['콜럼버스', '아메리카'],
+    options: [
+      { key: '20260419_0031_opt1', description: '바스코 다 가마', isAnswer: false },
+      { key: '20260419_0031_opt2', description: '크리스토퍼 콜럼버스', isAnswer: true },
+      { key: '20260419_0031_opt3', description: '마젤란', isAnswer: false },
+      { key: '20260419_0031_opt4', description: '아메리고 베스푸치', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0032_key',
+    description: '해적 깃발 "졸리 로저"에 그려진 상징은 무엇일까요?',
+    answerKey: '20260419_0032_answer',
+    answerDescription:
+      '졸리 로저는 해골과 교차된 뼈(Skull and Crossbones)가 그려진 해적 깃발이에요. 항복하라는 경고의 의미였죠!',
+    indexes: ['졸리로저', '해적'],
+    options: [
+      { key: '20260419_0032_opt1', description: '칼과 방패', isAnswer: false },
+      { key: '20260419_0032_opt2', description: '해골과 교차된 뼈', isAnswer: true },
+      { key: '20260419_0032_opt3', description: '독수리와 닻', isAnswer: false },
+      { key: '20260419_0032_opt4', description: '뱀과 모래시계', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0033_key',
+    description: '세계 최초로 지구 일주 항해에 성공한 탐험대의 지휘관은 누구였을까요?',
+    answerKey: '20260419_0033_answer',
+    answerDescription:
+      '마젤란이 1519년 출발했지만 도중에 사망했고, 부하 엘카노가 1522년에 항해를 완수했어요. 탐험대 자체는 마젤란의 이름으로 불려요!',
+    indexes: ['마젤란', '지구일주'],
+    options: [
+      { key: '20260419_0033_opt1', description: '콜럼버스', isAnswer: false },
+      { key: '20260419_0033_opt2', description: '마젤란', isAnswer: true },
+      { key: '20260419_0033_opt3', description: '드레이크', isAnswer: false },
+      { key: '20260419_0033_opt4', description: '쿡 선장', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 3,
+    key: '20260419_0034_key',
+    description: '"해적의 황금시대"는 주로 몇 세기를 가리킬까요?',
+    answerKey: '20260419_0034_answer',
+    answerDescription:
+      '해적의 황금시대는 17세기 후반~18세기 초반(1650~1730년경)으로, 카리브해를 중심으로 활동했어요!',
+    indexes: ['해적', '황금시대'],
+    options: [
+      { key: '20260419_0034_opt1', description: '15~16세기', isAnswer: false },
+      { key: '20260419_0034_opt2', description: '17~18세기 초', isAnswer: true },
+      { key: '20260419_0034_opt3', description: '19세기', isAnswer: false },
+      { key: '20260419_0034_opt4', description: '13~14세기', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 1,
+    key: '20260419_0035_key',
+    description: '수에즈 운하가 개통된 해는 언제일까요?',
+    answerKey: '20260419_0035_answer',
+    answerDescription:
+      '수에즈 운하는 1869년에 개통되어 지중해와 홍해를 연결했어요. 아프리카를 돌지 않고 아시아로 갈 수 있게 된 혁명적 수로죠!',
+    indexes: ['수에즈운하', '개통'],
+    options: [
+      { key: '20260419_0035_opt1', description: '1849년', isAnswer: false },
+      { key: '20260419_0035_opt2', description: '1869년', isAnswer: true },
+      { key: '20260419_0035_opt3', description: '1889년', isAnswer: false },
+      { key: '20260419_0035_opt4', description: '1909년', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0036_key',
+    description: '바이킹은 어느 지역 출신의 항해민이었을까요?',
+    answerKey: '20260419_0036_answer',
+    answerDescription:
+      '바이킹은 스칸디나비아(노르웨이, 스웨덴, 덴마크) 출신의 항해 전사들이에요. 8~11세기에 유럽 곳곳을 탐험했죠!',
+    indexes: ['바이킹', '스칸디나비아'],
+    options: [
+      { key: '20260419_0036_opt1', description: '영국', isAnswer: false },
+      { key: '20260419_0036_opt2', description: '스칸디나비아', isAnswer: true },
+      { key: '20260419_0036_opt3', description: '지중해', isAnswer: false },
+      { key: '20260419_0036_opt4', description: '동유럽', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0037_key',
+    description: '배에서 왼쪽을 "포트(Port)", 오른쪽을 무엇이라 부를까요?',
+    answerKey: '20260419_0037_answer',
+    answerDescription:
+      '배의 오른쪽을 "스타보드(Starboard)"라고 해요. 옛날에 배의 오른쪽에 방향타(스티어링보드)가 있었던 것에서 유래했어요!',
+    indexes: ['스타보드', '항해'],
+    options: [
+      { key: '20260419_0037_opt1', description: '보우(Bow)', isAnswer: false },
+      { key: '20260419_0037_opt2', description: '스타보드(Starboard)', isAnswer: true },
+      { key: '20260419_0037_opt3', description: '스턴(Stern)', isAnswer: false },
+      { key: '20260419_0037_opt4', description: '헬름(Helm)', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 3,
+    key: '20260419_0038_key',
+    description: '"검은 수염"으로 알려진 유명한 해적의 실제 이름은 무엇일까요?',
+    answerKey: '20260419_0038_answer',
+    answerDescription:
+      '검은 수염(Blackbeard)의 본명은 에드워드 티치(Edward Teach)예요. 카리브해에서 가장 두려운 해적이었죠!',
+    indexes: ['검은수염', '에드워드티치'],
+    options: [
+      { key: '20260419_0038_opt1', description: '에드워드 티치', isAnswer: true },
+      { key: '20260419_0038_opt2', description: '헨리 모건', isAnswer: false },
+      { key: '20260419_0038_opt3', description: '프랜시스 드레이크', isAnswer: false },
+      { key: '20260419_0038_opt4', description: '윌리엄 키드', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0039_key',
+    description: '바스코 다 가마는 유럽에서 어디까지의 바닷길을 개척했을까요?',
+    answerKey: '20260419_0039_answer',
+    answerDescription:
+      '포르투갈의 바스코 다 가마는 1498년 아프리카를 돌아 인도까지의 바닷길을 최초로 개척했어요!',
+    indexes: ['바스코다가마', '인도항로'],
+    options: [
+      { key: '20260419_0039_opt1', description: '중국', isAnswer: false },
+      { key: '20260419_0039_opt2', description: '인도', isAnswer: true },
+      { key: '20260419_0039_opt3', description: '일본', isAnswer: false },
+      { key: '20260419_0039_opt4', description: '아메리카', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 1,
+    key: '20260419_0040_key',
+    description: '해적들이 눈가리개(안대)를 한 이유로 가장 유력한 설은 무엇일까요?',
+    answerKey: '20260419_0040_answer',
+    answerDescription:
+      '해적들은 밝은 갑판에서 어두운 선실로 들어갈 때 빠르게 적응하기 위해 한쪽 눈을 어둠에 미리 적응시켰다는 설이 유력해요!',
+    indexes: ['해적', '안대'],
+    options: [
+      { key: '20260419_0040_opt1', description: '멋으로', isAnswer: false },
+      { key: '20260419_0040_opt2', description: '어두운 곳에서의 시력 적응을 위해', isAnswer: true },
+      { key: '20260419_0040_opt3', description: '눈을 다쳐서', isAnswer: false },
+      { key: '20260419_0040_opt4', description: '태양 빛을 피하려고', isAnswer: false },
+    ],
+  },
+
+  // ===== 초콜릿, 사탕, 디저트 역사 (Chocolate, candy, dessert history) =====
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 1,
+    key: '20260419_0041_key',
+    description: '초콜릿의 원료인 카카오의 원산지는 어디일까요?',
+    answerKey: '20260419_0041_answer',
+    answerDescription:
+      '카카오는 중앙아메리카와 남아메리카 열대 지역이 원산지예요. 아즈텍과 마야 문명에서 음료로 마셨죠!',
+    indexes: ['카카오', '원산지'],
+    options: [
+      { key: '20260419_0041_opt1', description: '아프리카', isAnswer: false },
+      { key: '20260419_0041_opt2', description: '중남미', isAnswer: true },
+      { key: '20260419_0041_opt3', description: '동남아시아', isAnswer: false },
+      { key: '20260419_0041_opt4', description: '유럽', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 2,
+    key: '20260419_0042_key',
+    description: '화이트 초콜릿에는 카카오의 어떤 성분이 들어갈까요?',
+    answerKey: '20260419_0042_answer',
+    answerDescription:
+      '화이트 초콜릿에는 카카오 버터만 들어가고 카카오 고형분(매스)은 빠져 있어요. 그래서 갈색이 아니라 흰색이죠!',
+    indexes: ['화이트초콜릿', '카카오버터'],
+    options: [
+      { key: '20260419_0042_opt1', description: '카카오 닙스', isAnswer: false },
+      { key: '20260419_0042_opt2', description: '카카오 버터', isAnswer: true },
+      { key: '20260419_0042_opt3', description: '카카오 파우더', isAnswer: false },
+      { key: '20260419_0042_opt4', description: '카카오 성분이 전혀 없다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 1,
+    key: '20260419_0043_key',
+    description: '마카롱은 원래 어느 나라에서 유래한 과자일까요?',
+    answerKey: '20260419_0043_answer',
+    answerDescription:
+      '마카롱은 원래 이탈리아에서 유래했지만, 현재의 화려한 샌드위치형 마카롱은 프랑스에서 완성되었어요!',
+    indexes: ['마카롱', '이탈리아'],
+    options: [
+      { key: '20260419_0043_opt1', description: '프랑스', isAnswer: false },
+      { key: '20260419_0043_opt2', description: '이탈리아', isAnswer: true },
+      { key: '20260419_0043_opt3', description: '스위스', isAnswer: false },
+      { key: '20260419_0043_opt4', description: '벨기에', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 2,
+    key: '20260419_0044_key',
+    description: '솜사탕(Cotton Candy)을 발명한 사람의 직업은 무엇이었을까요?',
+    answerKey: '20260419_0044_answer',
+    answerDescription:
+      '솜사탕 기계는 1897년 치과의사 윌리엄 모리슨이 발명했어요. 치과의사가 달콤한 간식을 만들다니 아이러니하죠!',
+    indexes: ['솜사탕', '치과의사'],
+    options: [
+      { key: '20260419_0044_opt1', description: '제빵사', isAnswer: false },
+      { key: '20260419_0044_opt2', description: '치과의사', isAnswer: true },
+      { key: '20260419_0044_opt3', description: '화학자', isAnswer: false },
+      { key: '20260419_0044_opt4', description: '농부', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 1,
+    key: '20260419_0045_key',
+    description: '아이스크림을 먹을 때 머리가 아픈 현상을 무엇이라 할까요?',
+    answerKey: '20260419_0045_answer',
+    answerDescription:
+      '"브레인 프리즈(brain freeze)"라고 불리는 이 현상은 차가운 것이 입천장에 닿아 혈관이 급수축하면서 발생해요!',
+    indexes: ['브레인프리즈', '아이스크림'],
+    options: [
+      { key: '20260419_0045_opt1', description: '아이스크림 두통', isAnswer: false },
+      { key: '20260419_0045_opt2', description: '브레인 프리즈', isAnswer: true },
+      { key: '20260419_0045_opt3', description: '콜드 쇼크', isAnswer: false },
+      { key: '20260419_0045_opt4', description: '프로즌 헤드', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 2,
+    key: '20260419_0046_key',
+    description: '초콜릿 칩 쿠키는 어떻게 탄생했을까요?',
+    answerKey: '20260419_0046_answer',
+    answerDescription:
+      '1938년 루스 웨이크필드가 쿠키 반죽에 초콜릿을 넣었는데, 녹아서 섞일 줄 알았던 초콜릿이 덩어리로 남아 우연히 탄생했어요!',
+    indexes: ['초콜릿칩쿠키', '우연'],
+    options: [
+      { key: '20260419_0046_opt1', description: '과학 실험 중 발견', isAnswer: false },
+      { key: '20260419_0046_opt2', description: '우연한 실수로 탄생', isAnswer: true },
+      { key: '20260419_0046_opt3', description: '제빵사의 의도적 발명', isAnswer: false },
+      { key: '20260419_0046_opt4', description: '아이들의 요청으로', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 3,
+    key: '20260419_0047_key',
+    description: '젤리빈 사탕의 바깥 코팅에 사용되는 기법은 원래 무엇을 만드는 기술이었을까요?',
+    answerKey: '20260419_0047_answer',
+    answerDescription:
+      '젤리빈의 단단한 코팅 기법인 "패닝(panning)"은 원래 약(알약)을 코팅하는 기술에서 유래했어요!',
+    indexes: ['젤리빈', '패닝'],
+    options: [
+      { key: '20260419_0047_opt1', description: '도자기 유약 기술', isAnswer: false },
+      { key: '20260419_0047_opt2', description: '약 코팅 기술', isAnswer: true },
+      { key: '20260419_0047_opt3', description: '금속 도금 기술', isAnswer: false },
+      { key: '20260419_0047_opt4', description: '페인트 기술', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 1,
+    key: '20260419_0048_key',
+    description: '티라미수의 이름은 이탈리아어로 무슨 뜻일까요?',
+    answerKey: '20260419_0048_answer',
+    answerDescription:
+      '티라미수(Tiramisù)는 이탈리아어로 "나를 끌어올려줘" 또는 "기분을 좋게 해줘"라는 뜻이에요. 커피가 들어가서 기운을 북돋우죠!',
+    indexes: ['티라미수', '이탈리아'],
+    options: [
+      { key: '20260419_0048_opt1', description: '달콤한 꿈', isAnswer: false },
+      { key: '20260419_0048_opt2', description: '나를 끌어올려줘', isAnswer: true },
+      { key: '20260419_0048_opt3', description: '천국의 맛', isAnswer: false },
+      { key: '20260419_0048_opt4', description: '행복한 오후', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 2,
+    key: '20260419_0049_key',
+    description: '세계에서 초콜릿을 가장 많이 소비하는 나라는 어디일까요?',
+    answerKey: '20260419_0049_answer',
+    answerDescription:
+      '스위스는 1인당 연간 약 10kg의 초콜릿을 소비하여 세계 1위예요. 유명한 초콜릿 브랜드도 많죠!',
+    indexes: ['초콜릿', '스위스'],
+    options: [
+      { key: '20260419_0049_opt1', description: '벨기에', isAnswer: false },
+      { key: '20260419_0049_opt2', description: '스위스', isAnswer: true },
+      { key: '20260419_0049_opt3', description: '미국', isAnswer: false },
+      { key: '20260419_0049_opt4', description: '독일', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'FOOD_AND_COOKING',
+    level: 2,
+    key: '20260419_0050_key',
+    description: '껌(Chewing Gum)의 원료로 고대 마야인이 사용한 것은 무엇일까요?',
+    answerKey: '20260419_0050_answer',
+    answerDescription:
+      '마야인은 사포딜라 나무의 수액인 "치클(chicle)"을 씹었어요. 이것이 현대 껌의 기원이 되었답니다!',
+    indexes: ['껌', '치클'],
+    options: [
+      { key: '20260419_0050_opt1', description: '밀랍', isAnswer: false },
+      { key: '20260419_0050_opt2', description: '치클(나무 수액)', isAnswer: true },
+      { key: '20260419_0050_opt3', description: '고무', isAnswer: false },
+      { key: '20260419_0050_opt4', description: '꿀', isAnswer: false },
+    ],
+  },
+
+  // ===== 곤충, 거미, 작은 생물 (Insects, spiders, tiny creatures) =====
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 1,
+    key: '20260419_0051_key',
+    description: '거미는 곤충일까요?',
+    answerKey: '20260419_0051_answer',
+    answerDescription:
+      '거미는 곤충이 아니라 거미강에 속하는 절지동물이에요. 다리가 8개인 반면 곤충은 다리가 6개예요!',
+    indexes: ['거미', '절지동물'],
+    options: [
+      { key: '20260419_0051_opt1', description: '곤충이다', isAnswer: false },
+      { key: '20260419_0051_opt2', description: '곤충이 아니다', isAnswer: true },
+      { key: '20260419_0051_opt3', description: '종류에 따라 다르다', isAnswer: false },
+      { key: '20260419_0051_opt4', description: '유충일 때만 곤충이다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 2,
+    key: '20260419_0052_key',
+    description: '딱정벌레는 전체 곤충 종의 약 몇 퍼센트를 차지할까요?',
+    answerKey: '20260419_0052_answer',
+    answerDescription:
+      '딱정벌레는 약 40만 종으로 전체 곤충의 약 25%를 차지해요. 지구에서 가장 성공한 생물군 중 하나죠!',
+    indexes: ['딱정벌레', '곤충'],
+    options: [
+      { key: '20260419_0052_opt1', description: '약 5%', isAnswer: false },
+      { key: '20260419_0052_opt2', description: '약 25%', isAnswer: true },
+      { key: '20260419_0052_opt3', description: '약 50%', isAnswer: false },
+      { key: '20260419_0052_opt4', description: '약 75%', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 1,
+    key: '20260419_0053_key',
+    description: '나비와 나방을 구별하는 가장 쉬운 방법은 무엇일까요?',
+    answerKey: '20260419_0053_answer',
+    answerDescription:
+      '나비의 더듬이는 끝이 곤봉 모양이고, 나방의 더듬이는 깃털이나 빗 모양이에요. 앉는 자세도 달라요!',
+    indexes: ['나비', '나방'],
+    options: [
+      { key: '20260419_0053_opt1', description: '날개 색상', isAnswer: false },
+      { key: '20260419_0053_opt2', description: '더듬이 모양', isAnswer: true },
+      { key: '20260419_0053_opt3', description: '몸 크기', isAnswer: false },
+      { key: '20260419_0053_opt4', description: '다리 개수', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 2,
+    key: '20260419_0054_key',
+    description: '반딧불이가 빛을 내는 원리는 무엇일까요?',
+    answerKey: '20260419_0054_answer',
+    answerDescription:
+      '반딧불이는 루시페린이라는 물질이 루시페라아제 효소와 반응하여 빛을 내요. 이 과정을 "생물발광"이라 해요!',
+    indexes: ['반딧불이', '생물발광'],
+    options: [
+      { key: '20260419_0054_opt1', description: '전기를 만들어내서', isAnswer: false },
+      { key: '20260419_0054_opt2', description: '화학 반응(생물발광)', isAnswer: true },
+      { key: '20260419_0054_opt3', description: '마찰열로', isAnswer: false },
+      { key: '20260419_0054_opt4', description: '태양 빛을 저장했다가', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 3,
+    key: '20260419_0055_key',
+    description: '곰벌레(완보동물)가 견딜 수 있는 극한 환경이 아닌 것은?',
+    answerKey: '20260419_0055_answer',
+    answerDescription:
+      '곰벌레는 진공, 방사선, 극저온, 극고온 등 거의 모든 극한 환경을 견딜 수 있지만, 크기가 커지는 능력은 없어요!',
+    indexes: ['곰벌레', '극한환경'],
+    options: [
+      { key: '20260419_0055_opt1', description: '우주의 진공', isAnswer: false },
+      { key: '20260419_0055_opt2', description: '영하 200°C 이하의 극저온', isAnswer: false },
+      { key: '20260419_0055_opt3', description: '강한 방사선', isAnswer: false },
+      { key: '20260419_0055_opt4', description: '자기 몸 크기를 늘리는 것', isAnswer: true },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 1,
+    key: '20260419_0056_key',
+    description: '세계에서 가장 큰 곤충은 무엇일까요?',
+    answerKey: '20260419_0056_answer',
+    answerDescription:
+      '대벌레(Giant Stick Insect)는 길이가 최대 60cm 이상으로, 세계에서 가장 긴 곤충이에요!',
+    indexes: ['대벌레', '곤충'],
+    options: [
+      { key: '20260419_0056_opt1', description: '장수풍뎅이', isAnswer: false },
+      { key: '20260419_0056_opt2', description: '대벌레', isAnswer: true },
+      { key: '20260419_0056_opt3', description: '헤라클레스 딱정벌레', isAnswer: false },
+      { key: '20260419_0056_opt4', description: '왕사마귀', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 2,
+    key: '20260419_0057_key',
+    description: '꿀벌이 꿀을 만들 때 날개를 퍼덕이는 이유는 무엇일까요?',
+    answerKey: '20260419_0057_answer',
+    answerDescription:
+      '꿀벌은 날개로 바람을 일으켜 꿀의 수분을 증발시켜요. 꿀의 수분 함량을 20% 이하로 낮춰야 보존이 가능하거든요!',
+    indexes: ['꿀벌', '수분증발'],
+    options: [
+      { key: '20260419_0057_opt1', description: '벌집 온도를 높이려고', isAnswer: false },
+      { key: '20260419_0057_opt2', description: '꿀의 수분을 증발시키려고', isAnswer: true },
+      { key: '20260419_0057_opt3', description: '적을 쫓아내려고', isAnswer: false },
+      { key: '20260419_0057_opt4', description: '꿀을 섞으려고', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 2,
+    key: '20260419_0058_key',
+    description: '잠자리의 비행 능력에 대한 설명으로 맞는 것은?',
+    answerKey: '20260419_0058_answer',
+    answerDescription:
+      '잠자리는 네 날개를 독립적으로 움직여 공중 정지, 후진, 옆으로 이동까지 할 수 있는 비행의 달인이에요!',
+    indexes: ['잠자리', '비행'],
+    options: [
+      { key: '20260419_0058_opt1', description: '일직선으로만 날 수 있다', isAnswer: false },
+      { key: '20260419_0058_opt2', description: '공중 정지와 후진 비행이 가능하다', isAnswer: true },
+      { key: '20260419_0058_opt3', description: '항상 무리 지어 날아다닌다', isAnswer: false },
+      { key: '20260419_0058_opt4', description: '야간에만 비행한다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 1,
+    key: '20260419_0059_key',
+    description: '무당벌레의 점 개수는 종류마다 다를까요?',
+    answerKey: '20260419_0059_answer',
+    answerDescription:
+      '무당벌레의 점 개수는 종류(종)에 따라 다르며, 나이에 따라 변하지 않아요. 7점무당벌레, 2점무당벌레 등 다양해요!',
+    indexes: ['무당벌레', '점'],
+    options: [
+      { key: '20260419_0059_opt1', description: '모두 같다', isAnswer: false },
+      { key: '20260419_0059_opt2', description: '종류마다 다르다', isAnswer: true },
+      { key: '20260419_0059_opt3', description: '나이에 따라 변한다', isAnswer: false },
+      { key: '20260419_0059_opt4', description: '계절에 따라 변한다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ANIMALS_AND_NATURE',
+    level: 3,
+    key: '20260419_0060_key',
+    description: '흰개미(termite) 군체에서 여왕의 수명은 최대 약 얼마일까요?',
+    answerKey: '20260419_0060_answer',
+    answerDescription:
+      '흰개미 여왕은 최대 약 50년까지 살 수 있어요. 곤충 중에서 가장 긴 수명을 가진 생물 중 하나죠!',
+    indexes: ['흰개미', '수명'],
+    options: [
+      { key: '20260419_0060_opt1', description: '약 5년', isAnswer: false },
+      { key: '20260419_0060_opt2', description: '약 15년', isAnswer: false },
+      { key: '20260419_0060_opt3', description: '약 50년', isAnswer: true },
+      { key: '20260419_0060_opt4', description: '약 100년', isAnswer: false },
+    ],
+  },
+
+  // ===== 무술, 격투 스포츠 역사 (Martial arts, combat sports history) =====
+  {
+    categoryName: 'SPORTS',
+    level: 1,
+    key: '20260419_0061_key',
+    description: '가라테(Karate)가 유래한 나라는 어디일까요?',
+    answerKey: '20260419_0061_answer',
+    answerDescription:
+      '가라테는 일본 오키나와에서 유래했어요. "가라테"는 "빈 손"이라는 뜻으로, 맨손 무술을 의미해요!',
+    indexes: ['가라테', '오키나와'],
+    options: [
+      { key: '20260419_0061_opt1', description: '중국', isAnswer: false },
+      { key: '20260419_0061_opt2', description: '일본', isAnswer: true },
+      { key: '20260419_0061_opt3', description: '한국', isAnswer: false },
+      { key: '20260419_0061_opt4', description: '태국', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'SPORTS',
+    level: 2,
+    key: '20260419_0062_key',
+    description: '유도(Judo)를 창시한 사람은 누구일까요?',
+    answerKey: '20260419_0062_answer',
+    answerDescription:
+      '유도는 1882년 일본의 가노 지고로가 유술(柔術)을 체계화하여 창시했어요. 올림픽 정식 종목이기도 하죠!',
+    indexes: ['유도', '가노지고로'],
+    options: [
+      { key: '20260419_0062_opt1', description: '가노 지고로', isAnswer: true },
+      { key: '20260419_0062_opt2', description: '우에시바 모리헤이', isAnswer: false },
+      { key: '20260419_0062_opt3', description: '최홍희', isAnswer: false },
+      { key: '20260419_0062_opt4', description: '이소룡', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'SPORTS',
+    level: 1,
+    key: '20260419_0063_key',
+    description: '무에타이(Muay Thai)는 어느 나라의 전통 격투기일까요?',
+    answerKey: '20260419_0063_answer',
+    answerDescription:
+      '무에타이는 태국의 전통 격투 스포츠예요. 팔꿈치와 무릎 공격까지 허용되어 "8개의 무기" 격투기로 불려요!',
+    indexes: ['무에타이', '태국'],
+    options: [
+      { key: '20260419_0063_opt1', description: '베트남', isAnswer: false },
+      { key: '20260419_0063_opt2', description: '태국', isAnswer: true },
+      { key: '20260419_0063_opt3', description: '미얀마', isAnswer: false },
+      { key: '20260419_0063_opt4', description: '캄보디아', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'SPORTS',
+    level: 2,
+    key: '20260419_0064_key',
+    description: '브라질 격투기 "카포에이라"의 특징은 무엇일까요?',
+    answerKey: '20260419_0064_answer',
+    answerDescription:
+      '카포에이라는 브라질의 아프리카 노예들이 만든 격투기로, 음악과 춤이 결합된 독특한 무술이에요!',
+    indexes: ['카포에이라', '브라질'],
+    options: [
+      { key: '20260419_0064_opt1', description: '무기를 주로 사용한다', isAnswer: false },
+      { key: '20260419_0064_opt2', description: '음악과 춤이 결합되어 있다', isAnswer: true },
+      { key: '20260419_0064_opt3', description: '물속에서 싸운다', isAnswer: false },
+      { key: '20260419_0064_opt4', description: '말을 타고 한다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'SPORTS',
+    level: 2,
+    key: '20260419_0065_key',
+    description: '쿵푸(Kung Fu)의 가장 유명한 발상지인 중국 사찰은 어디일까요?',
+    answerKey: '20260419_0065_answer',
+    answerDescription:
+      '소림사(Shaolin Temple)는 중국 허난성에 있는 사찰로, 소림 쿵푸의 발상지로 세계적으로 유명해요!',
+    indexes: ['쿵푸', '소림사'],
+    options: [
+      { key: '20260419_0065_opt1', description: '소림사', isAnswer: true },
+      { key: '20260419_0065_opt2', description: '무당산', isAnswer: false },
+      { key: '20260419_0065_opt3', description: '영은사', isAnswer: false },
+      { key: '20260419_0065_opt4', description: '한산사', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'SPORTS',
+    level: 3,
+    key: '20260419_0066_key',
+    description: '고대 그리스 올림픽의 격투 종목 "판크라티온"은 어떤 특징이 있었을까요?',
+    answerKey: '20260419_0066_answer',
+    answerDescription:
+      '판크라티온은 눈 찌르기와 물어뜯기만 금지된 거의 모든 공격이 허용된 고대 그리스의 종합격투기였어요!',
+    indexes: ['판크라티온', '고대격투'],
+    options: [
+      { key: '20260419_0066_opt1', description: '발차기만 허용', isAnswer: false },
+      { key: '20260419_0066_opt2', description: '거의 모든 공격이 허용', isAnswer: true },
+      { key: '20260419_0066_opt3', description: '무기 사용 허용', isAnswer: false },
+      { key: '20260419_0066_opt4', description: '여성만 참가', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'SPORTS',
+    level: 1,
+    key: '20260419_0067_key',
+    description: '합기도(Aikido)를 창시한 일본 무술가는 누구일까요?',
+    answerKey: '20260419_0067_answer',
+    answerDescription:
+      '합기도는 우에시바 모리헤이가 1920년대에 창시한 일본 무술이에요. 상대의 힘을 이용해 제압하는 것이 특징이죠!',
+    indexes: ['합기도', '우에시바'],
+    options: [
+      { key: '20260419_0067_opt1', description: '가노 지고로', isAnswer: false },
+      { key: '20260419_0067_opt2', description: '우에시바 모리헤이', isAnswer: true },
+      { key: '20260419_0067_opt3', description: '후나코시 기친', isAnswer: false },
+      { key: '20260419_0067_opt4', description: '미야기 조준', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'SPORTS',
+    level: 2,
+    key: '20260419_0068_key',
+    description: '펜싱에서 사용하는 세 가지 무기에 해당하지 않는 것은?',
+    answerKey: '20260419_0068_answer',
+    answerDescription:
+      '펜싱의 세 가지 무기는 플뢰레(Foil), 에페(Épée), 사브르(Sabre)예요. 레이피어는 펜싱 공식 무기가 아니에요!',
+    indexes: ['펜싱', '무기'],
+    options: [
+      { key: '20260419_0068_opt1', description: '플뢰레', isAnswer: false },
+      { key: '20260419_0068_opt2', description: '에페', isAnswer: false },
+      { key: '20260419_0068_opt3', description: '사브르', isAnswer: false },
+      { key: '20260419_0068_opt4', description: '레이피어', isAnswer: true },
+    ],
+  },
+  {
+    categoryName: 'SPORTS',
+    level: 1,
+    key: '20260419_0069_key',
+    description: '태권도의 "태"는 무엇을 의미할까요?',
+    answerKey: '20260419_0069_answer',
+    answerDescription:
+      '태권도에서 "태(跆)"는 발로 차다, "권(拳)"은 주먹으로 치다, "도(道)"는 길·정신을 의미해요!',
+    indexes: ['태권도', '태'],
+    options: [
+      { key: '20260419_0069_opt1', description: '손으로 막다', isAnswer: false },
+      { key: '20260419_0069_opt2', description: '발로 차다', isAnswer: true },
+      { key: '20260419_0069_opt3', description: '몸을 돌리다', isAnswer: false },
+      { key: '20260419_0069_opt4', description: '정신을 닦다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'SPORTS',
+    level: 3,
+    key: '20260419_0070_key',
+    description: 'UFC(Ultimate Fighting Championship)가 처음 개최된 해는 언제일까요?',
+    answerKey: '20260419_0070_answer',
+    answerDescription:
+      'UFC 1은 1993년 11월 12일 미국 덴버에서 개최되었어요. 초기에는 체급 제한도 없는 무제한 대회였죠!',
+    indexes: ['UFC', '종합격투기'],
+    options: [
+      { key: '20260419_0070_opt1', description: '1985년', isAnswer: false },
+      { key: '20260419_0070_opt2', description: '1993년', isAnswer: true },
+      { key: '20260419_0070_opt3', description: '2000년', isAnswer: false },
+      { key: '20260419_0070_opt4', description: '2005년', isAnswer: false },
+    ],
+  },
+
+  // ===== 라디오, 팟캐스트, 방송 역사 (Radio, podcasts, broadcasting history) =====
+  {
+    categoryName: 'TECHNOLOGY_AND_AI',
+    level: 1,
+    key: '20260419_0071_key',
+    description: '라디오 전파를 처음 발견한 과학자는 누구일까요?',
+    answerKey: '20260419_0071_answer',
+    answerDescription:
+      '하인리히 헤르츠가 1887년 전자기파(라디오파)의 존재를 실험으로 증명했어요. 주파수 단위 "헤르츠(Hz)"가 그의 이름에서 유래했죠!',
+    indexes: ['헤르츠', '라디오파'],
+    options: [
+      { key: '20260419_0071_opt1', description: '니콜라 테슬라', isAnswer: false },
+      { key: '20260419_0071_opt2', description: '하인리히 헤르츠', isAnswer: true },
+      { key: '20260419_0071_opt3', description: '마르코니', isAnswer: false },
+      { key: '20260419_0071_opt4', description: '에디슨', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 2,
+    key: '20260419_0072_key',
+    description: '세계 최초의 라디오 상업 방송은 어느 나라에서 시작되었을까요?',
+    answerKey: '20260419_0072_answer',
+    answerDescription:
+      '1920년 미국 피츠버그의 KDKA 방송국이 세계 최초의 상업 라디오 방송을 시작했어요!',
+    indexes: ['KDKA', '라디오방송'],
+    options: [
+      { key: '20260419_0072_opt1', description: '영국', isAnswer: false },
+      { key: '20260419_0072_opt2', description: '미국', isAnswer: true },
+      { key: '20260419_0072_opt3', description: '독일', isAnswer: false },
+      { key: '20260419_0072_opt4', description: '프랑스', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'TECHNOLOGY_AND_AI',
+    level: 2,
+    key: '20260419_0073_key',
+    description: '"팟캐스트(Podcast)"라는 이름은 어디서 유래했을까요?',
+    answerKey: '20260419_0073_answer',
+    answerDescription:
+      '"Podcast"는 애플의 "iPod"과 "broadcast"를 합친 말이에요. 2004년경 본 해머슬리 기자가 처음 사용했죠!',
+    indexes: ['팟캐스트', 'iPod'],
+    options: [
+      { key: '20260419_0073_opt1', description: 'Pod(꼬투리) + Cast(던지다)', isAnswer: false },
+      { key: '20260419_0073_opt2', description: 'iPod + Broadcast', isAnswer: true },
+      { key: '20260419_0073_opt3', description: 'Port + Cast', isAnswer: false },
+      { key: '20260419_0073_opt4', description: 'Pod(캡슐) + Casting', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0074_key',
+    description: 'FM과 AM 라디오에서 "FM"은 무엇의 약자일까요?',
+    answerKey: '20260419_0074_answer',
+    answerDescription:
+      'FM은 "Frequency Modulation(주파수 변조)"의 약자예요. AM은 "Amplitude Modulation(진폭 변조)"이고요!',
+    indexes: ['FM', '라디오'],
+    options: [
+      { key: '20260419_0074_opt1', description: 'Free Music', isAnswer: false },
+      { key: '20260419_0074_opt2', description: 'Frequency Modulation', isAnswer: true },
+      { key: '20260419_0074_opt3', description: 'Fast Media', isAnswer: false },
+      { key: '20260419_0074_opt4', description: 'Full Mode', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 3,
+    key: '20260419_0075_key',
+    description: '1938년 라디오 드라마 "우주 전쟁"이 방송되었을 때 어떤 일이 일어났을까요?',
+    answerKey: '20260419_0075_answer',
+    answerDescription:
+      '오손 웰스의 "우주 전쟁" 라디오 드라마가 너무 사실적이어서 일부 청취자들이 진짜 외계인 침공으로 착각하며 공포에 빠졌어요!',
+    indexes: ['우주전쟁', '라디오드라마'],
+    options: [
+      { key: '20260419_0075_opt1', description: '방송 장비가 고장났다', isAnswer: false },
+      { key: '20260419_0075_opt2', description: '청취자들이 진짜 외계인 침공으로 착각했다', isAnswer: true },
+      { key: '20260419_0075_opt3', description: '정전이 발생했다', isAnswer: false },
+      { key: '20260419_0075_opt4', description: '최고 시청률을 기록했다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0076_key',
+    description: '세계 최초의 텔레비전 방송은 몇 년대에 시작되었을까요?',
+    answerKey: '20260419_0076_answer',
+    answerDescription:
+      '1920년대 후반부터 실험 방송이 시작되었고, 1936년 영국 BBC가 세계 최초의 정규 TV 방송을 시작했어요!',
+    indexes: ['텔레비전', 'BBC'],
+    options: [
+      { key: '20260419_0076_opt1', description: '1910년대', isAnswer: false },
+      { key: '20260419_0076_opt2', description: '1920~1930년대', isAnswer: true },
+      { key: '20260419_0076_opt3', description: '1940년대', isAnswer: false },
+      { key: '20260419_0076_opt4', description: '1950년대', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'TECHNOLOGY_AND_AI',
+    level: 2,
+    key: '20260419_0077_key',
+    description: '디지털 오디오 방송(DAB)의 장점은 무엇일까요?',
+    answerKey: '20260419_0077_answer',
+    answerDescription:
+      'DAB는 기존 아날로그 라디오보다 잡음이 적고 음질이 좋으며, 같은 주파수 대역에서 더 많은 채널을 전송할 수 있어요!',
+    indexes: ['DAB', '디지털라디오'],
+    options: [
+      { key: '20260419_0077_opt1', description: '전력 소비가 많다', isAnswer: false },
+      { key: '20260419_0077_opt2', description: '잡음이 적고 음질이 좋다', isAnswer: true },
+      { key: '20260419_0077_opt3', description: '수신 범위가 좁다', isAnswer: false },
+      { key: '20260419_0077_opt4', description: '영상도 함께 전송된다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 2,
+    key: '20260419_0078_key',
+    description: '세계 최초의 라디오 DJ가 방송한 내용은 무엇이었을까요?',
+    answerKey: '20260419_0078_answer',
+    answerDescription:
+      '1906년 레지널드 페센던이 크리스마스 이브에 바이올린 연주와 성경 구절 낭독을 라디오로 방송했어요. 최초의 음악 라디오 방송이었죠!',
+    indexes: ['라디오DJ', '최초방송'],
+    options: [
+      { key: '20260419_0078_opt1', description: '뉴스 속보', isAnswer: false },
+      { key: '20260419_0078_opt2', description: '바이올린 연주와 성경 낭독', isAnswer: true },
+      { key: '20260419_0078_opt3', description: '대통령 연설', isAnswer: false },
+      { key: '20260419_0078_opt4', description: '광고 방송', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0079_key',
+    description: '세계에서 가장 많이 청취되는 라디오 방송 형태는 무엇일까요?',
+    answerKey: '20260419_0079_answer',
+    answerDescription:
+      '음악 방송이 전 세계 라디오 청취의 대부분을 차지해요. 특히 팝, 록, 클래식 등 다양한 장르별 전문 채널이 인기가 많아요!',
+    indexes: ['라디오', '음악방송'],
+    options: [
+      { key: '20260419_0079_opt1', description: '뉴스/시사', isAnswer: false },
+      { key: '20260419_0079_opt2', description: '음악 방송', isAnswer: true },
+      { key: '20260419_0079_opt3', description: '스포츠 중계', isAnswer: false },
+      { key: '20260419_0079_opt4', description: '교육/다큐', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 3,
+    key: '20260419_0080_key',
+    description: '세계에서 가장 오래된 방송사(Broadcasting Corporation)는 어디일까요?',
+    answerKey: '20260419_0080_answer',
+    answerDescription:
+      '영국의 BBC(British Broadcasting Corporation)는 1922년에 설립된 세계에서 가장 오래된 국영 방송사예요!',
+    indexes: ['BBC', '방송사'],
+    options: [
+      { key: '20260419_0080_opt1', description: 'NBC (미국)', isAnswer: false },
+      { key: '20260419_0080_opt2', description: 'BBC (영국)', isAnswer: true },
+      { key: '20260419_0080_opt3', description: 'NHK (일본)', isAnswer: false },
+      { key: '20260419_0080_opt4', description: 'ARD (독일)', isAnswer: false },
+    ],
+  },
+
+  // ===== 배터리, 전기, 에너지원 (Batteries, electricity, energy sources) =====
+  {
+    categoryName: 'BASIC_SCIENCE',
+    level: 1,
+    key: '20260419_0081_key',
+    description: '정전기가 발생하는 주된 원리는 무엇일까요?',
+    answerKey: '20260419_0081_answer',
+    answerDescription:
+      '정전기는 두 물체가 마찰할 때 전자가 한쪽에서 다른 쪽으로 이동하면서 전하 불균형이 생겨 발생해요!',
+    indexes: ['정전기', '마찰'],
+    options: [
+      { key: '20260419_0081_opt1', description: '온도 차이', isAnswer: false },
+      { key: '20260419_0081_opt2', description: '마찰에 의한 전자 이동', isAnswer: true },
+      { key: '20260419_0081_opt3', description: '자기장 변화', isAnswer: false },
+      { key: '20260419_0081_opt4', description: '화학 반응', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'BASIC_SCIENCE',
+    level: 2,
+    key: '20260419_0082_key',
+    description: '세계 최초의 배터리로 알려진 "볼타 전지"를 발명한 사람은 누구일까요?',
+    answerKey: '20260419_0082_answer',
+    answerDescription:
+      '알레산드로 볼타가 1800년에 아연과 구리판을 쌓아 최초의 화학 전지를 만들었어요. 전압 단위 "볼트(V)"가 그의 이름에서 유래했죠!',
+    indexes: ['볼타', '전지'],
+    options: [
+      { key: '20260419_0082_opt1', description: '벤저민 프랭클린', isAnswer: false },
+      { key: '20260419_0082_opt2', description: '알레산드로 볼타', isAnswer: true },
+      { key: '20260419_0082_opt3', description: '마이클 패러데이', isAnswer: false },
+      { key: '20260419_0082_opt4', description: '니콜라 테슬라', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'BASIC_SCIENCE',
+    level: 1,
+    key: '20260419_0083_key',
+    description: '태양광 발전은 태양의 어떤 에너지를 전기로 바꾸는 걸까요?',
+    answerKey: '20260419_0083_answer',
+    answerDescription:
+      '태양전지(솔라셀)는 태양의 빛 에너지를 직접 전기 에너지로 변환해요. 이를 "광전 효과"라고 해요!',
+    indexes: ['태양광', '광전효과'],
+    options: [
+      { key: '20260419_0083_opt1', description: '열에너지', isAnswer: false },
+      { key: '20260419_0083_opt2', description: '빛에너지', isAnswer: true },
+      { key: '20260419_0083_opt3', description: '운동에너지', isAnswer: false },
+      { key: '20260419_0083_opt4', description: '화학에너지', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'BASIC_SCIENCE',
+    level: 2,
+    key: '20260419_0084_key',
+    description: '리튬이온 배터리가 스마트폰에 많이 사용되는 이유는 무엇일까요?',
+    answerKey: '20260419_0084_answer',
+    answerDescription:
+      '리튬이온 배터리는 에너지 밀도가 높아 가볍고 작으면서도 많은 전력을 저장할 수 있어요. 메모리 효과도 없죠!',
+    indexes: ['리튬이온', '배터리'],
+    options: [
+      { key: '20260419_0084_opt1', description: '가장 저렴해서', isAnswer: false },
+      { key: '20260419_0084_opt2', description: '에너지 밀도가 높고 가벼워서', isAnswer: true },
+      { key: '20260419_0084_opt3', description: '영구적으로 사용 가능해서', isAnswer: false },
+      { key: '20260419_0084_opt4', description: '환경에 가장 친화적이어서', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'BASIC_SCIENCE',
+    level: 3,
+    key: '20260419_0085_key',
+    description: '번개 한 번에 발생하는 전기 에너지로 약 몇 가구의 하루 전력을 공급할 수 있을까요?',
+    answerKey: '20260419_0085_answer',
+    answerDescription:
+      '번개 한 번의 에너지는 약 1~5kWh로, 일반 가정 약 1~2가구의 하루 전력에 해당해요. 생각보다 적죠!',
+    indexes: ['번개', '전기에너지'],
+    options: [
+      { key: '20260419_0085_opt1', description: '약 1~2가구', isAnswer: true },
+      { key: '20260419_0085_opt2', description: '약 100가구', isAnswer: false },
+      { key: '20260419_0085_opt3', description: '약 1,000가구', isAnswer: false },
+      { key: '20260419_0085_opt4', description: '약 10,000가구', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'TECHNOLOGY_AND_AI',
+    level: 2,
+    key: '20260419_0086_key',
+    description: '전기자동차(EV)의 에너지 효율은 내연기관차보다 약 몇 배 높을까요?',
+    answerKey: '20260419_0086_answer',
+    answerDescription:
+      '전기차는 에너지의 약 85~90%를 동력으로 변환하지만, 내연기관차는 약 20~30%만 사용해요. 약 3~4배 효율적이죠!',
+    indexes: ['전기차', '에너지효율'],
+    options: [
+      { key: '20260419_0086_opt1', description: '약 1.5배', isAnswer: false },
+      { key: '20260419_0086_opt2', description: '약 3~4배', isAnswer: true },
+      { key: '20260419_0086_opt3', description: '약 10배', isAnswer: false },
+      { key: '20260419_0086_opt4', description: '거의 같다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'BASIC_SCIENCE',
+    level: 1,
+    key: '20260419_0087_key',
+    description: '건전지를 냉장고에 보관하면 수명이 늘어날까요?',
+    answerKey: '20260419_0087_answer',
+    answerDescription:
+      '냉장 보관은 화학 반응 속도를 늦춰 약간의 효과가 있지만, 결로 때문에 오히려 손상될 수 있어서 권장하지 않아요!',
+    indexes: ['건전지', '보관'],
+    options: [
+      { key: '20260419_0087_opt1', description: '크게 늘어난다', isAnswer: false },
+      { key: '20260419_0087_opt2', description: '약간 효과 있지만 권장하지 않는다', isAnswer: true },
+      { key: '20260419_0087_opt3', description: '전혀 효과 없다', isAnswer: false },
+      { key: '20260419_0087_opt4', description: '수명이 오히려 줄어든다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'ENVIRONMENT_AND_CLIMATE',
+    level: 2,
+    key: '20260419_0088_key',
+    description: '풍력 발전기의 날개는 보통 몇 개일까요?',
+    answerKey: '20260419_0088_answer',
+    answerDescription:
+      '현대 풍력 발전기의 날개는 보통 3개예요. 효율성, 안정성, 비용의 최적 균형점이 3개이기 때문이죠!',
+    indexes: ['풍력발전', '날개'],
+    options: [
+      { key: '20260419_0088_opt1', description: '2개', isAnswer: false },
+      { key: '20260419_0088_opt2', description: '3개', isAnswer: true },
+      { key: '20260419_0088_opt3', description: '4개', isAnswer: false },
+      { key: '20260419_0088_opt4', description: '5개', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'BASIC_SCIENCE',
+    level: 2,
+    key: '20260419_0089_key',
+    description: '전기뱀장어는 최대 약 몇 볼트의 전기를 만들어낼 수 있을까요?',
+    answerKey: '20260419_0089_answer',
+    answerDescription:
+      '전기뱀장어는 최대 약 860볼트의 전기를 발생시킬 수 있어요. 이는 가정용 콘센트(220V)의 약 4배에 해당해요!',
+    indexes: ['전기뱀장어', '볼트'],
+    options: [
+      { key: '20260419_0089_opt1', description: '약 100볼트', isAnswer: false },
+      { key: '20260419_0089_opt2', description: '약 860볼트', isAnswer: true },
+      { key: '20260419_0089_opt3', description: '약 2,000볼트', isAnswer: false },
+      { key: '20260419_0089_opt4', description: '약 5,000볼트', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'TECHNOLOGY_AND_AI',
+    level: 3,
+    key: '20260419_0090_key',
+    description: '"바그다드 배터리"란 무엇일까요?',
+    answerKey: '20260419_0090_answer',
+    answerDescription:
+      '바그다드 배터리는 약 2,000년 전 고대 메소포타미아에서 발견된 항아리로, 원시적인 전지 역할을 했을 것으로 추정돼요!',
+    indexes: ['바그다드배터리', '고대전지'],
+    options: [
+      { key: '20260419_0090_opt1', description: '현대식 대용량 배터리 브랜드', isAnswer: false },
+      { key: '20260419_0090_opt2', description: '고대에 발견된 원시적 전지 추정 유물', isAnswer: true },
+      { key: '20260419_0090_opt3', description: '이라크의 발전소 이름', isAnswer: false },
+      { key: '20260419_0090_opt4', description: '태양열 배터리의 일종', isAnswer: false },
+    ],
+  },
+
+  // ===== 지도, 항해, 지도 제작 (Maps, navigation, cartography) =====
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0091_key',
+    description: '지도에서 "축척 1:50,000"이란 무엇을 의미할까요?',
+    answerKey: '20260419_0091_answer',
+    answerDescription:
+      '축척 1:50,000은 지도의 1cm가 실제 500m(50,000cm)에 해당한다는 뜻이에요. 숫자가 작을수록 더 상세한 지도예요!',
+    indexes: ['축척', '지도'],
+    options: [
+      { key: '20260419_0091_opt1', description: '지도 1cm = 실제 500m', isAnswer: true },
+      { key: '20260419_0091_opt2', description: '지도 1cm = 실제 50m', isAnswer: false },
+      { key: '20260419_0091_opt3', description: '지도 1cm = 실제 5km', isAnswer: false },
+      { key: '20260419_0091_opt4', description: '지도 1cm = 실제 50km', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0092_key',
+    description: '"포르톨라노 해도"는 중세 시대에 어떤 용도로 사용되었을까요?',
+    answerKey: '20260419_0092_answer',
+    answerDescription:
+      '포르톨라노 해도는 13세기부터 지중해 항해사들이 사용한 상세한 해안선 지도예요. 항구와 항구 사이의 방위와 거리가 표시되어 있었죠!',
+    indexes: ['포르톨라노', '해도'],
+    options: [
+      { key: '20260419_0092_opt1', description: '영토 분쟁 해결용', isAnswer: false },
+      { key: '20260419_0092_opt2', description: '항해를 위한 해안선 지도', isAnswer: true },
+      { key: '20260419_0092_opt3', description: '군사 작전 계획용', isAnswer: false },
+      { key: '20260419_0092_opt4', description: '세금 징수 구역 표시용', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 2,
+    key: '20260419_0093_key',
+    description: '메르카토르 도법의 가장 큰 단점은 무엇일까요?',
+    answerKey: '20260419_0093_answer',
+    answerDescription:
+      '메르카토르 도법은 극지방으로 갈수록 면적이 크게 왜곡돼요. 그린란드가 아프리카와 비슷한 크기로 보이지만, 실제로는 14배 작아요!',
+    indexes: ['메르카토르', '지도왜곡'],
+    options: [
+      { key: '20260419_0093_opt1', description: '방향이 정확하지 않다', isAnswer: false },
+      { key: '20260419_0093_opt2', description: '극지방 면적이 크게 왜곡된다', isAnswer: true },
+      { key: '20260419_0093_opt3', description: '바다를 표시할 수 없다', isAnswer: false },
+      { key: '20260419_0093_opt4', description: '색상 표현이 불가능하다', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 1,
+    key: '20260419_0094_key',
+    description: '위도 0도를 지나는 선을 무엇이라 부를까요?',
+    answerKey: '20260419_0094_answer',
+    answerDescription:
+      '위도 0도를 지나는 선은 적도예요. 지구를 남반구와 북반구로 나누며, 둘레가 약 40,075km이에요!',
+    indexes: ['적도', '위도'],
+    options: [
+      { key: '20260419_0094_opt1', description: '본초자오선', isAnswer: false },
+      { key: '20260419_0094_opt2', description: '적도', isAnswer: true },
+      { key: '20260419_0094_opt3', description: '회귀선', isAnswer: false },
+      { key: '20260419_0094_opt4', description: '극선', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 3,
+    key: '20260419_0095_key',
+    description: '"지도 제작의 아버지"로 불리는 그리스 학자는 누구일까요?',
+    answerKey: '20260419_0095_answer',
+    answerDescription:
+      '프톨레마이오스(Ptolemy)는 2세기에 위도와 경도 좌표계를 사용한 세계 지도를 만들어 "지도학의 아버지"로 불려요!',
+    indexes: ['프톨레마이오스', '지도학'],
+    options: [
+      { key: '20260419_0095_opt1', description: '에라토스테네스', isAnswer: false },
+      { key: '20260419_0095_opt2', description: '프톨레마이오스', isAnswer: true },
+      { key: '20260419_0095_opt3', description: '아리스토텔레스', isAnswer: false },
+      { key: '20260419_0095_opt4', description: '히파르코스', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 2,
+    key: '20260419_0096_key',
+    description: '구글 지도의 스트리트 뷰 서비스가 처음 시작된 해는 언제일까요?',
+    answerKey: '20260419_0096_answer',
+    answerDescription:
+      '구글 스트리트 뷰는 2007년 5월에 미국 5개 도시에서 처음 서비스를 시작했어요. 360도 파노라마 사진으로 거리를 볼 수 있죠!',
+    indexes: ['스트리트뷰', '구글'],
+    options: [
+      { key: '20260419_0096_opt1', description: '2003년', isAnswer: false },
+      { key: '20260419_0096_opt2', description: '2007년', isAnswer: true },
+      { key: '20260419_0096_opt3', description: '2010년', isAnswer: false },
+      { key: '20260419_0096_opt4', description: '2012년', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 1,
+    key: '20260419_0097_key',
+    description: '보물 지도에서 "X"가 표시하는 것은 전통적으로 무엇일까요?',
+    answerKey: '20260419_0097_answer',
+    answerDescription:
+      '"X marks the spot!"은 보물이 묻힌 위치를 나타내요. 사실 역사적으로 실제 해적 보물 지도는 거의 발견되지 않았답니다!',
+    indexes: ['보물지도', 'X표시'],
+    options: [
+      { key: '20260419_0097_opt1', description: '위험 지역', isAnswer: false },
+      { key: '20260419_0097_opt2', description: '보물이 묻힌 위치', isAnswer: true },
+      { key: '20260419_0097_opt3', description: '물이 있는 곳', isAnswer: false },
+      { key: '20260419_0097_opt4', description: '출발점', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GEOGRAPHY_AND_CULTURE',
+    level: 3,
+    key: '20260419_0098_key',
+    description: '경도 0도를 지나는 "본초자오선"이 통과하는 도시는 어디일까요?',
+    answerKey: '20260419_0098_answer',
+    answerDescription:
+      '본초자오선은 영국 런던의 그리니치 천문대를 지나요. 1884년 국제회의에서 이곳을 경도 0도의 기준으로 정했어요!',
+    indexes: ['본초자오선', '그리니치'],
+    options: [
+      { key: '20260419_0098_opt1', description: '파리', isAnswer: false },
+      { key: '20260419_0098_opt2', description: '런던(그리니치)', isAnswer: true },
+      { key: '20260419_0098_opt3', description: '워싱턴 D.C.', isAnswer: false },
+      { key: '20260419_0098_opt4', description: '베를린', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'WORLD_HISTORY',
+    level: 2,
+    key: '20260419_0099_key',
+    description: '별자리를 이용한 항해술을 가장 먼저 발전시킨 민족은 누구일까요?',
+    answerKey: '20260419_0099_answer',
+    answerDescription:
+      '폴리네시아인은 별자리, 파도, 바람을 이용한 뛰어난 항해술로 태평양의 수천 개 섬을 탐험했어요!',
+    indexes: ['폴리네시아', '항해술'],
+    options: [
+      { key: '20260419_0099_opt1', description: '바이킹', isAnswer: false },
+      { key: '20260419_0099_opt2', description: '폴리네시아인', isAnswer: true },
+      { key: '20260419_0099_opt3', description: '페니키아인', isAnswer: false },
+      { key: '20260419_0099_opt4', description: '그리스인', isAnswer: false },
+    ],
+  },
+  {
+    categoryName: 'GENERAL_KNOWLEDGE',
+    level: 2,
+    key: '20260419_0100_key',
+    description: '현대 지도에서 "등고선"이 좁게 모여 있으면 무엇을 의미할까요?',
+    answerKey: '20260419_0100_answer',
+    answerDescription:
+      '등고선이 좁게 모여 있으면 경사가 급하다는 뜻이에요. 반대로 넓게 퍼져 있으면 경사가 완만하다는 의미죠!',
+    indexes: ['등고선', '경사'],
+    options: [
+      { key: '20260419_0100_opt1', description: '높이가 낮다', isAnswer: false },
+      { key: '20260419_0100_opt2', description: '경사가 급하다', isAnswer: true },
+      { key: '20260419_0100_opt3', description: '물이 있는 곳이다', isAnswer: false },
+      { key: '20260419_0100_opt4', description: '평지이다', isAnswer: false },
+    ],
+  },
+];
+
+export default basicQuizzes;

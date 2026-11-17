@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit"
+  short_description: "Commit, push, and open PRs safely"
+  default_prompt: "Use $commit to commit the current changes with conventional commit checks."

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Review Self'
+  short_description: 'Review and stabilize current Martie changes'
+  default_prompt: 'Use $review-self to review and improve the current Martie work until stable.'

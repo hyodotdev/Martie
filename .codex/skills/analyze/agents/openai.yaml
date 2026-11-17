@@ -1,0 +1,4 @@
+interface:
+  display_name: "Analyze"
+  short_description: "Analyze Martie Firebase growth metrics"
+  default_prompt: "Use $analyze to analyze the latest Martie Firebase/GA4 metrics and recommend the next retention experiments."

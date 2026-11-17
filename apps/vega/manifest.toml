@@ -1,0 +1,21 @@
+schema-version = 1
+
+[package]
+id = "dev.hyo.martie"
+title = "Martie"
+version = "2.2.0"
+icon = "@image/Martie.png"
+
+[components]
+[[components.interactive]]
+id = "dev.hyo.martie.main"
+runtime-module = "/com.amazon.kepler.keplerscript.runtime.loader_2@IKeplerScript_2_0"
+launch-type = "singleton"
+categories = ["com.amazon.category.main"]
+
+[wants]
+[[wants.service]]
+id = "com.amazon.inputmethod.service"
+
+[[wants.service]]
+id = "com.amazon.network.service"

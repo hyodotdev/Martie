@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Release Update'
+  short_description: 'Build, verify, submit, and update Martie releases'
+  default_prompt: 'Use $release-update to ship a verified Martie release to the appropriate channels.'

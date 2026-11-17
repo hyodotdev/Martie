@@ -1,0 +1,4 @@
+interface:
+  display_name: "Seed Articles"
+  short_description: "Create and seed Martie article content"
+  default_prompt: "Use $seed-articles to generate and seed multilingual Martie articles."

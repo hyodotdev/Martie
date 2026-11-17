@@ -1,0 +1,119 @@
+{
+  "cli": {
+    "version": ">= 5.9.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development",
+      "env": {
+        "STAGE": "development",
+        "EXPO_PUBLIC_PAYMENT_MODE": "mock_pg"
+      }
+    },
+    "preview": {
+      "channel": "preview",
+      "env": {
+        "STAGE": "preview",
+        "EXPO_PUBLIC_PAYMENT_MODE": "toss_test"
+      },
+      "cache": {
+        "disabled": true
+      },
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview-alternative": {
+      "extends": "preview",
+      "channel": "preview-alternative",
+      "env": {
+        "STAGE": "preview",
+        "EXPO_PUBLIC_PAYMENT_MODE": "alternative_billing"
+      }
+    },
+    "preview-alternative-play": {
+      "extends": "preview-alternative",
+      "environment": "preview",
+      "distribution": "store",
+      "channel": "preview-alternative-play",
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      }
+    },
+    "preview-naver": {
+      "extends": "preview",
+      "channel": "preview-naver",
+      "env": {
+        "STAGE": "preview",
+        "EXPO_PUBLIC_PAYMENT_MODE": "naver_test"
+      }
+    },
+    "amazon": {
+      "channel": "production",
+      "autoIncrement": true,
+      "env": {
+        "STAGE": "production",
+        "EXPO_PUBLIC_PAYMENT_MODE": "iap_only",
+        "AMAZON_APPSTORE": "1",
+        "ORG_GRADLE_PROJECT_reactNativeArchitectures": "armeabi-v7a,arm64-v8a"
+      },
+      "cache": {
+        "disabled": true
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    },
+    "horizon": {
+      "channel": "production",
+      "autoIncrement": true,
+      "env": {
+        "STAGE": "production",
+        "EXPO_PUBLIC_PAYMENT_MODE": "iap_only",
+        "HORIZON_OS": "1",
+        "ORG_GRADLE_PROJECT_reactNativeArchitectures": "arm64-v8a"
+      },
+      "cache": {
+        "disabled": true
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "autoIncrement": true,
+      "env": {
+        "STAGE": "production",
+        "EXPO_PUBLIC_PAYMENT_MODE": "iap_only"
+      },
+      "cache": {
+        "disabled": true
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "submit": {
+    "preview-alternative-play": {
+      "android": {
+        "track": "internal",
+        "releaseStatus": "completed"
+      }
+    },
+    "production": {
+      "android": {
+        "track": "production"
+      },
+      "ios": {
+        "ascAppId": "6740057833"
+      }
+    }
+  }
+}
