@@ -1,0 +1,121 @@
+# Codemagic native build checks for Martie.
+#
+# These workflows prove that the native iOS and Android projects still build.
+# They use no signing or store credentials, and placeholder Firebase files
+# (the real ones are not in the repository), so they run the same for forks.
+# Lint, typecheck and tests stay in GitHub Actions (.github/workflows/ci.yml).
+# Over-the-air updates ship with `bun ota:release` (Codemagic Patch).
+
+definitions:
+  environment: &environment
+    node: 22.14.0
+    vars:
+      CI: '1'
+      EXPO_NO_DOTENV: '1'
+      STAGE: development
+      BUN_VERSION: '1.3.13'
+  triggering: &triggering
+    events:
+      - push
+      - pull_request
+    branch_patterns:
+      - pattern: main
+        include: true
+        source: false
+    cancel_previous_builds: true
+  scripts:
+    - &install_bun
+      name: Install Bun
+      script: |
+        curl -fsSL https://bun.sh/install | bash -s "bun-v$BUN_VERSION"
+        echo "PATH=$HOME/.bun/bin:$PATH" >> "$CM_ENV"
+    - &install_dependencies
+      name: Install dependencies
+      script: bun install --frozen-lockfile
+    - &placeholder_firebase
+      name: Write placeholder Firebase config
+      script: |
+        cat > GoogleService-Info.plist <<'PLIST'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+          <key>API_KEY</key><string>placeholder</string>
+          <key>BUNDLE_ID</key><string>dev.hyo.martie</string>
+          <key>GCM_SENDER_ID</key><string>000000000000</string>
+          <key>GOOGLE_APP_ID</key><string>1:000000000000:ios:0000000000000000</string>
+          <key>PROJECT_ID</key><string>placeholder</string>
+          <key>STORAGE_BUCKET</key><string>placeholder.appspot.com</string>
+        </dict>
+        </plist>
+        PLIST
+        cat > google-services.json <<'JSON'
+        {
+          "project_info": {
+            "project_number": "000000000000",
+            "project_id": "placeholder",
+            "storage_bucket": "placeholder.appspot.com"
+          },
+          "client": [
+            {
+              "client_info": {
+                "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                "android_client_info": {"package_name": "dev.hyo.martie"}
+              },
+              "api_key": [{"current_key": "placeholder"}]
+            }
+          ],
+          "configuration_version": "1"
+        }
+        JSON
+
+workflows:
+  ios-simulator:
+    name: iOS simulator build
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      <<: *environment
+      xcode: latest
+      cocoapods: default
+    triggering: *triggering
+    scripts:
+      - *install_bun
+      - *install_dependencies
+      - *placeholder_firebase
+      - name: Generate the iOS project
+        script: bunx expo prebuild --no-install --platform ios
+      - name: Install pods
+        script: cd ios && pod install
+      - name: Build for the iOS simulator
+        script: |
+          set -o pipefail
+          xcodebuild \
+            -workspace ios/Martie.xcworkspace \
+            -scheme Martie \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build | xcpretty
+    artifacts:
+      - /Users/builder/Library/Developer/Xcode/DerivedData/**/Build/Products/**/*.app
+
+  android-release:
+    name: Android release build
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      <<: *environment
+      java: 17
+    triggering: *triggering
+    scripts:
+      - *install_bun
+      - *install_dependencies
+      - *placeholder_firebase
+      - name: Generate the Android project
+        script: bunx expo prebuild --no-install --platform android
+      - name: Build the release APK
+        script: cd android && ./gradlew :app:assembleRelease --no-daemon
+    artifacts:
+      - android/app/build/outputs/**/*.apk

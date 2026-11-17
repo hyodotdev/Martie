@@ -195,5 +195,5 @@ Report results as:
 | Growtoki event/crash verification | PASS/FAIL/SKIPPED | event sequence summary |
 ```
 
-Include EAS update group and commit SHA when this is a post-deploy validation.
+Include the Codemagic Patch release label and commit SHA when this is a post-deploy validation.
 Never call the bug fixed until both UI evidence and log/event evidence agree.

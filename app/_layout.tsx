@@ -21,7 +21,7 @@ import ErrorBoundary from 'react-native-error-boundary';
 import DisplayNameModal from '../src/modals/DisplayNameModal';
 import ForceUpdateModal from '../src/modals/ForceUpdateModal';
 import FirstQuizModal from '../src/modals/FirstQuizModal';
-import {useEASUpdate} from '../src/hooks/useEASUpdate';
+import {useOtaUpdate} from '../src/hooks/useOtaUpdate';
 import {useProductAnalytics} from '../src/hooks/useProductAnalytics';
 import {useAlternativeBillingRecovery} from '../src/hooks/useAlternativeBillingRecovery';
 import {
@@ -113,7 +113,7 @@ function App(): JSX.Element | null {
   });
 
   const {assetLoaded, theme} = useCPK();
-  const {isChecking, checkUpdate} = useEASUpdate();
+  const {isChecking, checkUpdate} = useOtaUpdate();
   const {back, replace} = useRouter();
   const pathname = usePathname();
   const isDarkMode = storage.getBoolean(Storage.ThemeType);

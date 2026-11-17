@@ -1,12 +1,12 @@
 import React from 'react';
 import {fireEvent, render, waitFor} from '@testing-library/react-native';
 import {Linking, Platform} from 'react-native';
-import {reloadAsync} from 'expo-updates';
+import {restartApp} from '@codemagic/react-native-patch';
 
 import FallbackComponent from '../../../src/uis/FallbackComponent';
 
-jest.mock('expo-updates', () => ({
-  reloadAsync: jest.fn(() => Promise.resolve()),
+jest.mock('@codemagic/react-native-patch', () => ({
+  restartApp: jest.fn(() => Promise.resolve()),
 }));
 
 jest.mock('../../../src/STRINGS', () => ({
@@ -55,7 +55,7 @@ describe('FallbackComponent', () => {
     fireEvent.press(getByLabelText('error.tryAgain'));
 
     await waitFor(() => {
-      expect(reloadAsync).toHaveBeenCalledTimes(1);
+      expect(restartApp).toHaveBeenCalledTimes(1);
     });
   });
 });

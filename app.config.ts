@@ -31,6 +31,24 @@ expand(
   }),
 );
 
+// Codemagic Patch delivers over-the-air updates. Deployment keys only let a
+// build ask for updates, so they ship inside every binary and live in the repo.
+// Only production store builds read Production; every other stage reads
+// Staging so test builds never take or replace a production update.
+const OTA_API_URL = 'https://ota.codemagicpatch.dev';
+const OTA_DOWNLOAD_BASE_URL = 'https://ota-storage.codemagicpatch.dev';
+const OTA_DEPLOYMENT_KEYS = {
+  ios: {
+    staging: 'dep_f2ad6121eb854f64925927e6684f8f02',
+    production: 'dep_8a23f1459bb74452ba0fcc8fde1d25fa',
+  },
+  android: {
+    staging: 'dep_0b464ab3b7df4dfc9105e006eb539c0a',
+    production: 'dep_d90387e38e924537b0d776abc4e35f80',
+  },
+};
+const otaTrack = process.env.STAGE === 'production' ? 'production' : 'staging';
+
 const DEEP_LINK_HOST = 'hyo.dev';
 const MARTIE_LINK_PATH_PREFIXES = [
   '/martie',
@@ -120,6 +138,21 @@ export default ({config}: ConfigContext): ExpoConfig => ({
   orientation: 'default',
   icon: './assets/icon.png',
   plugins: [
+    [
+      '@codemagic/react-native-patch',
+      {
+        ios: {
+          apiUrl: OTA_API_URL,
+          downloadBaseUrl: OTA_DOWNLOAD_BASE_URL,
+          deploymentKey: OTA_DEPLOYMENT_KEYS.ios[otaTrack],
+        },
+        android: {
+          apiUrl: OTA_API_URL,
+          downloadBaseUrl: OTA_DOWNLOAD_BASE_URL,
+          deploymentKey: OTA_DEPLOYMENT_KEYS.android[otaTrack],
+        },
+      },
+    ],
     './plugins/withAmazonFireCompatibility',
     './plugins/withIosPodDeploymentTarget',
     'expo-asset',
@@ -301,13 +334,6 @@ export default ({config}: ConfigContext): ExpoConfig => ({
     ROOT_URL: process.env.ROOT_URL,
     expoProjectId: process.env.expoProjectId,
     eas: {projectId: '89e8816c-1b59-4336-b3ea-110469262de7'},
-  },
-  updates: {
-    fallbackToCacheTimeout: 0,
-    url: 'https://u.expo.dev/89e8816c-1b59-4336-b3ea-110469262de7',
-  },
-  runtimeVersion: {
-    policy: 'appVersion',
   },
   assetBundlePatterns: ['**/*'],
   userInterfaceStyle: 'automatic',

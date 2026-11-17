@@ -13,7 +13,7 @@ export default async (): Promise<Config.InitialOptions> => {
     },
     transformIgnorePatterns: [
       // Transform ESM in selected node_modules (e.g., immer, zustand middleware)
-      'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|standard-navigation|@unimodules/.*|unimodules|native-base|react-native-svg|cpk-ui|@cpk-ui|immer|zustand|uuid)',
+      'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|standard-navigation|@unimodules/.*|unimodules|native-base|react-native-svg|cpk-ui|@cpk-ui|immer|zustand|uuid|@codemagic/react-native-patch)',
     ],
     modulePaths: ['<rootDir>'],
     moduleDirectories: ['node_modules'],
@@ -28,14 +28,15 @@ export default async (): Promise<Config.InitialOptions> => {
       '\\.svg': '<rootDir>/__mocks__/svgMock.js',
       '.+\\.(css|style|less|sass|scss|png|jpg|ttf|woff|woff2)$': 'babel-jest',
       '^convex/react$': '<rootDir>/__mocks__/convex/react.ts',
-      '^react-native-worklets$':
-        '<rootDir>/__mocks__/react-native-worklets.js',
+      '^react-native-worklets$': '<rootDir>/__mocks__/react-native-worklets.js',
       '^react-native-reanimated$':
         '<rootDir>/__mocks__/react-native-reanimated.js',
     },
     setupFiles: [
       '<rootDir>/test/testSetup.ts',
       './node_modules/react-native-gesture-handler/jestSetup.js',
+      // Fakes the Patch TurboModule: a store binary with no update waiting.
+      './node_modules/@codemagic/react-native-patch/jest-setup.js',
     ],
     cacheDirectory: '.jest/cache',
     setupFilesAfterEnv: [

@@ -1,0 +1,15 @@
+{
+  "serverUrl": "https://ota.codemagicpatch.dev",
+  "teamId": "team_d7a5cb3f206a4469aa838eebf6d70389",
+  "apps": {
+    "android": {
+      "app": "Martie-Android",
+      "deployment": "Production"
+    },
+    "ios": {
+      "app": "Martie-iOS",
+      "deployment": "Production"
+    }
+  },
+  "bundler": "expo"
+}

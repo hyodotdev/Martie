@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import {reloadAsync} from 'expo-updates';
+import {restartApp} from '@codemagic/react-native-patch';
 
 import {t} from '../STRINGS';
 import {APP_STORE_URLS, MARTIE_SHARE_URL} from '../utils/constants';
@@ -20,7 +20,7 @@ const STORE_URL_OPTIONS = {
 
 function FallbackComponent(): JSX.Element {
   const handleReload = useCallback(() => {
-    void reloadAsync().catch(() => {
+    void restartApp().catch(() => {
       // A reload failure should not replace the already visible fallback.
     });
   }, []);

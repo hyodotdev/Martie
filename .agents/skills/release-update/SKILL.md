@@ -1,6 +1,6 @@
 ---
 name: release-update
-description: Build, verify, submit, and publish Martie releases through EAS Build, Expo Updates, Google Play, and App Store Connect. Use when the user runs `/release-update` or `$release-update`, asks to release or deploy Martie, upload IPA/AAB artifacts, submit store builds for review, add release notes, choose between a native build and OTA update, or finish a version rollout after review and E2E.
+description: Build, verify, submit, and publish Martie releases through EAS Build, Codemagic Patch OTA updates, Google Play, and App Store Connect. Use when the user runs `/release-update` or `$release-update`, asks to release or deploy Martie, upload IPA/AAB artifacts, submit store builds for review, add release notes, choose between a native build and OTA update, or finish a version rollout after review and E2E.
 ---
 
 # Release Update
@@ -26,17 +26,25 @@ Require new iOS and Android binaries when any of these changed:
   targets, manifests, Info.plist, Pod/Gradle inputs, billing, IAP, ads, or native
   assets;
 - app version/build numbers or store compliance requirements;
-- behavior that cannot run safely on the installed runtime version.
+- behavior that cannot run safely on the installed binary version.
 
-Use Expo Updates only when changes are JavaScript/assets compatible with the
-existing production runtime and no store binary or compliance update is needed.
-Use the established scripts:
+Over-the-air updates ship through Codemagic Patch (apps `Martie-iOS` and
+`Martie-Android` in the OpenIAP team at https://ota.codemagicpatch.dev), never
+EAS Update. Use them only when changes are JavaScript/assets compatible with
+the store binary of the same `package.json` version and no store binary or
+compliance update is needed:
 
-- `bun eas:prod:updates`
-- `bun eas:prod:updates:ios`
-- `bun eas:prod:updates:android`
+- `OTA_CONFIRM_COMPATIBLE=1 OTA_MESSAGE="..." bun ota:release`
+  (`ota:release:ios` / `ota:release:android` for one platform)
+- `OTA_DEPLOYMENT=Staging` publishes to test builds first; Production requires a
+  clean `main` that matches `origin/main` with successful CI.
 
-Record update IDs, branches, runtime versions, and messages.
+Binaries up to 2.4.0 still run Expo Updates and have no Patch client. Do not
+publish EAS updates from a tree that imports `@codemagic/react-native-patch`;
+those binaries reach new code only through a store build (plus force update).
+
+Record the Patch release labels, deployment, binary version and messages
+(`bunx @codemagic/patch-cli@0.10.0 release list --app Martie-iOS`).
 
 ## Verify Before Shipping
 

@@ -133,7 +133,10 @@ Bun's own runner instead of jest).
 | `build:web`         | Static web export                              |
 
 `eas:*` scripts build and submit store binaries with the maintainer's EAS
-project and store credentials. Forks need their own (see
+project and store credentials. `ota:release` publishes a JavaScript-only
+over-the-air update through [Codemagic Patch](https://patch.codemagic.io)
+(`codemagic-patch.config.json`); `codemagic.yaml` checks that the native iOS and
+Android projects still build. Forks need their own (see
 [Running your own copy](#running-your-own-copy)).
 
 Before opening a pull request, run what CI runs
