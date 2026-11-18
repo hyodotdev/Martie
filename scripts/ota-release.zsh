@@ -126,7 +126,7 @@ for target in $targets; do
   prebuild=(bunx expo prebuild --no-install --clean --platform "$target")
   if [[ "$deployment" == "Production" ]]; then
     bunx dotenv -e "$env_file" -- bunx eas-cli@23.0.0 env:exec production --non-interactive \
-      "NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 ${(j: :)${(q)prebuild}} && NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 ${(j: :)${(q)release}}"
+      "NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 ${(j: :)${(@q)prebuild}} && NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 ${(j: :)${(@q)release}}"
   else
     NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 \
       bunx dotenv -e "$env_file" -- $prebuild
