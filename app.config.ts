@@ -342,7 +342,9 @@ export default ({config}: ConfigContext): ExpoConfig => ({
     appleTeamId: 'PRDQGB267K',
     associatedDomains: [`applinks:${DEEP_LINK_HOST}`],
     supportsTablet: true,
-    googleServicesFile: './GoogleService-Info.plist',
+    // Store builds outside this checkout get it from the EAS file variable.
+    googleServicesFile:
+      process.env.GOOGLE_SERVICES_INFO_PLIST ?? './GoogleService-Info.plist',
     infoPlist: {
       NSUserTrackingUsageDescription:
         "App requests permission to track your activity across other companies' apps and websites to provide personalized ads. By understanding your interests, we can deliver ads that are more relevant to you. Users can revoke this permission at any time in the settings.",
@@ -354,7 +356,8 @@ export default ({config}: ConfigContext): ExpoConfig => ({
   },
   android: {
     userInterfaceStyle: 'automatic',
-    googleServicesFile: './google-services.json',
+    googleServicesFile:
+      process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
     blockedPermissions: isHorizonOsBuild
       ? HORIZON_BLOCKED_ANDROID_PERMISSIONS
       : undefined,

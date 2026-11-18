@@ -1,9 +1,20 @@
-# Codemagic native build checks for Martie.
+# Codemagic native builds for Martie.
 #
-# These workflows prove that the native iOS and Android projects still build.
-# They use no signing or store credentials, and placeholder Firebase files
-# (the real ones are not in the repository), so they run the same for forks.
-# Lint, typecheck and tests stay in GitHub Actions (.github/workflows/ci.yml).
+# The check workflows prove that the native iOS and Android projects still
+# build. They use no signing or store credentials, and placeholder Firebase
+# files (the real ones are not in the repository), so they run the same for
+# forks. Lint, typecheck and tests stay in GitHub Actions (.github/workflows/ci.yml).
+#
+# The production workflows build signed store binaries on the Codemagic Mac
+# with `eas build --local`, so signing credentials, version numbers, the
+# Firebase files and the EXPO_PUBLIC_* values all stay in the EAS project and
+# its `production` environment. They upload to TestFlight and the Play internal
+# track as a draft (`eas submit --profile codemagic`) and never submit for
+# review or roll out. They start only by hand and read only EXPO_TOKEN from the
+# secure `martie_production` group.
+#
+# Every workflow runs on mac_mini_m2: the OpenIAP team plan offers no Linux
+# instance, and the Mac image carries the Android SDK as well.
 # Over-the-air updates ship with `bun ota:release` (Codemagic Patch).
 
 definitions:
@@ -32,6 +43,12 @@ definitions:
     - &install_dependencies
       name: Install dependencies
       script: bun install --frozen-lockfile
+    - &check_expo_token
+      name: Check the EAS access
+      script: |
+        set -euo pipefail
+        test -n "${EXPO_TOKEN:-}" || { echo "EXPO_TOKEN is missing from martie_production"; exit 1; }
+        bunx eas-cli@23.0.0 whoami
     - &placeholder_firebase
       name: Write placeholder Firebase config
       script: |
@@ -68,6 +85,12 @@ definitions:
           "configuration_version": "1"
         }
         JSON
+
+  # YAML merge keys are shallow: each production workflow lists its own `vars`.
+  production_environment: &production_environment
+    node: 22.14.0
+    groups:
+      - martie_production
 
 workflows:
   ios-simulator:
@@ -119,3 +142,81 @@ workflows:
         script: cd android && ./gradlew :app:assembleRelease --no-daemon
     artifacts:
       - android/app/build/outputs/**/*.apk
+
+  ios-production:
+    name: iOS production (TestFlight upload)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+    environment:
+      <<: *production_environment
+      vars:
+        CI: '1'
+        EXPO_NO_DOTENV: '1'
+        STAGE: production
+        BUN_VERSION: '1.3.13'
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - *install_bun
+      - *install_dependencies
+      - *check_expo_token
+      - name: Build the signed IPA with EAS credentials
+        script: |
+          set -euo pipefail
+          bunx eas-cli@23.0.0 build --platform ios --profile production \
+            --local --non-interactive --output build/martie.ipa
+      - name: Check the bundle carries the production backend
+        script: |
+          set -euo pipefail
+          # grep -c reads to the end; grep -q would close the pipe early and
+          # pipefail would turn the writer's SIGPIPE (141) into a failure.
+          unzip -p build/martie.ipa 'Payload/*.app/main.jsbundle' \
+            | grep -a -c martie-server.hyo.dev > /dev/null
+          echo "main.jsbundle targets martie-server.hyo.dev"
+      - name: Upload to TestFlight
+        script: |
+          bunx eas-cli@23.0.0 submit --platform ios --profile codemagic \
+            --path build/martie.ipa --non-interactive
+    artifacts:
+      - build/*.ipa
+
+  android-production:
+    name: Android production (Play internal draft)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+    environment:
+      <<: *production_environment
+      vars:
+        CI: '1'
+        EXPO_NO_DOTENV: '1'
+        STAGE: production
+        BUN_VERSION: '1.3.13'
+        # Public SHA-256 of the Play upload certificate (EAS keystore). A
+        # release signed with any other key fails here instead of at Play.
+        UPLOAD_CERT_SHA256: '2B:56:EA:9E:00:25:2E:28:13:4C:51:0B:D6:1B:8F:D0:A9:1F:67:C9:2E:2C:79:C9:EE:6D:CB:CF:A8:28:EE:9F'
+      java: 17
+    scripts:
+      - *install_bun
+      - *install_dependencies
+      - *check_expo_token
+      - name: Build the signed app bundle with EAS credentials
+        script: |
+          set -euo pipefail
+          bunx eas-cli@23.0.0 build --platform android --profile production \
+            --local --non-interactive --output build/martie.aab
+      - name: Check the signature and the production backend
+        script: |
+          set -euo pipefail
+          aab=build/martie.aab
+          # grep -c reads to the end; grep -q would close the pipe early and
+          # pipefail would turn the writer's SIGPIPE (141) into a failure.
+          keytool -printcert -jarfile "$aab" | grep -c "SHA256: $UPLOAD_CERT_SHA256" > /dev/null
+          unzip -p "$aab" base/assets/index.android.bundle \
+            | grep -a -c martie-server.hyo.dev > /dev/null
+          echo "Signed with the upload key; bundle targets martie-server.hyo.dev"
+      - name: Upload to the Play internal track as a draft
+        script: |
+          bunx eas-cli@23.0.0 submit --platform android --profile codemagic \
+            --path build/martie.aab --non-interactive
+    artifacts:
+      - build/*.aab

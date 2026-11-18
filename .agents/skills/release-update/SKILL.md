@@ -56,12 +56,15 @@ Record the Patch release labels, deployment, binary version and messages
    Verify launch, daily quiz completion, purchase-screen transition, and Hall of
    Fame. Defer real IAP transactions to physical devices unless explicitly
    authorized and available.
-4. For native releases, require successful production EAS builds from the exact
-   merged commit. Use the package scripts:
-   - `bun eas:prod:android`
-   - `bun eas:prod:ios`
-   - or `bun eas:prod:build-submit`
-5. Inspect EAS build metadata and download artifacts when URLs are available.
+4. For native releases, build on Codemagic (OpenIAP team, app `Martie`) from the
+   exact merged commit: start the `ios-production` and `android-production`
+   workflows by hand. They run `eas build --local` with the EAS credentials,
+   versions and `production` environment, check the bundle targets
+   `martie-server.hyo.dev` (and the Play upload key), then upload to TestFlight
+   and the Play internal track as a draft. They never submit for review.
+   The EAS cloud scripts (`bun eas:prod:android`, `bun eas:prod:ios`) remain a
+   fallback only.
+5. Inspect the build artifacts (Codemagic artifacts or EAS build metadata).
    Verify Android is a readable AAB with the expected package/version and iOS is
    an IPA archive with the expected bundle/version. A successful EAS status
    alone does not replace artifact inspection.
