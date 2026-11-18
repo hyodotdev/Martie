@@ -7,8 +7,8 @@
 #
 # The production workflows build signed store binaries on the Codemagic Mac
 # with `eas build --local`, so signing credentials, version numbers, the
-# Firebase files and the EXPO_PUBLIC_* values all stay in the EAS project and
-# its `production` environment. They upload to TestFlight and the Play internal
+# Firebase files (base64) and the EXPO_PUBLIC_* values all stay in the EAS
+# project and its `production` environment. They upload to TestFlight and the Play internal
 # track as a draft (`eas submit --profile codemagic`) and never submit for
 # review or roll out. They start only by hand and read only EXPO_TOKEN from the
 # secure `martie_production` group.
@@ -49,6 +49,17 @@ definitions:
         set -euo pipefail
         test -n "${EXPO_TOKEN:-}" || { echo "EXPO_TOKEN is missing from martie_production"; exit 1; }
         bunx eas-cli@23.0.0 whoami
+    - &firebase_from_eas
+      name: Write the Firebase config from EAS
+      script: |
+        set -euo pipefail
+        # The real files are not in the repository; the EAS production
+        # environment keeps them base64-encoded.
+        bunx eas-cli@23.0.0 env:exec production --non-interactive \
+          'printenv GOOGLE_SERVICES_JSON_BASE64 | base64 --decode > google-services.json &&
+           printenv GOOGLE_SERVICE_INFO_PLIST_BASE64 | base64 --decode > GoogleService-Info.plist'
+        test -s google-services.json
+        test -s GoogleService-Info.plist
     - &placeholder_firebase
       name: Write placeholder Firebase config
       script: |
@@ -160,6 +171,7 @@ workflows:
       - *install_bun
       - *install_dependencies
       - *check_expo_token
+      - *firebase_from_eas
       - name: Build the signed IPA with EAS credentials
         script: |
           set -euo pipefail
@@ -199,6 +211,7 @@ workflows:
       - *install_bun
       - *install_dependencies
       - *check_expo_token
+      - *firebase_from_eas
       - name: Build the signed app bundle with EAS credentials
         script: |
           set -euo pipefail
