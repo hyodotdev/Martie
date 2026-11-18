@@ -35,33 +35,46 @@ repo_root="${script_dir:h}"
 cd "$repo_root"
 
 if [[ "$deployment" == "Production" ]]; then
-  current_branch="$(git branch --show-current)"
-  if [[ "$current_branch" != "main" ]]; then
-    print -u2 "production OTA must run from main, not $current_branch"
-    exit 1
-  fi
   if [[ -n "$(git status --porcelain)" ]]; then
     print -u2 "production OTA requires a clean worktree"
     exit 1
   fi
   git fetch --quiet origin main
   local_head="$(git rev-parse HEAD)"
-  if [[ "$local_head" != "$(git rev-parse origin/main)" ]]; then
-    print -u2 "production OTA requires HEAD to match origin/main"
-    exit 1
-  fi
-  ci_state="$(
-    gh run list \
-      --workflow CI \
-      --commit "$local_head" \
-      --event push \
-      --limit 1 \
-      --json headSha,status,conclusion \
-      --jq 'if length == 1 then "\(.[0].headSha):\(.[0].status):\(.[0].conclusion)" else "" end'
-  )"
-  if [[ "$ci_state" != "${local_head}:completed:success" ]]; then
-    print -u2 "production OTA requires successful CI for exact main@$local_head"
-    exit 1
+  if [[ -n "${CM_BUILD_ID:-}" ]]; then
+    # Codemagic checks out the pushed `ota-*` tag; it must point into main.
+    if ! git merge-base --is-ancestor "$local_head" origin/main; then
+      print -u2 "production OTA requires a commit on main, not $local_head"
+      exit 1
+    fi
+    # GitHub CI cannot be queried from Codemagic: run its checks here.
+    print "Verifying $local_head: lint:all, tsc, test"
+    bun lint:all
+    bunx tsc --noEmit
+    bun run test --silent
+  else
+    current_branch="$(git branch --show-current)"
+    if [[ "$current_branch" != "main" ]]; then
+      print -u2 "production OTA must run from main, not $current_branch"
+      exit 1
+    fi
+    if [[ "$local_head" != "$(git rev-parse origin/main)" ]]; then
+      print -u2 "production OTA requires HEAD to match origin/main"
+      exit 1
+    fi
+    ci_state="$(
+      gh run list \
+        --workflow CI \
+        --commit "$local_head" \
+        --event push \
+        --limit 1 \
+        --json headSha,status,conclusion \
+        --jq 'if length == 1 then "\(.[0].headSha):\(.[0].status):\(.[0].conclusion)" else "" end'
+    )"
+    if [[ "$ci_state" != "${local_head}:completed:success" ]]; then
+      print -u2 "production OTA requires successful CI for exact main@$local_head"
+      exit 1
+    fi
   fi
 fi
 
@@ -100,10 +113,16 @@ for target in $targets; do
     --release-notes "$update_message"
     --non-interactive --yes
   )
+  # The native projects are generated (CNG); Patch fingerprints them, and
+  # refuses a release whose fingerprint differs from earlier releases for the
+  # same binary version, so they are regenerated from this commit every time.
+  prebuild=(bunx expo prebuild --no-install --clean --platform "$target")
   if [[ "$deployment" == "Production" ]]; then
     bunx dotenv -e "$env_file" -- bunx eas-cli@23.0.0 env:exec production --non-interactive \
-      "NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 ${(j: :)${(q)release}}"
+      "NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 ${(j: :)${(q)prebuild}} && NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 ${(j: :)${(q)release}}"
   else
+    NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 \
+      bunx dotenv -e "$env_file" -- $prebuild
     NODE_ENV=production STAGE=$stage EXPO_NO_DOTENV=1 \
       bunx dotenv -e "$env_file" -- $release
   fi

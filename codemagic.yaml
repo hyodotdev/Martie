@@ -60,6 +60,16 @@ definitions:
            printenv GOOGLE_SERVICE_INFO_PLIST_BASE64 | base64 --decode > GoogleService-Info.plist'
         test -s google-services.json
         test -s GoogleService-Info.plist
+    - &check_release_tag
+      name: Check the tag matches the app version
+      script: |
+        set -euo pipefail
+        version=$(node -p 'require("./package.json").version')
+        if [[ -n "${CM_TAG:-}" && "$CM_TAG" != "v$version" ]]; then
+          echo "Tag $CM_TAG does not match package.json version $version"
+          exit 1
+        fi
+        echo "Building $version"
     - &placeholder_firebase
       name: Write placeholder Firebase config
       script: |
@@ -97,6 +107,13 @@ definitions:
         }
         JSON
 
+  # Store builds start from a pushed `v<version>` tag (or by hand).
+  release_triggering: &release_triggering
+    events:
+      - tag
+    tag_patterns:
+      - pattern: 'v*'
+        include: true
   # YAML merge keys are shallow: each production workflow lists its own `vars`.
   production_environment: &production_environment
     node: 22.14.0
@@ -158,6 +175,7 @@ workflows:
     name: iOS production (TestFlight upload)
     instance_type: mac_mini_m2
     max_build_duration: 120
+    triggering: *release_triggering
     environment:
       <<: *production_environment
       vars:
@@ -170,6 +188,7 @@ workflows:
     scripts:
       - *install_bun
       - *install_dependencies
+      - *check_release_tag
       - *check_expo_token
       - *firebase_from_eas
       - name: Build the signed IPA with EAS credentials
@@ -196,6 +215,7 @@ workflows:
     name: Android production (Play internal draft)
     instance_type: mac_mini_m2
     max_build_duration: 120
+    triggering: *release_triggering
     environment:
       <<: *production_environment
       vars:
@@ -210,6 +230,7 @@ workflows:
     scripts:
       - *install_bun
       - *install_dependencies
+      - *check_release_tag
       - *check_expo_token
       - *firebase_from_eas
       - name: Build the signed app bundle with EAS credentials
@@ -233,3 +254,42 @@ workflows:
             --path build/martie.aab --non-interactive
     artifacts:
       - build/*.aab
+
+  # Publishes a Codemagic Patch OTA to the Production deployment from a pushed
+  # `ota-*` tag on a main commit. The tag message (or the commit subject) is
+  # the release note. `cmpatch release-react` refuses a bundle whose native
+  # fingerprint differs from the store binary, so native changes cannot ship
+  # this way.
+  ota-production:
+    name: OTA production (Codemagic Patch)
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+    environment:
+      <<: *production_environment
+      vars:
+        CI: '1'
+        EXPO_NO_DOTENV: '1'
+        BUN_VERSION: '1.3.13'
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'ota-*'
+          include: true
+    scripts:
+      - *install_bun
+      - *install_dependencies
+      - *check_expo_token
+      - name: Check the Patch access
+        script: |
+          set -euo pipefail
+          test -n "${CODEMAGIC_PATCH_TOKEN:-}" || { echo "CODEMAGIC_PATCH_TOKEN is missing from martie_production"; exit 1; }
+          bunx @codemagic/patch-cli@0.10.0 whoami --server-url https://ota.codemagicpatch.dev > /dev/null
+          echo "Patch login works"
+      - name: Publish the OTA update
+        script: |
+          set -euo pipefail
+          git fetch --quiet --tags origin
+          message=$(git tag -l --format='%(contents:subject)' "${CM_TAG:-}")
+          [[ -n "$message" ]] || message=$(git log -1 --format=%s)
+          OTA_CONFIRM_COMPATIBLE=1 OTA_MESSAGE="$message" scripts/ota-release.zsh all
