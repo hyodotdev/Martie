@@ -39,7 +39,14 @@ if [[ "$deployment" == "Production" ]]; then
     print -u2 "production OTA requires a clean worktree"
     exit 1
   fi
-  git fetch --quiet origin main
+  # Codemagic clones a tag shallowly without remote branches: fetch main into
+  # origin/main explicitly, with full history when the clone is shallow.
+  main_ref=+refs/heads/main:refs/remotes/origin/main
+  if [[ "$(git rev-parse --is-shallow-repository)" == true ]]; then
+    git fetch --quiet --unshallow origin "$main_ref"
+  else
+    git fetch --quiet origin "$main_ref"
+  fi
   local_head="$(git rev-parse HEAD)"
   if [[ -n "${CM_BUILD_ID:-}" ]]; then
     # Codemagic checks out the pushed `ota-*` tag; it must point into main.
