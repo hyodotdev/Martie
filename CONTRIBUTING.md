@@ -132,8 +132,9 @@ Bun's own runner instead of jest).
 | `fix:deps`          | Realign dependency versions with the Expo SDK  |
 | `build:web`         | Static web export                              |
 
-Releases run on Codemagic (`codemagic.yaml`): a `v<version>` tag builds and
-uploads store binaries, and an `ota-*` tag publishes a JavaScript-only
+Releases run on Codemagic (`codemagic.yaml`), started by the GitHub **Release**
+workflow (`workflow_dispatch`) or a GitHub Release: a `v<version>` tag builds
+and uploads store binaries, and an `ota-*` tag publishes a JavaScript-only
 over-the-air update through [Codemagic Patch](https://patch.codemagic.io)
 (`codemagic-patch.config.json`, or `bun ota:release` locally). Every push also
 checks that the native iOS and Android projects still build. `eas:*` scripts

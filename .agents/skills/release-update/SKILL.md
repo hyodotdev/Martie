@@ -34,7 +34,10 @@ EAS Update. Use them only when changes are JavaScript/assets compatible with
 the store binary of the same `package.json` version and no store binary or
 compliance update is needed:
 
-- Production (preferred): push an annotated `ota-*` tag on a `main` commit, e.g.
+- Production (preferred): run the GitHub **Release** workflow (Actions → Release
+  → Run workflow, kind `ota`, with the release note). It requires green CI on
+  `main` and pushes the next `ota-<version>-<n>` tag. Pushing the tag by hand
+  works the same, e.g.
   `git tag -a ota-2.5.0-1 -m "Fix quiz timer" && git push origin ota-2.5.0-1`.
   Codemagic's `ota-production` workflow runs lint, tsc and tests, regenerates
   the native projects and publishes both platforms; the tag message is the
@@ -64,9 +67,11 @@ Record the Patch release labels, deployment, binary version and messages
    Fame. Defer real IAP transactions to physical devices unless explicitly
    authorized and available.
 4. For native releases, build on Codemagic (OpenIAP team, app `Martie`) from the
-   exact merged commit: push a `v<package.json version>` tag (e.g.
-   `git tag v2.5.0 && git push origin v2.5.0`), or start the `ios-production`
-   and `android-production` workflows by hand. They run `eas build --local` with the EAS credentials,
+   exact merged commit: run the GitHub **Release** workflow with kind `store`
+   (it tags `v<package.json version>` and creates the GitHub Release), publish
+   a GitHub Release for a new `v<version>` tag, push that tag yourself, or start
+   the `ios-production` and `android-production` workflows by hand. Bump
+   `package.json` first: the tag must match it. They run `eas build --local` with the EAS credentials,
    versions and `production` environment, check the bundle targets
    `martie-server.hyo.dev` (and the Play upload key), then upload to TestFlight
    and the Play internal track as a draft. They never submit for review.
