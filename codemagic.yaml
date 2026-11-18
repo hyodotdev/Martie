@@ -281,6 +281,7 @@ workflows:
       - *install_bun
       - *install_dependencies
       - *check_expo_token
+      - *firebase_from_eas
       - name: Check the Patch access
         script: |
           set -euo pipefail
