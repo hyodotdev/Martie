@@ -196,6 +196,10 @@ The short version — the long form is in [`AGENTS.md`](./AGENTS.md):
    prefix and use Conventional Commits (`feat(scope): …`, `fix(scope): …`).
 4. Make sure the checks above pass, and include the CLA line in the
    description.
+5. Pull requests get GitHub Actions CI, and those targeting `main` also get
+   native iOS and Android build checks on Codemagic. Every pull request gets an
+   automated review from [Gitdog](https://gitdog.dev). Address or answer its
+   findings before review by a maintainer.
 
 New quizzes are welcome through the in-app "Have a good question? → Create" flow or as seed
 files under `scripts/_seeds/`. Questions must be factual, verifiable and free
