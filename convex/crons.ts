@@ -17,4 +17,11 @@ crons.weekly(
   internal.league.mutations.weeklyReset,
 );
 
+// 10분마다 — 방장이 사라진 대전 대기실 정리
+crons.interval(
+  'close stale battle rooms',
+  {minutes: 10},
+  internal.battle.mutations.sweepStaleRooms,
+);
+
 export default crons;

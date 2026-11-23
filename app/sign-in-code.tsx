@@ -138,6 +138,19 @@ export default function SignInCode(): JSX.Element {
             try {
               dismissAll();
             } catch {}
+
+            // A battle link opened while signed out resumes in its room.
+            const pendingBattleCode = storage.getString(
+              Storage.PendingBattleCode,
+            );
+            if (pendingBattleCode) {
+              storage.delete(Storage.PendingBattleCode);
+              replace({
+                pathname: '/battle/[code]',
+                params: {code: pendingBattleCode},
+              });
+              return;
+            }
             replace('/my');
           } else {
             setError(t('signInCode.error'));

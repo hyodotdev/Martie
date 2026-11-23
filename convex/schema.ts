@@ -22,6 +22,11 @@ import {reviewQueueTable} from './schema/reviewQueue';
 import {quizSubmissionsTable} from './schema/quizSubmissions';
 import {adRewardEventsTable} from './schema/adRewardEvents';
 import {
+  battlesTable,
+  battleRoundsTable,
+  battlePlayersTable,
+} from './schema/battles';
+import {
   analyticsVisitorsTable,
   analyticsVisitorDaysTable,
 } from './schema/analytics';
@@ -50,4 +55,7 @@ export default defineSchema({
   quizSubmissions: quizSubmissionsTable,
   analyticsVisitors: analyticsVisitorsTable,
   analyticsVisitorDays: analyticsVisitorDaysTable,
+  battles: battlesTable,
+  battleRounds: battleRoundsTable,
+  battlePlayers: battlePlayersTable,
 });

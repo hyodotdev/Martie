@@ -6,6 +6,8 @@ type RedirectSystemPathParams = {
 const MARTIE_WEB_PATH_PATTERN = /^\/(?:en\/|ko\/|ja\/)?martie(?:\/|$)/;
 const MARTIE_INVITE_PATH_PATTERN =
   /^\/(?:en\/|ko\/|ja\/)?martie\/invite\/([^/?#]+)/;
+const MARTIE_BATTLE_PATH_PATTERN =
+  /^\/(?:en\/|ko\/|ja\/)?martie\/battle\/([^/?#]+)/;
 
 function normalizePath(path: string): string {
   if (path.includes('://')) {
@@ -24,6 +26,10 @@ export function redirectSystemPath({
     const inviteMatch = pathname.match(MARTIE_INVITE_PATH_PATTERN);
     if (inviteMatch?.[1]) {
       return `/invite/${inviteMatch[1]}`;
+    }
+    const battleMatch = pathname.match(MARTIE_BATTLE_PATH_PATTERN);
+    if (battleMatch?.[1]) {
+      return `/battle/${battleMatch[1]}`;
     }
     if (MARTIE_WEB_PATH_PATTERN.test(pathname)) {
       return '/(tabs)';

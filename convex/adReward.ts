@@ -3,8 +3,10 @@ import {httpAction, internalMutation} from './_generated/server';
 import {internal} from './_generated/api';
 import {md5Hex} from './utils/md5';
 import {
+  BATTLE_AD_PURPOSE,
   isLevelPlayGrantMode,
   levelPlayPrivateKeys,
+  REWARD_PURPOSE_PARAM,
   REWARD_USER_PARAM,
 } from './utils/levelPlay';
 
@@ -107,6 +109,11 @@ export const levelPlayRewardCallback = httpAction(async (ctx, request) => {
   ) {
     log('expired');
     return new Response('Expired event', {status: 410});
+  }
+
+  if (params.get(`custom_${REWARD_PURPOSE_PARAM}`) === BATTLE_AD_PURPOSE) {
+    log('battle_invite');
+    return new Response(`${eventId}:OK`, {status: 200});
   }
 
   const grant = isLevelPlayGrantMode();

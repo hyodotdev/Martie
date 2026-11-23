@@ -14,6 +14,7 @@ export const Storage = {
   Locale: 'Locale',
   DidFinishFirstDaily: 'DidFinishFirstDaily',
   PendingReferralCode: 'PendingReferralCode',
+  PendingBattleCode: 'PendingBattleCode',
   GuestDailyResult: 'GuestDailyResult',
   LastDailyCompletionSummary: 'LastDailyCompletionSummary',
   // Acquisition source attribution (from deep links / referrals)

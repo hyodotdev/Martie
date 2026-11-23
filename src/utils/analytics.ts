@@ -88,6 +88,19 @@ export const LOG_EVENTS = {
   LOGIN_PROMPT_SHOWN: 'login_prompt_shown',
   LOGIN_PROMPT_DISMISSED: 'login_prompt_dismissed',
   LOGIN_PROMPT_ACCEPTED: 'login_prompt_accepted',
+
+  // 1:1 battle
+  BATTLE_ROOM_CREATED: 'battle_room_created',
+  BATTLE_INVITE_SHARED: 'battle_invite_shared',
+  BATTLE_LINK_OPENED: 'battle_link_opened',
+  BATTLE_JOINED: 'battle_joined',
+  BATTLE_JOIN_FAILED: 'battle_join_failed',
+  BATTLE_READY: 'battle_ready',
+  BATTLE_STARTED: 'battle_started',
+  BATTLE_ANSWERED: 'battle_answered',
+  BATTLE_FINISHED: 'battle_finished',
+  BATTLE_LEFT: 'battle_left',
+  BATTLE_REMATCH: 'battle_rematch',
 } as const;
 
 const STREAK_MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
