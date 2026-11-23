@@ -1,5 +1,8 @@
 import {
+  PENDING_BATTLE_TTL_MS,
   battleShareUrl,
+  decodePendingBattle,
+  encodePendingBattle,
   estimateClockOffset,
   isSeenRecently,
   remainingMs,
@@ -27,5 +30,18 @@ describe('battle utils', () => {
     expect(isSeenRecently(1000, 5000, 0, 4000)).toBe(true);
     expect(isSeenRecently(1000, 5001, 0, 4000)).toBe(false);
     expect(isSeenRecently(undefined, 0, 0, 4000)).toBe(false);
+  });
+
+  it('resumes a pending battle only right after the link was opened', () => {
+    const saved = encodePendingBattle('abcd2345', 1000);
+    expect(decodePendingBattle(saved, 1000 + PENDING_BATTLE_TTL_MS)).toBe(
+      'abcd2345',
+    );
+    expect(
+      decodePendingBattle(saved, 1000 + PENDING_BATTLE_TTL_MS + 1),
+    ).toBeNull();
+    // Codes saved by an older build were bare strings with no timestamp.
+    expect(decodePendingBattle('abcd2345', 1000)).toBeNull();
+    expect(decodePendingBattle(undefined, 1000)).toBeNull();
   });
 });

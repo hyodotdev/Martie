@@ -2,6 +2,7 @@ import {internal} from '../_generated/api';
 import type {Doc, Id} from '../_generated/dataModel';
 import type {MutationCtx, QueryCtx} from '../_generated/server';
 import {
+  BATTLE_BUZZ_GRACE_MS,
   BATTLE_COUNTDOWN_MS,
   BATTLE_FIRST_BUZZ_MS,
   BATTLE_QUESTION_COUNT,
@@ -161,7 +162,14 @@ export async function startRound(
       phaseEndsAt,
       phaseVersion,
     });
-    await schedulePhase(ctx, battle._id, phaseEndsAt, phaseVersion);
+    // Answers are accepted for a grace period after the deadline, so the
+    // timeout must not close the question before that window ends.
+    await schedulePhase(
+      ctx,
+      battle._id,
+      phaseEndsAt + BATTLE_BUZZ_GRACE_MS,
+      phaseVersion,
+    );
     return;
   }
 
@@ -186,7 +194,12 @@ export async function enterPhase(
     phaseEndsAt,
     phaseVersion,
   });
-  await schedulePhase(ctx, battle._id, phaseEndsAt, phaseVersion);
+  await schedulePhase(
+    ctx,
+    battle._id,
+    phase === 'second_chance' ? phaseEndsAt + BATTLE_BUZZ_GRACE_MS : phaseEndsAt,
+    phaseVersion,
+  );
 }
 
 export async function getRound(

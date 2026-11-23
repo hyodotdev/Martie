@@ -35,3 +35,34 @@ export function isSeenRecently(
 ): boolean {
   return seenAt !== undefined && deviceNow + offsetMs - seenAt <= staleMs;
 }
+
+// A battle link opened while signed out resumes after sign-in, but only if
+// that sign-in follows soon; an abandoned one must not redirect a later login.
+export const PENDING_BATTLE_TTL_MS = 15 * 60 * 1000;
+
+export function encodePendingBattle(code: string, now: number): string {
+  return JSON.stringify({code, savedAt: now});
+}
+
+export function decodePendingBattle(
+  raw: string | undefined,
+  now: number,
+): string | null {
+  if (!raw) return null;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (
+      typeof parsed === 'object' &&
+      parsed !== null &&
+      'code' in parsed &&
+      'savedAt' in parsed &&
+      typeof parsed.code === 'string' &&
+      typeof parsed.savedAt === 'number' &&
+      now - parsed.savedAt >= 0 &&
+      now - parsed.savedAt <= PENDING_BATTLE_TTL_MS
+    ) {
+      return parsed.code;
+    }
+  } catch {}
+  return null;
+}

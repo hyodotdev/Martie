@@ -11,6 +11,7 @@ import {
 } from '../../../convex/battle/mutations';
 import {getRoom, listMyBattles} from '../../../convex/battle/queries';
 import {
+  BATTLE_BUZZ_GRACE_MS,
   BATTLE_COUNTDOWN_MS,
   BATTLE_PRESENCE_STALE_MS,
   BATTLE_QUESTION_COUNT,
@@ -223,6 +224,24 @@ describe('battle match', () => {
         opponentName: 'Guest',
       }),
     ]);
+  });
+
+  it('keeps the question open for answers sent inside the grace window', async () => {
+    const code = await openMatch();
+    await runScheduled();
+    const {phaseEndsAt} = battle();
+    expect(fake.scheduled.at(-1)?.runAt).toBe(
+      (phaseEndsAt as number) + BATTLE_BUZZ_GRACE_MS,
+    );
+
+    clock = (phaseEndsAt as number) + BATTLE_BUZZ_GRACE_MS - 100;
+    as(HOST);
+    await expect(
+      call.buzz(ctx, {code, index: 0, optionKey: wrongKey()}),
+    ).resolves.toEqual({ok: true, correct: false});
+    expect(fake.scheduled.at(-1)?.runAt).toBe(
+      (battle().phaseEndsAt as number) + BATTLE_BUZZ_GRACE_MS,
+    );
   });
 
   it('reveals with no point when nobody answers, and ignores stale timers', async () => {

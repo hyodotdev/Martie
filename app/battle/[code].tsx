@@ -19,7 +19,7 @@ import {useBattleRoom} from '../../src/hooks/useBattleRoom';
 import {useBattleInvite} from '../../src/hooks/useBattleInvite';
 import {logEvent, LOG_EVENTS, logScreenView} from '../../src/utils/analytics';
 import {logError} from '../../src/utils/error';
-import {battleShareUrl} from '../../src/utils/battle';
+import {battleShareUrl, encodePendingBattle} from '../../src/utils/battle';
 import {storage, Storage} from '../../src/utils/storage';
 import {withErrorBoundary} from '../../src/hoc/withErrorBoundary';
 import CustomLoadingIndicator from '../../src/uis/CustomLoadingIndicator';
@@ -180,7 +180,7 @@ function BattleRoomPage(): JSX.Element {
   }, [router]);
 
   const handleSignIn = useCallback(() => {
-    storage.set(Storage.PendingBattleCode, code);
+    storage.set(Storage.PendingBattleCode, encodePendingBattle(code, Date.now()));
     router.push('/sign-in');
   }, [code, router]);
 
