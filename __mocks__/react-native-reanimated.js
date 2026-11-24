@@ -1,6 +1,14 @@
 const {View, Text, Image, Animated} = require('react-native');
 
-const useSharedValue = (init) => ({value: init});
+const useSharedValue = (init) => ({
+  value: init,
+  get() {
+    return this.value;
+  },
+  set(next) {
+    this.value = next;
+  },
+});
 const useAnimatedStyle = (fn) => fn();
 const useDerivedValue = (fn) => ({value: fn()});
 const useAnimatedScrollHandler = () => ({});

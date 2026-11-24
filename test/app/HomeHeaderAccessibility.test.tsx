@@ -69,6 +69,7 @@ jest.mock('cpk-ui', () => {
       Body1: TextComponent,
       Body2: TextComponent,
       Body3: TextComponent,
+      Body4: TextComponent,
       Heading3: TextComponent,
       Heading4: TextComponent,
       Heading5: TextComponent,
@@ -167,6 +168,11 @@ jest.mock('convex/react', () => ({
 
 jest.mock('../../convex/_generated/api', () => ({
   api: {
+    battle: {
+      queries: {
+        getMyBattleStats: 'battle.queries.getMyBattleStats',
+      },
+    },
     dailyChallenge: {
       queries: {
         getToday: 'dailyChallenge.queries.getToday',

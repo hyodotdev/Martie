@@ -374,8 +374,18 @@ const STREAK_REMINDER_STAGES: StreakReminderStage[] = [
 
 const STREAK_REMINDER_IDS = STREAK_REMINDER_STAGES.map((s) => s.id);
 
+/** iOS refuses to schedule anything until the user allows notifications. */
+async function canScheduleNotifications(): Promise<boolean> {
+  const {authorizationStatus} = await notifee.getNotificationSettings();
+  return (
+    authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+    authorizationStatus === AuthorizationStatus.PROVISIONAL
+  );
+}
+
 export async function createStreakReminderNotification(): Promise<void> {
   try {
+    if (!(await canScheduleNotifications())) return;
     const now = new Date();
 
     // 매번 다시 등록 — 단계별 시각이 바뀌었거나 어제분이 남아있을 수 있음.
@@ -424,6 +434,7 @@ export async function createNextDailyReadyNotification({
   wrongCount?: number;
 } = {}): Promise<void> {
   try {
+    if (!(await canScheduleNotifications())) return;
     const now = new Date();
     const notificationTime = new Date(now);
     notificationTime.setDate(notificationTime.getDate() + 1);

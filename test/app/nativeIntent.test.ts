@@ -19,6 +19,15 @@ describe('redirectSystemPath', () => {
     ).toBe('/invite/testcode');
   });
 
+  it('battle links open the battle room', () => {
+    expect(
+      redirectSystemPath({
+        initial: true,
+        path: 'https://hyo.dev/ja/martie/battle/abcd2345?source=battle',
+      }),
+    ).toBe('/battle/abcd2345');
+  });
+
   it('generic Martie web landing links route to the app tabs', () => {
     expect(
       redirectSystemPath({

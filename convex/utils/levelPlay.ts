@@ -3,6 +3,10 @@
 // The app sends the signed-in Convex user id as a LevelPlay rewarded server
 // param, which arrives as `custom_<name>`.
 export const REWARD_USER_PARAM = 'userId';
+// Ads watched to open a battle invite are the price of the invite, not a
+// recharge: the app tags them `custom_purpose=battle` and they grant nothing.
+export const REWARD_PURPOSE_PARAM = 'purpose';
+export const BATTLE_AD_PURPOSE = 'battle';
 
 export const levelPlayPrivateKeys = (): string[] =>
   (process.env.LEVELPLAY_S2S_PRIVATE_KEY ?? '')
