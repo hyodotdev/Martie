@@ -7,7 +7,9 @@ import {
 } from '@amazon-devices/react-native-kepler';
 import {WebView} from '@amazon-devices/webview';
 
-const MARTIE_WEB_URL = 'https://hyo.dev/martie';
+// The Expo web build on GitHub Pages; hyo.dev/martie only redirects to the
+// stores now.
+const MARTIE_WEB_URL = 'https://martie.hyo.dev/app/';
 
 export const App = () => {
   const [loadKey, setLoadKey] = useState(0);
