@@ -13,6 +13,7 @@ import BattleResult, {myResult} from '../../../../src/uis/Battle/BattleResult';
 import BattleRecordCard from '../../../../src/uis/Battle/BattleRecordCard';
 import BattleLobby from '../../../../src/uis/Battle/BattleLobby';
 import {noticeArt} from '../../../../src/uis/Battle/BattleNotice';
+import {paperTint} from '../../../../src/uis/Battle/Sticker';
 import {
   battleErrorMessage,
   type BattleErrorReason,
@@ -464,6 +465,12 @@ describe('kicking the guest', () => {
     fireEvent.press(await screen.findByLabelText('Hana, Host, Offline'));
     expect(await screen.findByText('🏆 Record')).toBeTruthy();
     expect(screen.queryByText('Kick out')).toBeNull();
+  });
+
+  it('tints sticker faces with solid colors so shadows never show through', () => {
+    expect(paperTint('#FF5B50', 0)).toBe('#FFFFFF');
+    expect(paperTint('#FF5B50', 1)).toBe('#FF5B50');
+    expect(paperTint('#000000', 0.5)).toBe('#808080');
   });
 
   it('gives every dead end its own Martie prop', () => {

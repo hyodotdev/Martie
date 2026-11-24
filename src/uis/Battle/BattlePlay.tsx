@@ -21,7 +21,7 @@ import {
   RIVAL_COLOR,
   type MartieMood,
 } from './BattleParts';
-import {Burst} from './Sticker';
+import {Burst, CREAM, INK, Sticker, paperTint} from './Sticker';
 import type {BattlePlayer, BattleRoom, BattleRound} from './types';
 
 type Props = {
@@ -128,39 +128,47 @@ function PlayerScore({
   active: boolean;
 }): JSX.Element {
   return (
-    <Side
-      style={css`
-        flex-direction: ${alignEnd ? 'row-reverse' : 'row'};
-        border-color: ${active ? color : 'transparent'};
-        background-color: ${color + (active ? '24' : '12')};
-      `}
+    <Sticker
+      // The side whose turn it is lifts off the page in its own color.
+      shadow={active ? color : INK}
+      offset={active ? 5 : 3}
+      radius={16}
+      style={{flex: 1, transform: [{rotate: alignEnd ? '1.5deg' : '-1.5deg'}]}}
+      faceStyle={{backgroundColor: active ? paperTint(color, 0.18) : '#FFFFFF'}}
     >
-      {player ? <PlayerAvatar player={player} size={30} ringColor={color} /> : null}
-      <View
+      <Side
         style={css`
-          flex: 1;
-          align-items: ${alignEnd ? 'flex-end' : 'flex-start'};
+          flex-direction: ${alignEnd ? 'row-reverse' : 'row'};
         `}
       >
-        <Typography.Body4
-          numberOfLines={1}
+        {player ? <PlayerAvatar player={player} size={30} ringColor={color} /> : null}
+        <View
           style={css`
-            font-weight: 700;
-            opacity: 0.75;
+            flex: 1;
+            align-items: ${alignEnd ? 'flex-end' : 'flex-start'};
           `}
         >
-          {label}
-        </Typography.Body4>
-        <Typography.Heading3
-          style={css`
-            font-weight: 900;
-            color: ${color};
-          `}
-        >
-          {score}
-        </Typography.Heading3>
-      </View>
-    </Side>
+          <Typography.Body4
+            numberOfLines={1}
+            style={css`
+              color: ${INK};
+              font-weight: 800;
+              opacity: 0.7;
+            `}
+          >
+            {label}
+          </Typography.Body4>
+          <Typography.Heading3
+            style={css`
+              font-weight: 900;
+              color: ${color};
+            `}
+          >
+            {score}
+          </Typography.Heading3>
+        </View>
+      </Side>
+    </Sticker>
   );
 }
 
@@ -181,12 +189,12 @@ function TimerBar({
           style={{
             width: `${Math.round(ratio * 100)}%`,
             height: '100%',
-            borderRadius: 6,
+            borderRadius: 5,
             backgroundColor: color,
           }}
         />
       </TimerTrack>
-      <Typography.Body3
+      <Typography.Body2
         style={css`
           width: 28px;
           text-align: right;
@@ -195,7 +203,7 @@ function TimerBar({
         `}
       >
         {Math.ceil(leftMs / 1000)}
-      </Typography.Body3>
+      </Typography.Body2>
     </TimerRow>
   );
 }
@@ -249,7 +257,7 @@ function OptionCard({
   const mark = state === 'correct' ? '✓' : state === 'wrong' ? '✕' : letter;
 
   return (
-    <Animated.View style={pulseStyle}>
+    <Animated.View style={[{opacity: dimmed ? 0.45 : 1}, pulseStyle]}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={description}
@@ -257,53 +265,60 @@ function OptionCard({
         disabled={disabled}
         onPress={onPress}
       >
-        <OptionBox
-          style={css`
-            border-color: ${accent ?? theme.role.border};
-            background-color: ${accent ? accent + '1F' : theme.bg.basic};
-            opacity: ${dimmed ? 0.45 : 1};
-          `}
-        >
-          <LetterBadge
-            style={css`
-              background-color: ${accent ?? theme.bg.paper};
-            `}
+        {({pressed}) => (
+          // Pressing an answer pushes the card down onto its shadow.
+          <Sticker
+            shadow={accent ?? INK}
+            offset={pressed ? 1 : 4}
+            radius={16}
+            style={{transform: [{translateY: pressed ? 3 : 0}]}}
+            faceStyle={{backgroundColor: accent ? paperTint(accent, 0.16) : '#FFFFFF'}}
           >
-            <Typography.Body2
-              style={css`
-                font-weight: 900;
-                color: ${accent ? '#FFFFFF' : theme.text.basic};
-              `}
-            >
-              {mark}
-            </Typography.Body2>
-          </LetterBadge>
-          <Typography.Body1
-            style={css`
-              flex: 1;
-              font-weight: ${accent ? '700' : '400'};
-            `}
-          >
-            {description}
-          </Typography.Body1>
-          {pickerName && pickerColor ? (
-            <PickerTag
-              style={css`
-                background-color: ${pickerColor};
-              `}
-            >
-              <Typography.Body4
-                numberOfLines={1}
+            <OptionBox>
+              <LetterBadge
                 style={css`
-                  color: #ffffff;
-                  font-weight: 800;
+                  background-color: ${accent ?? CREAM};
                 `}
               >
-                {pickerName}
-              </Typography.Body4>
-            </PickerTag>
-          ) : null}
-        </OptionBox>
+                <Typography.Body2
+                  style={css`
+                    font-weight: 900;
+                    color: ${accent ? '#FFFFFF' : INK};
+                  `}
+                >
+                  {mark}
+                </Typography.Body2>
+              </LetterBadge>
+              <Typography.Body1
+                style={css`
+                  flex: 1;
+                  color: ${INK};
+                  font-weight: ${accent ? '800' : '600'};
+                `}
+              >
+                {description}
+              </Typography.Body1>
+              {pickerName && pickerColor ? (
+                <PickerTag
+                  style={{
+                    backgroundColor: pickerColor,
+                    transform: [{rotate: '-5deg'}],
+                  }}
+                >
+                  <Typography.Body4
+                    numberOfLines={1}
+                    style={css`
+                      color: #ffffff;
+                      font-weight: 900;
+                    `}
+                  >
+                    {pickerName}
+                  </Typography.Body4>
+                </PickerTag>
+              ) : null}
+            </OptionBox>
+          </Sticker>
+        )}
       </Pressable>
     </Animated.View>
   );
@@ -384,14 +399,19 @@ export default function BattlePlay({
         label={t('battle.me')}
         active={turnRole === myRole}
       />
-      <Typography.Body4
-        style={css`
-          font-weight: 900;
-          opacity: 0.5;
-        `}
-      >
-        VS
-      </Typography.Body4>
+      <View style={{zIndex: 1, marginHorizontal: -14, transform: [{rotate: '-8deg'}]}}>
+        <Burst size={44}>
+          <Typography.Body3
+            style={css`
+              color: ${INK};
+              font-weight: 900;
+              font-style: italic;
+            `}
+          >
+            VS
+          </Typography.Body3>
+        </Burst>
+      </View>
       <PlayerScore
         player={opponent}
         score={opponentScore}
@@ -442,31 +462,44 @@ export default function BattlePlay({
         }
       />
 
-      <QuestionCard>
-        <Typography.Body3
-          style={css`
-            font-weight: 800;
-            color: ${myColor};
-          `}
-        >
-          {t('battle.questionOf', {
-            current: round.index + 1,
-            total: room.totalQuestions,
-          })}
-        </Typography.Body3>
-        <Typography.Heading4
-          style={css`
-            font-weight: 800;
-          `}
-        >
-          {round.question}
-        </Typography.Heading4>
-        {room.phase === 'question' || room.phase === 'second_chance' ? (
-          <TimerBar leftMs={leftMs} totalMs={phaseMs} color={timerColor} />
-        ) : null}
-      </QuestionCard>
+      <Sticker
+        offset={5}
+        radius={20}
+        style={{marginTop: 8}}
+        faceStyle={{backgroundColor: QUESTION_BG}}
+      >
+        <QuestionBody>
+          {/* The question number is a tag slapped on the card's corner. */}
+          <QuestionTag
+            style={{backgroundColor: myColor, transform: [{rotate: '-4deg'}]}}
+          >
+            <Typography.Body3
+              style={css`
+                font-weight: 900;
+                color: #ffffff;
+              `}
+            >
+              {t('battle.questionOf', {
+                current: round.index + 1,
+                total: room.totalQuestions,
+              })}
+            </Typography.Body3>
+          </QuestionTag>
+          <Typography.Heading4
+            style={css`
+              color: ${INK};
+              font-weight: 900;
+            `}
+          >
+            {round.question}
+          </Typography.Heading4>
+          {room.phase === 'question' || room.phase === 'second_chance' ? (
+            <TimerBar leftMs={leftMs} totalMs={phaseMs} color={timerColor} />
+          ) : null}
+        </QuestionBody>
+      </Sticker>
 
-      <View style={css`gap: 10px;`}>
+      <View style={css`gap: 12px;`}>
         {round.options.map((option, index) => {
           const state = optionState(option.key, round, pendingOptionKey);
           const picker =
@@ -490,16 +523,24 @@ export default function BattlePlay({
       </View>
 
       {room.phase === 'reveal' && correctOption ? (
-        <AnswerNote>
+        <Sticker
+          shadow={theme.role.success}
+          offset={4}
+          radius={16}
+          faceStyle={{backgroundColor: CREAM}}
+        >
           <Typography.Body3
             style={css`
+              padding: 14px 16px;
+              color: ${INK};
+              font-weight: 600;
               line-height: 20px;
             `}
           >
             {round.answerDescription ||
               t('battle.answerIs', {answer: correctOption.description})}
           </Typography.Body3>
-        </AnswerNote>
+        </Sticker>
       ) : null}
     </Container>
   );
@@ -517,12 +558,9 @@ const ScoreRow = styled.View`
 `;
 
 const Side = styled.View`
-  flex: 1;
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border-radius: 16px;
-  border-width: 2px;
 `;
 
 const Center = styled.View`
@@ -532,11 +570,22 @@ const Center = styled.View`
   gap: 24px;
 `;
 
-const QuestionCard = styled.View`
-  padding: 18px;
-  gap: 10px;
-  border-radius: 20px;
-  background-color: ${({theme}) => theme.bg.paper};
+// A warm card, like the lobby arena, so the question reads as the stage.
+const QUESTION_BG = '#FFF1C9';
+
+const QuestionBody = styled.View`
+  padding: 22px 18px 18px;
+  gap: 12px;
+`;
+
+const QuestionTag = styled.View`
+  position: absolute;
+  top: -14px;
+  left: 14px;
+  padding: 3px 12px;
+  border-radius: 10px;
+  border-width: 2px;
+  border-color: ${INK};
 `;
 
 const TimerRow = styled.View`
@@ -548,37 +597,36 @@ const TimerRow = styled.View`
 
 const TimerTrack = styled.View`
   flex: 1;
-  height: 10px;
-  border-radius: 6px;
+  height: 14px;
+  padding: 1px;
+  border-radius: 8px;
   overflow: hidden;
-  background-color: ${({theme}) => theme.role.border};
+  border-width: 2px;
+  border-color: ${INK};
+  background-color: ${CREAM};
 `;
 
 const OptionBox = styled.View`
   flex-direction: row;
   align-items: center;
   gap: 12px;
-  padding: 14px;
-  border-radius: 16px;
-  border-width: 2px;
+  padding: 13px 14px;
 `;
 
 const LetterBadge = styled.View`
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
   align-items: center;
   justify-content: center;
+  border-width: 2px;
+  border-color: ${INK};
 `;
 
 const PickerTag = styled.View`
   max-width: 96px;
   padding: 3px 8px;
   border-radius: 10px;
-`;
-
-const AnswerNote = styled.View`
-  padding: 14px 16px;
-  border-radius: 16px;
-  background-color: ${({theme}) => theme.role.success + '14'};
+  border-width: 2px;
+  border-color: ${INK};
 `;

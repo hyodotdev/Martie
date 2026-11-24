@@ -20,6 +20,7 @@ import {
 import type {BattleRecord} from '../../../convex/battle/logic';
 import {t} from '../../STRINGS';
 import {recordText} from './BattleRecordCard';
+import {Burst, CREAM, INK} from './Sticker';
 import type {BattlePlayer} from './types';
 
 // Each side keeps one color on every screen so a glance tells who did what.
@@ -53,7 +54,6 @@ export function MartieHost({
   size?: number;
   accessory?: JSX.Element | null;
 }): JSX.Element {
-  const {theme} = useCPK();
   const bob = useSharedValue(0);
   const pop = useSharedValue(1);
 
@@ -97,7 +97,7 @@ export function MartieHost({
           <Typography.Body2
             style={css`
               font-weight: 700;
-              color: ${theme.text.basic};
+              color: ${INK};
             `}
           >
             {message}
@@ -129,28 +129,17 @@ export function CountdownBadge({
   const style = useAnimatedStyle(() => ({transform: [{scale: pulse.value}]}));
 
   return (
-    <Animated.View
-      accessibilityLabel={String(seconds)}
-      style={[
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: color,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        style,
-      ]}
-    >
-      <Typography.Heading3
-        style={css`
-          color: #ffffff;
-          font-weight: 900;
-        `}
-      >
-        {seconds}
-      </Typography.Heading3>
+    <Animated.View accessibilityLabel={String(seconds)} style={style}>
+      <Burst size={size + 8} color={color}>
+        <Typography.Heading4
+          style={css`
+            color: #ffffff;
+            font-weight: 900;
+          `}
+        >
+          {seconds}
+        </Typography.Heading4>
+      </Burst>
     </Animated.View>
   );
 }
@@ -290,12 +279,13 @@ const HostRow = styled.View`
   gap: 10px;
 `;
 
+// Martie talks in an inked cream bubble, the same in both themes.
 const Bubble = styled.View`
   padding: 12px 14px;
   border-radius: 16px;
-  background-color: ${({theme}) => theme.bg.basic};
-  border-width: 2px;
-  border-color: ${({theme}) => theme.text.basic + '1A'};
+  background-color: ${CREAM};
+  border-width: 2.5px;
+  border-color: ${INK};
 `;
 
 const BubbleTail = styled.View`
@@ -304,8 +294,8 @@ const BubbleTail = styled.View`
   top: 16px;
   width: 12px;
   height: 12px;
-  background-color: ${({theme}) => theme.bg.basic};
-  border-left-width: 2px;
-  border-bottom-width: 2px;
-  border-color: ${({theme}) => theme.text.basic + '1A'};
+  background-color: ${CREAM};
+  border-left-width: 2.5px;
+  border-bottom-width: 2.5px;
+  border-color: ${INK};
 `;

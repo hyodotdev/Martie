@@ -17,6 +17,21 @@ export const INK = '#22225E';
 export const SUN = '#FFC83D';
 export const CREAM = '#FFFDF6';
 
+/**
+ * `color` mixed into white as a solid color. Sticker faces must be opaque,
+ * or the colored shadow under them shows through.
+ */
+export function paperTint(color: string, amount: number): string {
+  const hex = color.replace('#', '').slice(0, 6);
+  const mix = (offset: number) => {
+    const channel = parseInt(hex.slice(offset, offset + 2), 16);
+    return Math.round(255 + (channel - 255) * amount)
+      .toString(16)
+      .padStart(2, '0');
+  };
+  return `#${mix(0)}${mix(2)}${mix(4)}`.toUpperCase();
+}
+
 // Hand-cut spikes: each one a little longer or shorter than the last.
 const SPIKE_LENGTHS = [1, 0.9, 0.97, 0.86, 1, 0.92, 0.88, 0.99, 0.9, 0.95, 0.85, 0.98];
 

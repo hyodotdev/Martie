@@ -1,14 +1,13 @@
 import {Typography, useCPK} from 'cpk-ui';
 import {styled, css} from 'kstyled';
-import {ImpactFeedbackStyle} from 'expo-haptics';
 import {
   BATTLE_STAKE_BULBS,
   otherRole,
   type BattleRole,
 } from '../../../convex/battle/logic';
 import {t} from '../../STRINGS';
-import ButtonMartie from '../ButtonMartie';
 import {HeadToHead, MartieHost, PlayerAvatar, RIVAL_COLOR} from './BattleParts';
+import {Burst, CREAM, INK, SUN, Sticker, StickerButton} from './Sticker';
 import type {BattleRoom} from './types';
 
 type Props = {
@@ -53,12 +52,9 @@ export default function BattleResult({
       : result === 'loss'
         ? t('battle.resultLoss')
         : t('battle.resultDraw');
-  const color =
-    result === 'win'
-      ? theme.role.success
-      : result === 'loss'
-        ? theme.role.danger
-        : theme.text.label;
+  // A win gets the bulb's gold; a loss a cool wash of the rival's indigo.
+  const burstColor =
+    result === 'win' ? SUN : result === 'loss' ? '#DCDEF2' : CREAM;
 
   const mood = result === 'win' ? 'smile' : result === 'loss' ? 'sweat' : 'impressed';
   const mc =
@@ -78,46 +74,60 @@ export default function BattleResult({
     <Container>
       <MartieHost mood={mood} message={mc} size={96} />
 
-      <Hero
-        style={css`
-          background-color: ${color + '14'};
-          border-color: ${color};
-        `}
-      >
-        <Typography.Heading1
-          accessibilityLiveRegion="polite"
-          style={css`
-            text-align: center;
-            font-size: 44px;
-            line-height: 52px;
-            font-weight: 900;
-            color: ${color};
-          `}
-        >
-          {result === 'win'
-            ? t('battle.win')
-            : result === 'loss'
-              ? t('battle.loss')
-              : t('battle.draw')}
-        </Typography.Heading1>
-        <Typography.Body1
-          style={css`
-            text-align: center;
-            font-weight: 700;
-          `}
-        >
-          {headline}
-        </Typography.Body1>
-        <BulbChip>
-          <Typography.Body2
+      <Sticker offset={5} radius={24} faceStyle={{backgroundColor: '#FFF1C9'}}>
+        <HeroBody>
+          <Burst size={170} color={burstColor}>
+            <Typography.Heading1
+              accessibilityLiveRegion="polite"
+              style={[
+                css`
+                  color: ${INK};
+                  font-size: 36px;
+                  line-height: 44px;
+                  font-weight: 900;
+                  text-align: center;
+                `,
+                {transform: [{rotate: '-6deg'}]},
+              ]}
+            >
+              {result === 'win'
+                ? t('battle.win')
+                : result === 'loss'
+                  ? t('battle.loss')
+                  : t('battle.draw')}
+            </Typography.Heading1>
+          </Burst>
+          <Typography.Body1
             style={css`
-              font-weight: 900;
+              color: ${INK};
+              text-align: center;
+              font-weight: 800;
             `}
           >
-            💡 {bulbDelta}
-          </Typography.Body2>
-        </BulbChip>
-      </Hero>
+            {headline}
+          </Typography.Body1>
+          <Sticker
+            offset={3}
+            radius={12}
+            style={{transform: [{rotate: '-3deg'}]}}
+            faceStyle={{
+              borderWidth: 2,
+              paddingHorizontal: 14,
+              paddingVertical: 4,
+              backgroundColor: CREAM,
+            }}
+          >
+            <Typography.Body2
+              style={css`
+                color: ${INK};
+                font-weight: 900;
+              `}
+            >
+              💡 {bulbDelta}
+            </Typography.Body2>
+          </Sticker>
+        </HeroBody>
+      </Sticker>
       {result !== 'draw' && !opponentLeft && myScore === opponentScore ? (
         <Typography.Body3
           style={css`
@@ -139,93 +149,75 @@ export default function BattleResult({
         </Typography.Body3>
       ) : null}
 
-      <ScoreCard
-        accessibilityLabel={t('battle.score', {
-          mine: myScore,
-          theirs: opponentScore,
-        })}
-      >
-        <PlayerColumn>
-          {me ? (
-            <PlayerAvatar player={me} size={52} ringColor={theme.role.primary} />
-          ) : null}
-          <Typography.Body4 numberOfLines={1} style={css`font-weight: 700;`}>
-            {t('battle.me')}
-          </Typography.Body4>
-        </PlayerColumn>
-        <Typography.Heading1
-          style={css`
-            font-weight: 900;
-          `}
+      <Sticker offset={4} radius={18}>
+        <ScoreBody
+          accessibilityLabel={t('battle.score', {
+            mine: myScore,
+            theirs: opponentScore,
+          })}
         >
-          {t('battle.score', {mine: myScore, theirs: opponentScore})}
-        </Typography.Heading1>
-        <PlayerColumn>
-          {opponent ? (
-            <PlayerAvatar player={opponent} size={52} ringColor={RIVAL_COLOR} />
-          ) : null}
-          <Typography.Body4 numberOfLines={1} style={css`font-weight: 700;`}>
-            {opponent?.displayName ?? ''}
-          </Typography.Body4>
-        </PlayerColumn>
-      </ScoreCard>
+          <PlayerColumn>
+            {me ? (
+              <PlayerAvatar player={me} size={52} ringColor={theme.role.primary} />
+            ) : null}
+            <Typography.Body4
+              numberOfLines={1}
+              style={css`
+                color: ${INK};
+                font-weight: 800;
+              `}
+            >
+              {t('battle.me')}
+            </Typography.Body4>
+          </PlayerColumn>
+          <Typography.Heading1
+            style={css`
+              color: ${INK};
+              font-weight: 900;
+            `}
+          >
+            {t('battle.score', {mine: myScore, theirs: opponentScore})}
+          </Typography.Heading1>
+          <PlayerColumn>
+            {opponent ? (
+              <PlayerAvatar player={opponent} size={52} ringColor={RIVAL_COLOR} />
+            ) : null}
+            <Typography.Body4
+              numberOfLines={1}
+              style={css`
+                color: ${INK};
+                font-weight: 800;
+              `}
+            >
+              {opponent?.displayName ?? ''}
+            </Typography.Body4>
+          </PlayerColumn>
+        </ScoreBody>
+      </Sticker>
       {room.headToHead && opponent ? (
         <HeadToHead record={room.headToHead} opponentName={opponent.displayName} />
       ) : null}
 
       {room.rematchCode ? (
-        <ButtonMartie
-          hapticFeedback={ImpactFeedbackStyle.Medium}
+        <StickerButton
+          text={t('battle.joinRematch')}
           disabled={isBusy}
           onPress={() => room.rematchCode && onJoinRematch(room.rematchCode)}
-          text={t('battle.joinRematch')}
-          borderRadius={14}
-          styles={{
-            container: css`
-              height: 52px;
-              border-width: 0;
-            `,
-            text: css`
-              font-size: 16px;
-              font-weight: 800;
-            `,
-          }}
+          color={theme.role.primary}
         />
       ) : (
-        <ButtonMartie
-          hapticFeedback={ImpactFeedbackStyle.Medium}
-          disabled={isBusy}
-          loading={isBusy}
-          onPress={onRematch}
+        <StickerButton
           text={t('battle.rematch')}
-          borderRadius={14}
-          styles={{
-            container: css`
-              height: 52px;
-              border-width: 0;
-            `,
-            text: css`
-              font-size: 16px;
-              font-weight: 800;
-            `,
-          }}
+          disabled={isBusy}
+          onPress={onRematch}
+          color={theme.role.primary}
         />
       )}
-      <ButtonMartie
-        onPress={onHome}
+      <StickerButton
         text={t('battle.goHome')}
-        borderRadius={14}
-        color="light"
-        styles={{
-          container: css`
-            height: 48px;
-            border-width: 0;
-          `,
-          text: css`
-            font-size: 15px;
-            font-weight: 700;
-          `,
-        }}
+        onPress={onHome}
+        color={CREAM}
+        textColor={INK}
       />
     </Container>
   );
@@ -236,18 +228,10 @@ const Container = styled.View`
   gap: 16px;
 `;
 
-const Hero = styled.View`
+const HeroBody = styled.View`
   align-items: center;
-  gap: 8px;
-  padding: 22px 16px;
-  border-radius: 24px;
-  border-width: 2px;
-`;
-
-const BulbChip = styled.View`
-  padding: 6px 14px;
-  border-radius: 14px;
-  background-color: ${({theme}) => theme.bg.basic};
+  gap: 10px;
+  padding: 12px 16px 20px;
 `;
 
 const PlayerColumn = styled.View`
@@ -256,13 +240,9 @@ const PlayerColumn = styled.View`
   gap: 6px;
 `;
 
-const ScoreCard = styled.View`
+const ScoreBody = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  padding: 20px;
-  border-radius: 16px;
-  background-color: ${({theme}) => theme.bg.paper};
-  border-width: 1px;
-  border-color: ${({theme}) => theme.role.border};
+  padding: 18px;
 `;
