@@ -41,10 +41,10 @@ export default function BattleInviteAd({onDone}: Props): JSX.Element {
       clearTimeout(loadTimer);
       done();
     };
-    // An ad that cannot be served never blocks the invite.
+    // An ad that cannot be served never blocks the invite. No fill is
+    // routine, so it is counted as an event rather than reported as a bug.
     const fallback = (error: unknown) => {
       if (finished) return;
-      logError(error, 'battle_invite_ad_unavailable');
       logEvent('ad_load_failed', {
         adProvider: 'levelplay',
         surface: 'battle_invite',
