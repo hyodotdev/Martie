@@ -233,7 +233,10 @@ export const heartbeat = mutation({
     const userId = await getAuthUserId(ctx);
     const battle = await getBattleByCode(ctx, code);
     const role = battle ? roleOf(battle, userId) : null;
-    if (battle && role && battle.status !== 'closed') {
+    // Presence only matters in the lobby. Writing it during a match would
+    // re-run both players' room query every beat for nothing; the reply
+    // still carries the server time for the countdowns.
+    if (battle && role && battle.status === 'waiting') {
       await ctx.db.patch(
         battle._id,
         role === 'host' ? {hostSeenAt: now} : {guestSeenAt: now},

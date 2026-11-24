@@ -18,7 +18,7 @@ import {
 } from './logic';
 
 const MAX_BULB_COUNT = 9999;
-// Categories sampled per match; each is read in full, like the daily quiz.
+// Categories a match draws from; only a short run of each is read.
 const CATEGORIES_PER_MATCH = 3;
 
 export async function getProfile(
@@ -49,17 +49,57 @@ export function userIdOf(
   return role === 'host' ? battle.hostUserId : battle.guestUserId;
 }
 
+/**
+ * A short run of a category's quizzes from a random point, wrapping to the
+ * start when the run hits the end. The by_category index is ordered by
+ * creation time, so this reads `count` quizzes however big the category is.
+ */
+async function sampleCategory(
+  ctx: MutationCtx,
+  categoryId: Id<'categories'>,
+  count: number,
+): Promise<Doc<'quizzes'>[]> {
+  const inCategory = () =>
+    ctx.db
+      .query('quizzes')
+      .withIndex('by_category', (q) => q.eq('categoryId', categoryId));
+  const oldest = await inCategory().first();
+  const newest = await inCategory().order('desc').first();
+  if (!oldest || !newest) return [];
+
+  const pivot =
+    oldest._creationTime +
+    Math.random() * (newest._creationTime - oldest._creationTime);
+  const after = await ctx.db
+    .query('quizzes')
+    .withIndex('by_category', (q) =>
+      q.eq('categoryId', categoryId).gte('_creationTime', pivot),
+    )
+    .take(count);
+  if (after.length >= count) return after;
+  const before = await ctx.db
+    .query('quizzes')
+    .withIndex('by_category', (q) =>
+      q.eq('categoryId', categoryId).lt('_creationTime', pivot),
+    )
+    .take(count - after.length);
+  return [...after, ...before];
+}
+
 async function pickQuizIds(ctx: MutationCtx): Promise<Id<'quizzes'>[]> {
   const categories = shuffle(await ctx.db.query('categories').collect()).slice(
     0,
     CATEGORIES_PER_MATCH,
   );
+  if (categories.length === 0) return [];
+  // Twice the questions needed, spread over the categories, so the shuffle
+  // still has room to mix them.
+  const perCategory = Math.ceil(
+    (BATTLE_QUESTION_COUNT * 2) / categories.length,
+  );
   const pools = await Promise.all(
     categories.map((category) =>
-      ctx.db
-        .query('quizzes')
-        .withIndex('by_category', (q) => q.eq('categoryId', category._id))
-        .collect(),
+      sampleCategory(ctx, category._id, perCategory),
     ),
   );
   return shuffle(

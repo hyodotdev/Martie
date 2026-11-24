@@ -3,6 +3,7 @@ import {
   advance,
   buzz,
   createRoom,
+  heartbeat,
   joinRoom,
   kickGuest,
   launch,
@@ -43,6 +44,7 @@ const call = {
   setReady: handlerOf<CodeArgs & {ready: boolean}, Result>(setReady),
   buzz: handlerOf<CodeArgs & {index: number; optionKey: string}, Result>(buzz),
   leave: handlerOf<CodeArgs, Result>(leave),
+  heartbeat: handlerOf<CodeArgs, {serverNow: number}>(heartbeat),
   kickGuest: handlerOf<CodeArgs, Result>(kickGuest),
   requestRematch: handlerOf<CodeArgs, Result & {code?: string}>(requestRematch),
   advance: handlerOf<{battleId: string; phaseVersion: number}, void>(advance),
@@ -417,6 +419,65 @@ describe('battle match', () => {
     });
     expect(battle()).toMatchObject({status: 'waiting', hostReady: false});
     expect(profile(GUEST).bulbCount).toBe(3);
+  });
+});
+
+describe('battle costs', () => {
+  it('starts a match without reading whole categories', async () => {
+    for (let c = 0; c < 4; c++) {
+      const categoryId = await ctx.db.insert('categories', {name: `C${c}`});
+      for (let i = 0; i < 60; i++) {
+        await ctx.db.insert('quizzes', {
+          categoryId,
+          level: 1,
+          key: `c${c}_q${i}`,
+          answerKey: `c${c}_q${i}_answer`,
+          indexes: [],
+          options: [{key: `c${c}_q${i}_a`, isAnswer: true}, {key: `c${c}_q${i}_b`}],
+        });
+      }
+    }
+    // Any full read of the quiz table would fail the match start.
+    const query = ctx.db.query.bind(ctx.db);
+    jest.spyOn(ctx.db, 'query').mockImplementation((name: string) => {
+      const chain = query(name);
+      if (name !== 'quizzes') return chain;
+      const guarded: typeof chain = new Proxy(chain, {
+        get: (target, prop, receiver) => {
+          if (prop === 'collect') {
+            return () => Promise.reject(new Error('collected all quizzes'));
+          }
+          const value = Reflect.get(target, prop, receiver);
+          if (typeof value !== 'function') return value;
+          // Keep guarding through withIndex/order, which return the chain.
+          return (...args: unknown[]) => {
+            const result = value.apply(target, args);
+            return result === target ? guarded : result;
+          };
+        },
+      });
+      return guarded;
+    });
+
+    await openMatch();
+    expect(battle().quizIds).toHaveLength(BATTLE_QUESTION_COUNT);
+    expect(new Set(battle().quizIds as string[]).size).toBe(BATTLE_QUESTION_COUNT);
+  });
+
+  it('writes presence in the lobby but not during a match', async () => {
+    as(HOST);
+    const {code} = await call.createRoom(ctx, {});
+    clock += 5000;
+    await call.heartbeat(ctx, {code: code!});
+    expect(battle().hostSeenAt).toBe(clock);
+
+    await ctx.db.patch(battle()._id, {status: 'playing'});
+    const seenAt = battle().hostSeenAt;
+    clock += 5000;
+    await expect(call.heartbeat(ctx, {code: code!})).resolves.toEqual({
+      serverNow: clock,
+    });
+    expect(battle().hostSeenAt).toBe(seenAt);
   });
 });
 
