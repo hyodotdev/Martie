@@ -98,6 +98,7 @@ import type * as user_mutations from "../user/mutations.js";
 import type * as user_queries from "../user/queries.js";
 import type * as userCategory_mutation from "../userCategory/mutation.js";
 import type * as utils_emailList from "../utils/emailList.js";
+import type * as utils_fixedOtp from "../utils/fixedOtp.js";
 import type * as utils_levelPlay from "../utils/levelPlay.js";
 import type * as utils_md5 from "../utils/md5.js";
 import type * as utils_resendClient from "../utils/resendClient.js";
@@ -201,6 +202,7 @@ declare const fullApi: ApiFromModules<{
   "user/queries": typeof user_queries;
   "userCategory/mutation": typeof userCategory_mutation;
   "utils/emailList": typeof utils_emailList;
+  "utils/fixedOtp": typeof utils_fixedOtp;
   "utils/levelPlay": typeof utils_levelPlay;
   "utils/md5": typeof utils_md5;
   "utils/resendClient": typeof utils_resendClient;
