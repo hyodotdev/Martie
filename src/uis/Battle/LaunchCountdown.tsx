@@ -16,6 +16,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import {BATTLE_LAUNCH_MS} from '../../../convex/battle/logic';
 import {IC_MARTIE_IMPRESSED, IC_MARTIE_SMILE, IC_MARTIE_SWEAT} from '../../icons';
 import {AUDIO_PRESS} from '../../sounds';
 import {t} from '../../STRINGS';
@@ -30,9 +31,12 @@ import type {BattlePlayer} from './types';
 // The last seconds turn red and hit harder.
 const FINAL_SECONDS = 3;
 const DANGER = '#FF4D4D';
+const LAUNCH_SECONDS = BATTLE_LAUNCH_MS / 1000;
 
 type Props = {
-  launchAt: number | null;
+  // Mount one per countdown (keyed by this), so the clock never starts from
+  // a previous value and flashes the finish.
+  launchAt: number;
   offsetMs: number;
   me: BattlePlayer | null;
   opponent: BattlePlayer | null;
@@ -90,7 +94,6 @@ export default function LaunchCountdown({
   isBusy,
   onCancel,
 }: Props): JSX.Element {
-  const visible = launchAt !== null;
   const leftMs = useBattleCountdown(launchAt, offsetMs);
   const seconds = Math.ceil(leftMs / 1000);
   const final = seconds <= FINAL_SECONDS;
@@ -100,7 +103,6 @@ export default function LaunchCountdown({
   const flash = useSharedValue(0);
 
   useEffect(() => {
-    if (!visible) return;
     slam.set(2.2);
     slam.set(withSpring(1, {damping: 15, stiffness: 240}));
     ring.set(0);
@@ -110,14 +112,19 @@ export default function LaunchCountdown({
       return;
     }
     if (final) {
-      flash.set(withSequence(withTiming(0.4, {duration: 60}), withTiming(0, {duration: 500})));
+      flash.set(
+        withSequence(
+          withTiming(0.4, {duration: 60}),
+          withTiming(0, {duration: 500}),
+        ),
+      );
     }
     void impactAsync(
       final ? ImpactFeedbackStyle.Heavy : ImpactFeedbackStyle.Medium,
     ).catch(() => {});
     safeSeekAudioPlayerToStart(tick);
     safePlayAudioPlayer(tick);
-  }, [final, flash, ring, seconds, slam, tick, visible]);
+  }, [final, flash, ring, seconds, slam, tick]);
 
   const numberStyle = useAnimatedStyle(() => ({
     opacity: Math.min(1, 2.6 - slam.get()),
@@ -134,7 +141,14 @@ export default function LaunchCountdown({
     seconds === 0 ? IC_MARTIE_IMPRESSED : final ? IC_MARTIE_SWEAT : IC_MARTIE_SMILE;
 
   return (
-    <Modal transparent visible={visible} animationType="fade" statusBarTranslucent>
+    <Modal
+      transparent
+      visible
+      animationType="fade"
+      statusBarTranslucent
+      // Android's back button backs out, like the button below.
+      onRequestClose={isBusy || seconds === 0 ? undefined : onCancel}
+    >
       <Backdrop accessibilityViewIsModal>
         <Halves pointerEvents="none" style={{backgroundColor: '#0B0A12'}} />
         <Halves pointerEvents="none">
@@ -165,7 +179,7 @@ export default function LaunchCountdown({
         </Typography.Body2>
 
         <Stage>
-          <Fighter player={me} color={myColor} side={-1} closing={5 - seconds} />
+          <Fighter player={me} color={myColor} side={-1} closing={LAUNCH_SECONDS - seconds} />
           <Clock>
             <Animated.View
               pointerEvents="none"
@@ -200,7 +214,7 @@ export default function LaunchCountdown({
             player={opponent}
             color={RIVAL_COLOR}
             side={1}
-            closing={5 - seconds}
+            closing={LAUNCH_SECONDS - seconds}
           />
         </Stage>
 

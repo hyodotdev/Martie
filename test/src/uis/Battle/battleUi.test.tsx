@@ -1,4 +1,5 @@
 import {fireEvent, render, screen} from '@testing-library/react-native';
+import {notificationAsync} from 'expo-haptics';
 import type {ReactNode} from 'react';
 import {ThemeProvider, type DefaultTheme} from 'kstyled';
 import {light} from '../../../../src/theme';
@@ -30,6 +31,16 @@ jest.mock('cpk-ui', () => {
     useCPK: () => ({theme}),
   };
 });
+jest.mock('expo-haptics', () => ({
+  ImpactFeedbackStyle: {Light: 'light', Medium: 'medium', Heavy: 'heavy'},
+  NotificationFeedbackType: {
+    Success: 'success',
+    Warning: 'warning',
+    Error: 'error',
+  },
+  impactAsync: jest.fn(() => Promise.resolve()),
+  notificationAsync: jest.fn(() => Promise.resolve()),
+}));
 jest.mock('../../../../src/uis/ButtonMartie', () => ({
   __esModule: true,
   default: ({onPress, text}: {onPress: () => void; text: string}) => {
@@ -380,6 +391,17 @@ describe('launch countdown', () => {
 
     fireEvent.press(screen.getByText('Wait! Not yet'));
     expect(onReady).toHaveBeenCalledWith(false);
+  });
+
+  it('starts from the full count when both become ready', async () => {
+    jest.spyOn(Date, 'now').mockReturnValue(1_000);
+    const {rerender} = render(lobby(null));
+    (notificationAsync as jest.Mock).mockClear();
+    rerender(lobby(6_000));
+    expect(await screen.findByText('5')).toBeTruthy();
+    expect(screen.queryByText('GO!')).toBeNull();
+    // The finish buzz must not fire before the clock even starts.
+    expect(notificationAsync).not.toHaveBeenCalledWith('success');
   });
 
   it('stays hidden until both are ready', async () => {

@@ -435,16 +435,19 @@ export default function BattleLobby({
         }
       />
 
-      <LaunchCountdown
-        launchAt={room.launchAt}
-        offsetMs={offsetMs}
-        me={me}
-        opponent={opponent}
-        myColor={theme.role.primary}
-        pot={room.stake * 2}
-        isBusy={isBusy}
-        onCancel={() => onReady(false)}
-      />
+      {room.launchAt !== null ? (
+        <LaunchCountdown
+          key={room.launchAt}
+          launchAt={room.launchAt}
+          offsetMs={offsetMs}
+          me={me}
+          opponent={opponent}
+          myColor={theme.role.primary}
+          pot={room.stake * 2}
+          isBusy={isBusy}
+          onCancel={() => onReady(false)}
+        />
+      ) : null}
     </Container>
   );
 }
