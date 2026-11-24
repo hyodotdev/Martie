@@ -9,6 +9,7 @@ import BattlePlay, {
   pickedBy,
 } from '../../../../src/uis/Battle/BattlePlay';
 import BattleResult, {myResult} from '../../../../src/uis/Battle/BattleResult';
+import BattleRecordCard from '../../../../src/uis/Battle/BattleRecordCard';
 import {
   battleErrorMessage,
   type BattleErrorReason,
@@ -64,8 +65,21 @@ const room = (overrides: Partial<BattleRoom> = {}): BattleRoom => ({
   code: 'abcd2345',
   status: 'playing',
   myRole: 'host',
-  host: {displayName: 'Hana', avatarUrl: null, ready: true, seenAt: 0},
-  guest: {displayName: 'Gil', avatarUrl: null, ready: true, seenAt: 0},
+  headToHead: {wins: 0, losses: 0, draws: 0},
+  host: {
+    displayName: 'Hana',
+    avatarUrl: null,
+    ready: true,
+    seenAt: 0,
+    record: {wins: 0, losses: 0, draws: 0},
+  },
+  guest: {
+    displayName: 'Gil',
+    avatarUrl: null,
+    ready: true,
+    seenAt: 0,
+    record: {wins: 0, losses: 0, draws: 0},
+  },
   stake: 1,
   phase: 'question',
   phaseStartedAt: 0,
@@ -218,5 +232,42 @@ describe('BattleResult', () => {
     );
     fireEvent.press(await screen.findByText('Join the rematch'));
     expect(onJoinRematch).toHaveBeenCalledWith('wxyz2345');
+  });
+});
+
+describe('battle records', () => {
+  it('shows my lifetime record with win rate and streaks', async () => {
+    render(
+      createTestElement(
+        <BattleRecordCard
+          stats={{wins: 7, losses: 2, draws: 1, streak: 3, bestStreak: 4}}
+        />,
+      ),
+    );
+    expect(await screen.findByText('Win rate 70%')).toBeTruthy();
+    expect(screen.getByText('7')).toBeTruthy();
+    expect(screen.getByText('🔥 3 wins in a row')).toBeTruthy();
+    expect(screen.getByText('Best: 4 in a row')).toBeTruthy();
+  });
+
+  it('shows the head-to-head after a match, or a first meeting', async () => {
+    const finished = (headToHead: BattleRoom['headToHead']) =>
+      createTestElement(
+        <BattleResult
+          room={room({status: 'finished', outcome: 'host', round: null, headToHead})}
+          myRole="host"
+          isBusy={false}
+          onRematch={jest.fn()}
+          onJoinRematch={jest.fn()}
+          onHome={jest.fn()}
+        />,
+      );
+    const {unmount} = render(finished({wins: 3, losses: 1, draws: 0}));
+    expect(await screen.findByText('⚔️ Record vs Gil')).toBeTruthy();
+    expect(screen.getByText('3W 1L 0D')).toBeTruthy();
+    unmount();
+
+    render(finished({wins: 0, losses: 0, draws: 0}));
+    expect(await screen.findByText('Your first match!')).toBeTruthy();
   });
 });

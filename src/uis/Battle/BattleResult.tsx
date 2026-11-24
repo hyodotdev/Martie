@@ -8,7 +8,7 @@ import {
 } from '../../../convex/battle/logic';
 import {t} from '../../STRINGS';
 import ButtonMartie from '../ButtonMartie';
-import {MartieHost, PlayerAvatar, RIVAL_COLOR} from './BattleParts';
+import {HeadToHead, MartieHost, PlayerAvatar, RIVAL_COLOR} from './BattleParts';
 import type {BattleRoom} from './types';
 
 type Props = {
@@ -169,6 +169,9 @@ export default function BattleResult({
           </Typography.Body4>
         </PlayerColumn>
       </ScoreCard>
+      {room.headToHead && opponent ? (
+        <HeadToHead record={room.headToHead} opponentName={opponent.displayName} />
+      ) : null}
 
       {room.rematchCode ? (
         <ButtonMartie

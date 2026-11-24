@@ -10,7 +10,8 @@ import {t} from '../../STRINGS';
 import {isSeenRecently} from '../../utils/battle';
 import {useNow} from '../../hooks/useBattleCountdown';
 import ButtonMartie from '../ButtonMartie';
-import {MartieHost, PlayerAvatar, RIVAL_COLOR} from './BattleParts';
+import {HeadToHead, MartieHost, PlayerAvatar, RIVAL_COLOR} from './BattleParts';
+import {recordText} from './BattleRecordCard';
 import type {BattlePlayer, BattleRoom} from './types';
 
 const PRESENCE_REFRESH_MS = 5000;
@@ -84,6 +85,14 @@ function PlayerSlot({
       >
         {name}
       </Typography.Body2>
+      <Typography.Body4
+        style={css`
+          font-weight: 700;
+          opacity: 0.6;
+        `}
+      >
+        {recordText(player.record)}
+      </Typography.Body4>
       {isHost ? (
         <Typography.Body4
           style={css`
@@ -163,6 +172,9 @@ export default function BattleLobby({
           now={now}
         />
       </SlotsRow>
+      {room.headToHead && opponent ? (
+        <HeadToHead record={room.headToHead} opponentName={opponent.displayName} />
+      ) : null}
 
       {hasOpponent ? (
         <Typography.Body3

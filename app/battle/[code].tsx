@@ -100,6 +100,8 @@ function BattleRoomPage(): JSX.Element {
     myRoleRef.current = myRole;
   }, [myRole, status]);
   const allowLeaveRef = useRef(false);
+  // A quick double back press must not stack a second leave prompt.
+  const leavePromptOpenRef = useRef(false);
 
   useEffect(() => {
     logEvent(LOG_EVENTS.BATTLE_LINK_OPENED, {hasCode: !!code});
@@ -161,12 +163,21 @@ function BattleRoomPage(): JSX.Element {
       navigation.dispatch(data.action);
       return;
     }
+    if (leavePromptOpenRef.current) return;
+    leavePromptOpenRef.current = true;
     Alert.alert(t('battle.leaveTitle'), t('battle.leaveMessage'), [
-      {text: t('common.cancel'), style: 'cancel'},
+      {
+        text: t('common.cancel'),
+        style: 'cancel',
+        onPress: () => {
+          leavePromptOpenRef.current = false;
+        },
+      },
       {
         text: t('battle.leave'),
         style: 'destructive',
         onPress: () => {
+          leavePromptOpenRef.current = false;
           allowLeaveRef.current = true;
           logEvent(LOG_EVENTS.BATTLE_LEFT, {phase: 'match'});
           void leave().finally(() => navigation.dispatch(data.action));

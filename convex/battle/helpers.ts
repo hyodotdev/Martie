@@ -7,6 +7,8 @@ import {
   BATTLE_FIRST_BUZZ_MS,
   BATTLE_QUESTION_COUNT,
   BATTLE_STAKE_BULBS,
+  EMPTY_BATTLE_STATS,
+  applyResult,
   decideOutcome,
   payout,
   shuffle,
@@ -243,16 +245,10 @@ export async function finishBattle(
     const myScore = player.role === 'host' ? battle.hostScore : battle.guestScore;
     const opponentScore =
       player.role === 'host' ? battle.guestScore : battle.hostScore;
-    await ctx.db.patch(player._id, {
-      result:
-        outcome === 'draw'
-          ? 'draw'
-          : outcome === player.role
-            ? 'win'
-            : 'loss',
-      myScore,
-      opponentScore,
-    });
+    const result =
+      outcome === 'draw' ? 'draw' : outcome === player.role ? 'win' : 'loss';
+    await ctx.db.patch(player._id, {result, myScore, opponentScore});
+    await recordResult(ctx, player.userId, player.opponentUserId, result, now);
   }
 
   await ctx.db.patch(battle._id, {
@@ -266,4 +262,73 @@ export async function finishBattle(
     phaseEndsAt: undefined,
     phaseVersion: battle.phaseVersion + 1,
   });
+}
+
+export async function getBattleStats(
+  ctx: QueryCtx,
+  userId: Id<'users'>,
+): Promise<Doc<'battleStats'> | null> {
+  return ctx.db
+    .query('battleStats')
+    .withIndex('by_user', (q) => q.eq('userId', userId))
+    .first();
+}
+
+export async function getRivalRecord(
+  ctx: QueryCtx,
+  userId: Id<'users'>,
+  opponentUserId: Id<'users'>,
+): Promise<Doc<'battleRivals'> | null> {
+  return ctx.db
+    .query('battleRivals')
+    .withIndex('by_user_and_opponent', (q) =>
+      q.eq('userId', userId).eq('opponentUserId', opponentUserId),
+    )
+    .first();
+}
+
+/** Adds a finished match to the player's lifetime and head-to-head records. */
+async function recordResult(
+  ctx: MutationCtx,
+  userId: Id<'users'>,
+  opponentUserId: Id<'users'>,
+  result: 'win' | 'loss' | 'draw',
+  now: number,
+): Promise<void> {
+  const stats = await getBattleStats(ctx, userId);
+  const nextStats = applyResult(
+    {
+      wins: stats?.wins ?? EMPTY_BATTLE_STATS.wins,
+      losses: stats?.losses ?? EMPTY_BATTLE_STATS.losses,
+      draws: stats?.draws ?? EMPTY_BATTLE_STATS.draws,
+      streak: stats?.streak ?? EMPTY_BATTLE_STATS.streak,
+      bestStreak: stats?.bestStreak ?? EMPTY_BATTLE_STATS.bestStreak,
+    },
+    result,
+  );
+  if (stats) {
+    await ctx.db.patch(stats._id, {...nextStats, updatedAt: now});
+  } else {
+    await ctx.db.insert('battleStats', {userId, ...nextStats, updatedAt: now});
+  }
+
+  const rival = await getRivalRecord(ctx, userId, opponentUserId);
+  const nextRival = applyResult(
+    {
+      wins: rival?.wins ?? 0,
+      losses: rival?.losses ?? 0,
+      draws: rival?.draws ?? 0,
+    },
+    result,
+  );
+  if (rival) {
+    await ctx.db.patch(rival._id, {...nextRival, lastPlayedAt: now});
+  } else {
+    await ctx.db.insert('battleRivals', {
+      userId,
+      opponentUserId,
+      ...nextRival,
+      lastPlayedAt: now,
+    });
+  }
 }

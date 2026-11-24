@@ -103,3 +103,27 @@ export const battlePlayersTable = defineTable({
 })
   .index('by_user_and_created', ['userId', 'createdAt'])
   .index('by_battle', ['battleId']);
+
+const recordFields = {
+  wins: v.number(),
+  losses: v.number(),
+  draws: v.number(),
+};
+
+// Lifetime 1:1 record per player, kept beside the history so it never needs
+// the whole history to be read.
+export const battleStatsTable = defineTable({
+  userId: v.id('users'),
+  ...recordFields,
+  streak: v.number(),
+  bestStreak: v.number(),
+  updatedAt: v.number(),
+}).index('by_user', ['userId']);
+
+// Head-to-head record from `userId`'s side against one opponent.
+export const battleRivalsTable = defineTable({
+  userId: v.id('users'),
+  opponentUserId: v.id('users'),
+  ...recordFields,
+  lastPlayedAt: v.number(),
+}).index('by_user_and_opponent', ['userId', 'opponentUserId']);

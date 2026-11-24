@@ -183,6 +183,49 @@ export function payout(outcome: BattleOutcome): Record<BattleRole, number> {
   return outcome === 'host' ? {host: pot, guest: 0} : {host: 0, guest: pot};
 }
 
+export type BattleRecord = {
+  wins: number;
+  losses: number;
+  draws: number;
+};
+
+export type BattleStatsRecord = BattleRecord & {
+  // Consecutive wins up to the last match; a loss or draw resets it.
+  streak: number;
+  bestStreak: number;
+};
+
+export const EMPTY_BATTLE_STATS: BattleStatsRecord = {
+  wins: 0,
+  losses: 0,
+  draws: 0,
+  streak: 0,
+  bestStreak: 0,
+};
+
+/** Adds one finished match to a running record. */
+export function applyResult<T extends BattleRecord & Partial<BattleStatsRecord>>(
+  record: T,
+  result: 'win' | 'loss' | 'draw',
+): T {
+  const streak = result === 'win' ? (record.streak ?? 0) + 1 : 0;
+  return {
+    ...record,
+    wins: record.wins + (result === 'win' ? 1 : 0),
+    losses: record.losses + (result === 'loss' ? 1 : 0),
+    draws: record.draws + (result === 'draw' ? 1 : 0),
+    ...(record.streak === undefined
+      ? {}
+      : {streak, bestStreak: Math.max(record.bestStreak ?? 0, streak)}),
+  };
+}
+
+/** Whole-number win rate over decided and drawn matches, or null before any. */
+export function winRate(record: BattleRecord): number | null {
+  const played = record.wins + record.losses + record.draws;
+  return played === 0 ? null : Math.round((record.wins / played) * 100);
+}
+
 export type JoinRejection =
   | 'not_found'
   | 'closed'

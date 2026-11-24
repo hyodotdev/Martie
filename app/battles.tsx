@@ -1,7 +1,7 @@
 /**
  * @name Battles
  *
- * 1:1 퀴즈 대결 허브 — 방 만들기 + 최근 대결 기록
+ * 1:1 퀴즈 대결 허브 — 방 만들기 + 내 전적 + 최근 대결 기록
  */
 import {styled, css} from 'kstyled';
 import {FlashList} from '@shopify/flash-list';
@@ -10,7 +10,7 @@ import {Stack} from 'expo-router';
 import {ActivityIndicator, Platform, View} from 'react-native';
 import {useCallback, useEffect, useMemo} from 'react';
 import {ImpactFeedbackStyle} from 'expo-haptics';
-import {useConvexAuth, usePaginatedQuery} from 'convex/react';
+import {useConvexAuth, usePaginatedQuery, useQuery} from 'convex/react';
 import {api} from '../convex/_generated/api';
 import type {BattleHistoryItem} from '../convex/battle/queries';
 import {BATTLE_STAKE_BULBS} from '../convex/battle/logic';
@@ -19,6 +19,7 @@ import {logScreenView} from '../src/utils/analytics';
 import {withErrorBoundary} from '../src/hoc/withErrorBoundary';
 import ButtonMartie from '../src/uis/ButtonMartie';
 import {MartieHost} from '../src/uis/Battle/BattleParts';
+import BattleRecordCard from '../src/uis/Battle/BattleRecordCard';
 import {needsInviteAd, useBattleInvite} from '../src/hooks/useBattleInvite';
 import {useUserStore} from '../src/stores/userStore';
 
@@ -37,6 +38,10 @@ function BattlesPage(): JSX.Element {
   const {isAuthenticated} = useConvexAuth();
   const isPremium = useUserStore((state) => state.isPremium);
   const {startInvite, isStarting} = useBattleInvite();
+  const stats = useQuery(
+    api.battle.queries.getMyBattleStats,
+    isAuthenticated ? {} : 'skip',
+  );
   const {results, status, loadMore, isLoading} = usePaginatedQuery(
     api.battle.queries.listMyBattles,
     isAuthenticated ? {} : 'skip',
@@ -172,6 +177,7 @@ function BattlesPage(): JSX.Element {
             </Typography.Body4>
           ) : null}
         </HeroCard>
+        {stats ? <BattleRecordCard stats={stats} /> : null}
         {isAuthenticated ? (
           <Typography.Heading5
             style={css`
@@ -183,7 +189,7 @@ function BattlesPage(): JSX.Element {
         ) : null}
       </View>
     ),
-    [handleCreate, isAuthenticated, isPremium, isStarting],
+    [handleCreate, isAuthenticated, isPremium, isStarting, stats],
   );
 
   const ListEmpty = useCallback(() => {

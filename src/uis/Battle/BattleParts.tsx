@@ -17,6 +17,9 @@ import {
   IC_MARTIE_SMILE,
   IC_MARTIE_SWEAT,
 } from '../../icons';
+import type {BattleRecord} from '../../../convex/battle/logic';
+import {t} from '../../STRINGS';
+import {recordText} from './BattleRecordCard';
 import type {BattlePlayer} from './types';
 
 // Each side keeps one color on every screen so a glance tells who did what.
@@ -195,6 +198,92 @@ export function PlayerAvatar({
     </View>
   );
 }
+
+/** My record against this opponent, or a first-meeting note. */
+export function HeadToHead({
+  record,
+  opponentName,
+}: {
+  record: BattleRecord;
+  opponentName: string;
+}): JSX.Element {
+  const {theme} = useCPK();
+  const played = record.wins + record.losses + record.draws;
+  return (
+    <Rivalry>
+      <Typography.Body4
+        numberOfLines={1}
+        style={css`
+          font-weight: 700;
+          opacity: 0.7;
+        `}
+      >
+        ⚔️ {t('battle.headToHeadTitle', {name: opponentName})}
+      </Typography.Body4>
+      {played === 0 ? (
+        <Typography.Body2
+          style={css`
+            font-weight: 800;
+          `}
+        >
+          {t('battle.firstMeeting')}
+        </Typography.Body2>
+      ) : (
+        <View
+          style={css`
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+          `}
+        >
+          <Typography.Heading4
+            style={css`
+              font-weight: 900;
+              color: ${theme.role.primary};
+            `}
+          >
+            {record.wins}
+          </Typography.Heading4>
+          <Typography.Body3
+            style={css`
+              font-weight: 700;
+              opacity: 0.6;
+            `}
+          >
+:
+          </Typography.Body3>
+          <Typography.Heading4
+            style={css`
+              font-weight: 900;
+              color: ${RIVAL_COLOR};
+            `}
+          >
+            {record.losses}
+          </Typography.Heading4>
+        </View>
+      )}
+      {played > 0 ? (
+        <Typography.Body4
+          style={css`
+            opacity: 0.6;
+          `}
+        >
+          {recordText(record)}
+        </Typography.Body4>
+      ) : null}
+    </Rivalry>
+  );
+}
+
+const Rivalry = styled.View`
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border-width: 2px;
+  border-style: dashed;
+  border-color: ${({theme}) => theme.role.border};
+`;
 
 const HostRow = styled.View`
   flex-direction: row;

@@ -25,6 +25,8 @@ import {
   battlesTable,
   battleRoundsTable,
   battlePlayersTable,
+  battleStatsTable,
+  battleRivalsTable,
 } from './schema/battles';
 import {
   analyticsVisitorsTable,
@@ -58,4 +60,6 @@ export default defineSchema({
   battles: battlesTable,
   battleRounds: battleRoundsTable,
   battlePlayers: battlePlayersTable,
+  battleStats: battleStatsTable,
+  battleRivals: battleRivalsTable,
 });

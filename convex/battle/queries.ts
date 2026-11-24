@@ -5,12 +5,21 @@ import {query} from '../_generated/server';
 import type {Doc, Id} from '../_generated/dataModel';
 import type {QueryCtx} from '../_generated/server';
 import {getQuizLanguageMap} from '../quizLanguage/helpers';
-import {getBattleByCode, getProfile, getRound} from './helpers';
+import {
+  getBattleByCode,
+  getBattleStats,
+  getProfile,
+  getRivalRecord,
+  getRound,
+} from './helpers';
 import {
   BATTLE_STAKE_BULBS,
   normalizeBattleCode,
+  otherRole,
   roleOf,
+  type BattleRecord,
   type BattleRole,
+  type BattleStatsRecord,
 } from './logic';
 
 const quizLanguageValidator = v.union(
@@ -24,7 +33,14 @@ type BattlePlayerView = {
   avatarUrl: string | null;
   ready: boolean;
   seenAt: number | undefined;
+  record: BattleRecord;
 };
+
+const toRecord = (row: BattleRecord | null): BattleRecord => ({
+  wins: row?.wins ?? 0,
+  losses: row?.losses ?? 0,
+  draws: row?.draws ?? 0,
+});
 
 async function playerView(
   ctx: QueryCtx,
@@ -45,6 +61,7 @@ async function playerView(
     avatarUrl,
     ready,
     seenAt,
+    record: toRecord(await getBattleStats(ctx, userId)),
   };
 }
 
@@ -118,11 +135,24 @@ export const getRoom = query({
     const battle = normalized ? await getBattleByCode(ctx, normalized) : null;
     if (!battle) return null;
     const userId = await getAuthUserId(ctx).catch(() => null);
+    const myRole = roleOf(battle, userId);
+    const opponentUserId =
+      myRole === null
+        ? undefined
+        : otherRole(myRole) === 'host'
+          ? battle.hostUserId
+          : battle.guestUserId;
+    // My record against this opponent, from my side.
+    const headToHead =
+      userId && opponentUserId
+        ? toRecord(await getRivalRecord(ctx, userId, opponentUserId))
+        : null;
 
     return {
       code: battle.code,
       status: battle.status,
-      myRole: roleOf(battle, userId),
+      myRole,
+      headToHead,
       host: await playerView(
         ctx,
         battle.hostUserId,
@@ -195,5 +225,19 @@ export const listMyBattles = query({
       }),
     );
     return {...paginated, page};
+  },
+});
+
+export const getMyBattleStats = query({
+  args: {},
+  handler: async (ctx): Promise<BattleStatsRecord | null> => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const stats = await getBattleStats(ctx, userId);
+    return {
+      ...toRecord(stats),
+      streak: stats?.streak ?? 0,
+      bestStreak: stats?.bestStreak ?? 0,
+    };
   },
 });

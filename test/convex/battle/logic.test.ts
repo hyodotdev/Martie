@@ -3,6 +3,7 @@ import {
   BATTLE_CODE_LENGTH,
   BATTLE_PRESENCE_STALE_MS,
   addPoint,
+  applyResult,
   checkJoin,
   decideOutcome,
   evaluateBuzz,
@@ -14,6 +15,7 @@ import {
   roleOf,
   shuffle,
   type RoundPlay,
+  winRate,
 } from '../../../convex/battle/logic';
 
 const round = (overrides: Partial<RoundPlay> = {}): RoundPlay => ({
@@ -136,6 +138,30 @@ describe('scoring', () => {
     expect(payout('host')).toEqual({host: 2, guest: 0});
     expect(payout('guest')).toEqual({host: 0, guest: 2});
     expect(payout('draw')).toEqual({host: 1, guest: 1});
+  });
+});
+
+describe('records', () => {
+  it('counts results and tracks the win streak', () => {
+    let stats = {wins: 0, losses: 0, draws: 0, streak: 0, bestStreak: 0};
+    for (const result of ['win', 'win', 'loss', 'win'] as const) {
+      stats = applyResult(stats, result);
+    }
+    expect(stats).toEqual({wins: 3, losses: 1, draws: 0, streak: 1, bestStreak: 2});
+    expect(applyResult(stats, 'draw')).toMatchObject({draws: 1, streak: 0});
+  });
+
+  it('leaves records without a streak alone', () => {
+    expect(applyResult({wins: 1, losses: 0, draws: 0}, 'loss')).toEqual({
+      wins: 1,
+      losses: 1,
+      draws: 0,
+    });
+  });
+
+  it('rounds the win rate and has none before a match', () => {
+    expect(winRate({wins: 2, losses: 1, draws: 0})).toBe(67);
+    expect(winRate({wins: 0, losses: 0, draws: 0})).toBeNull();
   });
 });
 

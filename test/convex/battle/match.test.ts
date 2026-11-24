@@ -9,7 +9,11 @@ import {
   setReady,
   sweepStaleRooms,
 } from '../../../convex/battle/mutations';
-import {getRoom, listMyBattles} from '../../../convex/battle/queries';
+import {
+  getMyBattleStats,
+  getRoom,
+  listMyBattles,
+} from '../../../convex/battle/queries';
 import {
   BATTLE_BUZZ_GRACE_MS,
   BATTLE_JUDGE_MS,
@@ -41,6 +45,9 @@ const call = {
   getRoom: handlerOf<CodeArgs & {language?: 'en'}, Record<string, unknown> | null>(
     getRoom,
   ),
+  getMyBattleStats: handlerOf<Record<string, never>, Record<string, number> | null>(
+    getMyBattleStats,
+  ),
   listMyBattles: handlerOf<
     {paginationOpts: {numItems: number; cursor: string | null}},
     {page: Record<string, unknown>[]}
@@ -54,7 +61,8 @@ let ctx: FakeCtx;
 const as = (userId: string | null) => {
   (getAuthUserId as jest.Mock).mockResolvedValue(userId);
 };
-const battle = () => fake.table('battles')[0];
+// The match being played is the newest room (a rematch opens a new one).
+const battle = () => fake.table('battles').at(-1)!;
 const profile = (userId: string) =>
   fake.table('userProfiles').find((p) => p.userId === userId)!;
 const currentRound = () =>
@@ -289,6 +297,58 @@ describe('battle match', () => {
     expect(battle()).toMatchObject({status: 'finished', outcome: 'draw'});
     expect(profile(HOST).bulbCount).toBe(3);
     expect(profile(GUEST).bulbCount).toBe(3);
+    as(GUEST);
+    expect(await call.getMyBattleStats(ctx, {})).toEqual({
+      wins: 0,
+      losses: 0,
+      draws: 1,
+      streak: 0,
+      bestStreak: 0,
+    });
+  });
+
+  it('keeps lifetime and head-to-head records across matches', async () => {
+    const winAll = async (code: string, winner: string) => {
+      await runScheduled();
+      for (let index = 0; index < BATTLE_QUESTION_COUNT; index++) {
+        as(winner);
+        await call.buzz(ctx, {
+          code,
+          index,
+          optionKey: currentRound().correctOptionKey as string,
+        });
+        await runScheduled(); // judging ends
+        await runScheduled(); // reveal ends
+      }
+    };
+
+    const first = await openMatch();
+    await winAll(first, HOST);
+    as(HOST);
+    const second = (await call.requestRematch(ctx, {code: first})).code!;
+    as(GUEST);
+    await call.joinRoom(ctx, {code: second});
+    for (const user of [HOST, GUEST]) {
+      as(user);
+      await call.setReady(ctx, {code: second, ready: true});
+    }
+    await winAll(second, HOST);
+
+    as(HOST);
+    expect(await call.getMyBattleStats(ctx, {})).toEqual({
+      wins: 2,
+      losses: 0,
+      draws: 0,
+      streak: 2,
+      bestStreak: 2,
+    });
+    as(GUEST);
+    expect(await call.getRoom(ctx, {code: second})).toMatchObject({
+      headToHead: {wins: 0, losses: 2, draws: 0},
+      host: {record: {wins: 2, losses: 0, draws: 0}},
+      guest: {record: {wins: 0, losses: 2, draws: 0}},
+    });
+    expect(fake.table('battleRivals')).toHaveLength(2);
   });
 
   it('leaving a running match forfeits it to the other player', async () => {
@@ -303,6 +363,8 @@ describe('battle match', () => {
       forfeitedBy: 'guest',
     });
     expect(profile(HOST).bulbCount).toBe(4);
+    // A forfeit counts as a loss in the record.
+    expect(await call.getMyBattleStats(ctx, {})).toMatchObject({losses: 1});
   });
 
   it('does not start or charge when the opponent has no bulb', async () => {
@@ -402,6 +464,6 @@ describe('battle lobby', () => {
     const second = await call.requestRematch(ctx, {code});
     expect(first).toMatchObject({ok: true});
     expect(second.code).toBe(first.code);
-    expect(battle().rematchCode).toBe(first.code);
+    expect(fake.table('battles')[0].rematchCode).toBe(first.code);
   });
 });
