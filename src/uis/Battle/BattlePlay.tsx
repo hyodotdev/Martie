@@ -21,6 +21,7 @@ import {
   RIVAL_COLOR,
   type MartieMood,
 } from './BattleParts';
+import {Burst} from './Sticker';
 import type {BattlePlayer, BattleRoom, BattleRound} from './types';
 
 type Props = {
@@ -310,57 +311,30 @@ function OptionCard({
 
 /** The match opens with a slam, right after the lobby countdown. */
 function GoBurst({color}: {color: string}): JSX.Element {
-  const slam = useSharedValue(2.4);
-  const ring = useSharedValue(0);
+  const slam = useSharedValue(1.8);
   useEffect(() => {
-    slam.set(withSpring(1, {damping: 15, stiffness: 220}));
-    ring.set(withTiming(1, {duration: 900}));
-  }, [ring, slam]);
+    slam.set(withSpring(1, {damping: 11, stiffness: 240}));
+  }, [slam]);
   const slamStyle = useAnimatedStyle(() => ({
-    opacity: Math.min(1, 2.8 - slam.get()),
-    transform: [{scale: slam.get()}, {rotate: '-6deg'}],
-  }));
-  const ringStyle = useAnimatedStyle(() => ({
-    opacity: 1 - ring.get(),
-    transform: [{scale: 0.5 + ring.get() * 1.6}],
+    transform: [{rotate: '-8deg'}, {scale: slam.get()}],
   }));
 
   return (
-    <View
-      style={css`
-        width: 180px;
-        height: 180px;
-        align-items: center;
-        justify-content: center;
-      `}
-    >
-      <Animated.View
-        style={[
-          {
-            position: 'absolute',
-            width: 160,
-            height: 160,
-            borderRadius: 80,
-            borderWidth: 5,
-            borderColor: color,
-          },
-          ringStyle,
-        ]}
-      />
-      <Animated.View style={slamStyle}>
+    <Animated.View style={slamStyle}>
+      <Burst size={190} color={color}>
         <Typography.Heading1
           accessibilityLiveRegion="assertive"
           style={css`
-            color: ${color};
-            font-size: 52px;
-            line-height: 64px;
+            color: #ffffff;
+            font-size: 44px;
+            line-height: 54px;
             font-weight: 900;
           `}
         >
           {t('battle.go')}
         </Typography.Heading1>
-      </Animated.View>
-    </View>
+      </Burst>
+    </Animated.View>
   );
 }
 

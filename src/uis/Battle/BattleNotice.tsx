@@ -19,6 +19,7 @@ import {
 } from '../../icons';
 import ButtonMartie from '../ButtonMartie';
 import type {BattleErrorReason} from './battleMessages';
+import {Burst, CREAM, Sticker} from './Sticker';
 
 export type NoticeKind = BattleErrorReason | 'invite';
 
@@ -105,9 +106,9 @@ export default function BattleNotice({
   return (
     <Container>
       <Stage>
-        <Halo style={{backgroundColor: theme.role.primary + '14'}}>
-          <InnerRing style={{borderColor: theme.role.primary + '40'}} />
-        </Halo>
+        <View style={{position: 'absolute'}}>
+          <Burst size={210} color={theme.role.primary + '24'} stroke={null} />
+        </View>
         <Animated.View style={bobStyle}>
           <Image
             accessibilityIgnoresInvertColors
@@ -117,24 +118,21 @@ export default function BattleNotice({
           />
         </Animated.View>
         <Animated.View
-          style={[
-            {
-              position: 'absolute',
-              top: 18,
-              right: 14,
+          style={[{position: 'absolute', top: 14, right: 8}, wiggleStyle]}
+        >
+          <Sticker
+            radius={29}
+            offset={3}
+            faceStyle={{
               width: 58,
               height: 58,
-              borderRadius: 29,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: theme.bg.basic,
-              borderWidth: 2,
-              borderColor: theme.role.border,
-            },
-            wiggleStyle,
-          ]}
-        >
-          <Typography.Heading3>{emoji}</Typography.Heading3>
+              backgroundColor: CREAM,
+            }}
+          >
+            <Typography.Heading3>{emoji}</Typography.Heading3>
+          </Sticker>
         </Animated.View>
         <Shadow />
       </Stage>
@@ -192,23 +190,6 @@ const Stage = styled.View`
   height: 220px;
   align-items: center;
   justify-content: center;
-`;
-
-const Halo = styled.View`
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  border-radius: 100px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const InnerRing = styled.View`
-  width: 172px;
-  height: 172px;
-  border-radius: 86px;
-  border-width: 2px;
-  border-style: dashed;
 `;
 
 const Shadow = styled.View`

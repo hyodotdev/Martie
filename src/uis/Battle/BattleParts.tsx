@@ -23,7 +23,8 @@ import {recordText} from './BattleRecordCard';
 import type {BattlePlayer} from './types';
 
 // Each side keeps one color on every screen so a glance tells who did what.
-export const RIVAL_COLOR = '#4C7DFF';
+// The rival wears Martie's own indigo, a shade lighter so it reads on dark.
+export const RIVAL_COLOR = '#5A63C8';
 
 export type MartieMood =
   | 'basic'
@@ -280,9 +281,7 @@ const Rivalry = styled.View`
   gap: 4px;
   padding: 12px 16px;
   border-radius: 16px;
-  border-width: 2px;
-  border-style: dashed;
-  border-color: ${({theme}) => theme.role.border};
+  background-color: ${({theme}) => theme.bg.paper};
 `;
 
 const HostRow = styled.View`

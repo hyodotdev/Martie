@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {Pressable, View} from 'react-native';
+import {Image, Pressable, View} from 'react-native';
 import {Typography, useCPK} from 'cpk-ui';
 import {styled, css} from 'kstyled';
 import {
@@ -24,15 +24,17 @@ import {
 import {t} from '../../STRINGS';
 import {isSeenRecently} from '../../utils/battle';
 import {useNow} from '../../hooks/useBattleCountdown';
-import ButtonMartie from '../ButtonMartie';
+import {IC_MARTIE_SLEEP} from '../../icons';
 import {HeadToHead, MartieHost, PlayerAvatar, RIVAL_COLOR} from './BattleParts';
 import LaunchCountdown from './LaunchCountdown';
 import PlayerPeek from './PlayerPeek';
+import {Burst, CREAM, INK, Sticker, StickerButton} from './Sticker';
 import type {BattlePlayer, BattleRoom} from './types';
 
 const PRESENCE_REFRESH_MS = 5000;
-// The arena is dark in both themes, like a versus screen.
-const ARENA_BG = '#15131F';
+// The arena is a printed card in both themes, warm like the bulb.
+const ARENA_BG = '#FFF1C9';
+const SEAT_HEIGHT = 176;
 
 type Props = {
   room: BattleRoom;
@@ -101,34 +103,34 @@ function PlayerSlot({
     ],
   }));
 
+  // Seats lean toward each other, like two cards squaring off.
+  const tilt = `${side * -2}deg`;
+
   if (!player) {
     return (
-      <Slot
-        accessibilityLabel={t('battle.emptySeat')}
-        style={css`
-          border-style: dashed;
-          border-color: #ffffff33;
-        `}
+      <Sticker
+        style={{flex: 1, transform: [{rotate: tilt}]}}
+        shadow={INK + '33'}
+        faceStyle={{height: SEAT_HEIGHT, backgroundColor: CREAM, borderColor: INK + '66'}}
       >
-        <EmptyAvatar>
-          <Typography.Heading4
+        <SeatBody accessibilityLabel={t('battle.emptySeat')}>
+          <Image
+            accessibilityIgnoresInvertColors
+            source={IC_MARTIE_SLEEP}
+            resizeMode="contain"
+            style={{width: 64, height: 64, opacity: 0.55}}
+          />
+          <Typography.Body3
             style={css`
-              color: #ffffff4d;
-              font-weight: 900;
+              color: ${INK};
+              opacity: 0.55;
+              font-weight: 800;
             `}
           >
-            ?
-          </Typography.Heading4>
-        </EmptyAvatar>
-        <Typography.Body3
-          style={css`
-            color: #ffffff80;
-            font-weight: 700;
-          `}
-        >
-          {t('battle.emptySeat')}
-        </Typography.Body3>
-      </Slot>
+            {t('battle.emptySeat')}
+          </Typography.Body3>
+        </SeatBody>
+      </Sticker>
     );
   }
 
@@ -162,63 +164,70 @@ function PlayerSlot({
           onPeek(false);
         }}
       >
-        <Slot
-          style={css`
-            border-color: ${lit ? color : '#FFFFFF26'};
-            background-color: ${lit ? color + '33' : '#FFFFFF0F'};
-          `}
+        <Sticker
+          style={{transform: [{rotate: tilt}]}}
+          // A ready player's card casts their own color.
+          shadow={lit ? color : INK}
+          offset={lit ? 6 : 4}
+          faceStyle={{height: SEAT_HEIGHT}}
         >
-          <View>
-            <PlayerAvatar player={player} size={60} ringColor={color} />
-            {isHost ? (
-              <CrownBadge>
-                <Typography.Body4>👑</Typography.Body4>
-              </CrownBadge>
-            ) : null}
-            {isMe ? (
-              <MeTag style={{backgroundColor: color}}>
+          <SeatBody>
+            <View>
+              <PlayerAvatar player={player} size={58} ringColor={color} />
+              {isHost ? (
+                <CrownBadge>
+                  <Typography.Body4>👑</Typography.Body4>
+                </CrownBadge>
+              ) : null}
+              {isMe ? (
+                <MeTag style={{backgroundColor: color}}>
+                  <Typography.Body4
+                    style={css`
+                      color: #ffffff;
+                      font-weight: 800;
+                      font-size: 11px;
+                    `}
+                  >
+                    {t('battle.me')}
+                  </Typography.Body4>
+                </MeTag>
+              ) : null}
+            </View>
+            <Typography.Body2
+              numberOfLines={1}
+              style={css`
+                color: ${INK};
+                font-weight: 900;
+                max-width: 100%;
+              `}
+            >
+              {player.displayName}
+            </Typography.Body2>
+            {lit ? (
+              // Stamped on, a little crooked, like a rubber stamp.
+              <Stamp style={{backgroundColor: color, transform: [{rotate: '-6deg'}]}}>
                 <Typography.Body4
                   style={css`
                     color: #ffffff;
-                    font-weight: 800;
-                    font-size: 11px;
+                    font-weight: 900;
                   `}
                 >
-                  {t('battle.me')}
+                  {label}
                 </Typography.Body4>
-              </MeTag>
-            ) : null}
-          </View>
-          <Typography.Body2
-            numberOfLines={1}
-            style={css`
-              color: #ffffff;
-              font-weight: 800;
-              max-width: 100%;
-            `}
-          >
-            {player.displayName}
-          </Typography.Body2>
-          <StatusPill
-            style={css`
-              background-color: ${!online
-                ? '#FFFFFF33'
-                : player.ready
-                  ? color
-                  : '#FFFFFF1F'};
-            `}
-          >
-            <Typography.Body4
-              style={css`
-                font-weight: 800;
-                color: #ffffff;
-              `}
-            >
-              {lit ? '✓ ' : ''}
-              {label}
-            </Typography.Body4>
-          </StatusPill>
-        </Slot>
+              </Stamp>
+            ) : (
+              <Typography.Body4
+                style={css`
+                  color: ${INK};
+                  opacity: 0.5;
+                  font-weight: 800;
+                `}
+              >
+                {label}
+              </Typography.Body4>
+            )}
+          </SeatBody>
+        </Sticker>
       </Pressable>
     </Animated.View>
   );
@@ -265,7 +274,9 @@ export default function BattleLobby({
       ),
     );
   }, [beat, beatMs]);
-  const beatStyle = useAnimatedStyle(() => ({transform: [{scale: beat.get()}]}));
+  const beatStyle = useAnimatedStyle(() => ({
+    transform: [{rotate: '-8deg'}, {scale: beat.get()}],
+  }));
 
   // A jolt when the rival sits down, and a jolt when someone backs out.
   const hadOpponent = useRef(hasOpponent);
@@ -284,71 +295,73 @@ export default function BattleLobby({
   return (
     <Container>
       <MartieHost mood={hasOpponent ? 'smile' : 'basic'} message={mc} size={80} />
-      <Arena>
-        <ArenaHalves pointerEvents="none">
-          <View style={{flex: 1, backgroundColor: theme.role.primary + '40'}} />
-          <View style={{flex: 1, backgroundColor: RIVAL_COLOR + '40'}} />
-        </ArenaHalves>
-        <Slash style={{left: '50%', transform: [{rotate: '14deg'}]}} />
-        <ArenaHeader>
-          <Typography.Body4
-            style={css`
-              color: #ffffffb3;
-              font-weight: 900;
-              letter-spacing: 2px;
-            `}
-          >
-            {t('battle.arenaTitle')}
-          </Typography.Body4>
-          <PotTag>
-            <Typography.Body4
+      <Sticker shadow={INK} offset={5} radius={26} faceStyle={{backgroundColor: ARENA_BG}}>
+        <ArenaBody>
+          <ArenaHeader>
+            <Typography.Heading5
               style={css`
-                color: #ffffff;
-                font-weight: 800;
+                color: ${INK};
+                font-weight: 900;
               `}
             >
-              {t('battle.potLabel', {pot: room.stake * 2})}
-            </Typography.Body4>
-          </PotTag>
-        </ArenaHeader>
-        <SlotsRow>
-          <PlayerSlot
-            player={room.host}
-            isMe={myRole === 'host'}
-            isHost
-            side={-1}
-            offsetMs={offsetMs}
-            now={now}
-            onPeek={(sticky) => setPeek({role: 'host', sticky})}
-            onPeekEnd={endPeek}
-          />
-          <Animated.View style={[{zIndex: 1, marginHorizontal: -16}, beatStyle]}>
-            <VsBadge>
-              <Typography.Heading5
+              {t('battle.arenaTitle')}
+            </Typography.Heading5>
+            <Sticker
+              offset={2}
+              radius={10}
+              faceStyle={{borderWidth: 2, paddingVertical: 2, paddingHorizontal: 8}}
+            >
+              <Typography.Body4
                 style={css`
-                  color: #15131f;
+                  color: ${INK};
                   font-weight: 900;
-                  font-style: italic;
                 `}
               >
-                VS
-              </Typography.Heading5>
-            </VsBadge>
-          </Animated.View>
-          <PlayerSlot
-            // A new key per guest replays the slide-in when someone sits down.
-            key={room.guest?.displayName ?? 'empty'}
-            player={room.guest}
-            isMe={myRole === 'guest'}
-            isHost={false}
-            side={1}
-            offsetMs={offsetMs}
-            now={now}
-            onPeek={(sticky) => setPeek({role: 'guest', sticky})}
-            onPeekEnd={endPeek}
-          />
-        </SlotsRow>
-      </Arena>
+                {t('battle.potLabel', {pot: room.stake * 2})}
+              </Typography.Body4>
+            </Sticker>
+          </ArenaHeader>
+          <SlotsRow>
+            <PlayerSlot
+              player={room.host}
+              isMe={myRole === 'host'}
+              isHost
+              side={-1}
+              offsetMs={offsetMs}
+              now={now}
+              onPeek={(sticky) => setPeek({role: 'host', sticky})}
+              onPeekEnd={endPeek}
+            />
+            <Animated.View
+              style={[{zIndex: 1, marginHorizontal: -10}, beatStyle]}
+            >
+              <Burst size={60}>
+                <Typography.Heading5
+                  style={css`
+                    color: ${INK};
+                    font-weight: 900;
+                    font-style: italic;
+                  `}
+                >
+                  VS
+                </Typography.Heading5>
+              </Burst>
+            </Animated.View>
+            <PlayerSlot
+              // A new key per guest replays the slide-in when someone sits down.
+              key={room.guest?.displayName ?? 'empty'}
+              player={room.guest}
+              isMe={myRole === 'guest'}
+              isHost={false}
+              side={1}
+              offsetMs={offsetMs}
+              now={now}
+              onPeek={(sticky) => setPeek({role: 'guest', sticky})}
+              onPeekEnd={endPeek}
+            />
+          </SlotsRow>
+        </ArenaBody>
+      </Sticker>
       <Typography.Body4
         style={css`
           margin-top: -10px;
@@ -374,45 +387,21 @@ export default function BattleLobby({
       ) : null}
 
       {hasOpponent ? (
-        <ButtonMartie
-          hapticFeedback={ImpactFeedbackStyle.Medium}
-          disabled={isBusy}
-          loading={isBusy}
-          onPress={() => onReady(!me?.ready)}
+        <StickerButton
           text={me?.ready ? t('battle.unready') : t('battle.ready')}
-          borderRadius={14}
-          color={me?.ready ? 'light' : 'primary'}
-          styles={{
-            container: css`
-              height: 52px;
-              border-width: 0;
-            `,
-            text: css`
-              font-size: 16px;
-              font-weight: 800;
-            `,
-          }}
+          onPress={() => onReady(!me?.ready)}
+          disabled={isBusy}
+          color={me?.ready ? CREAM : theme.role.primary}
+          textColor={me?.ready ? INK : '#FFFFFF'}
         />
       ) : null}
 
       {/* The room is 1:1, so inviting stops once the other seat is taken. */}
       {myRole === 'host' && !hasOpponent ? (
-        <ButtonMartie
-          hapticFeedback={ImpactFeedbackStyle.Light}
-          onPress={onShare}
+        <StickerButton
           text={t('battle.invite')}
-          borderRadius={14}
-          color="primary"
-          styles={{
-            container: css`
-              height: 48px;
-              border-width: 0;
-            `,
-            text: css`
-              font-size: 15px;
-              font-weight: 700;
-            `,
-          }}
+          onPress={onShare}
+          color={theme.role.primary}
         />
       ) : null}
 
@@ -457,108 +446,59 @@ const Container = styled.View`
   gap: 20px;
 `;
 
-const Arena = styled.View`
-  overflow: hidden;
+const ArenaBody = styled.View`
   gap: 14px;
-  padding: 14px 12px 16px;
-  border-radius: 26px;
-  background-color: ${ARENA_BG};
-`;
-
-const ArenaHalves = styled.View`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  flex-direction: row;
-`;
-
-const Slash = styled.View`
-  position: absolute;
-  top: -40px;
-  bottom: -40px;
-  width: 3px;
-  margin-left: -1px;
-  background-color: #ffffff59;
+  padding: 14px 12px 18px;
 `;
 
 const ArenaHeader = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 0 4px;
-`;
-
-const PotTag = styled.View`
-  padding: 3px 10px;
-  border-radius: 10px;
-  background-color: #ffffff1f;
+  padding: 0 2px;
 `;
 
 const SlotsRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
 `;
 
-const VsBadge = styled.View`
-  width: 52px;
-  height: 52px;
-  border-radius: 26px;
-  align-items: center;
-  justify-content: center;
-  background-color: #ffffff;
-  border-width: 3px;
-  border-color: ${ARENA_BG};
-`;
-
-const StatusPill = styled.View`
-  padding: 4px 10px;
-  border-radius: 12px;
-`;
-
-const Slot = styled.View`
+const SeatBody = styled.View`
   flex: 1;
-  height: 176px;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 10px;
-  border-radius: 20px;
-  border-width: 2px;
-  border-color: #ffffff26;
-  background-color: #ffffff0f;
+  padding: 12px 8px;
 `;
 
-const EmptyAvatar = styled.View`
-  width: 66px;
-  height: 66px;
-  border-radius: 33px;
-  align-items: center;
-  justify-content: center;
+const Stamp = styled.View`
+  padding: 3px 10px;
+  border-radius: 8px;
   border-width: 2px;
-  border-style: dashed;
-  border-color: #ffffff33;
+  border-color: ${INK};
 `;
 
 const CrownBadge = styled.View`
   position: absolute;
-  top: -6px;
-  right: -8px;
-  width: 26px;
-  height: 26px;
-  border-radius: 13px;
+  top: -8px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
   align-items: center;
   justify-content: center;
-  background-color: ${ARENA_BG};
+  border-width: 2px;
+  border-color: ${INK};
+  background-color: ${CREAM};
 `;
 
 const MeTag = styled.View`
   position: absolute;
-  bottom: -8px;
+  bottom: -9px;
   align-self: center;
-  padding: 1px 8px;
+  padding: 0 8px;
   border-radius: 8px;
+  border-width: 2px;
+  border-color: ${INK};
 `;
