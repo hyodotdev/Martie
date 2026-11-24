@@ -150,8 +150,14 @@ describe('levelPlayRewardCallback', () => {
   };
   const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
+  // Callbacks expire after a week, so pin the clock to just after `timestamp`.
+  beforeEach(() => {
+    jest.spyOn(Date, 'now').mockReturnValue(Date.UTC(2026, 10, 17, 12, 5));
+  });
+
   afterEach(() => {
     process.env = {...env};
+    (Date.now as jest.Mock).mockRestore();
   });
 
   it('grants the account sent as a custom param in grant mode', async () => {
