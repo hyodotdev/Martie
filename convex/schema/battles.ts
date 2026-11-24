@@ -32,6 +32,8 @@ export const battlesTable = defineTable({
       v.literal('reveal'),
     ),
   ),
+  // Set while both players are ready and the lobby counts down to the start.
+  launchAt: v.optional(v.number()),
   phaseStartedAt: v.optional(v.number()),
   phaseEndsAt: v.optional(v.number()),
   // Bumped on every phase change; scheduled timeouts carry the version they

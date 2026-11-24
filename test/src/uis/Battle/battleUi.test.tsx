@@ -84,6 +84,7 @@ const room = (overrides: Partial<BattleRoom> = {}): BattleRoom => ({
     record: {wins: 0, losses: 0, draws: 0},
   },
   stake: 1,
+  launchAt: null,
   phase: 'question',
   phaseStartedAt: 0,
   phaseEndsAt: 15000,
@@ -347,6 +348,59 @@ describe('BattleLobby invite', () => {
     render(lobby(room().guest));
     expect(await screen.findByLabelText('Gil, Offline')).toBeTruthy();
     expect(screen.queryByText('Invite a friend')).toBeNull();
+  });
+});
+
+describe('launch countdown', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const lobby = (launchAt: number | null, onReady = jest.fn()) =>
+    createTestElement(
+      <BattleLobby
+        room={room({status: 'waiting', round: null, launchAt})}
+        myRole="host"
+        offsetMs={0}
+        isBusy={false}
+        onReady={onReady}
+        onShare={jest.fn()}
+        onKick={jest.fn()}
+      />,
+    );
+
+  it('counts down over the lobby and lets me back out', async () => {
+    jest.spyOn(Date, 'now').mockReturnValue(1_000);
+    const onReady = jest.fn();
+    render(lobby(5_000, onReady));
+    expect(await screen.findByText('Battle starts in')).toBeTruthy();
+    expect(screen.getByText('4')).toBeTruthy();
+    // The pot shows in the arena and again on the countdown.
+    expect(screen.getAllByText('💡2 on the line')).toHaveLength(2);
+
+    fireEvent.press(screen.getByText('Wait! Not yet'));
+    expect(onReady).toHaveBeenCalledWith(false);
+  });
+
+  it('stays hidden until both are ready', async () => {
+    render(lobby(null));
+    expect(await screen.findByText('1:1 BATTLE')).toBeTruthy();
+    expect(screen.queryByText('Battle starts in')).toBeNull();
+  });
+
+  it('opens the match with a GO splash', async () => {
+    render(
+      createTestElement(
+        <BattlePlay
+          room={room({phase: 'countdown', round: null})}
+          myRole="host"
+          offsetMs={0}
+          pendingOptionKey={null}
+          onAnswer={jest.fn()}
+        />,
+      ),
+    );
+    expect(await screen.findByText('GO!')).toBeTruthy();
   });
 });
 

@@ -170,6 +170,10 @@ export const getRoom = query({
         battle.guestSeenAt,
       ),
       stake: BATTLE_STAKE_BULBS,
+      launchAt:
+        battle.status === 'waiting' && battle.hostReady && battle.guestReady
+          ? (battle.launchAt ?? null)
+          : null,
       phase: battle.phase ?? null,
       phaseStartedAt: battle.phaseStartedAt ?? null,
       phaseEndsAt: battle.phaseEndsAt ?? null,

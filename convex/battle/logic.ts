@@ -8,7 +8,10 @@
  */
 
 export const BATTLE_QUESTION_COUNT = 10;
-export const BATTLE_COUNTDOWN_MS = 3000;
+// Both ready: the lobby counts down this long, and un-readying cancels it.
+export const BATTLE_LAUNCH_MS = 5000;
+// Then the match opens with a short "go" splash before the first question.
+export const BATTLE_COUNTDOWN_MS = 1500;
 export const BATTLE_FIRST_BUZZ_MS = 15000;
 export const BATTLE_SECOND_CHANCE_MS = 7000;
 export const BATTLE_REVEAL_MS = 2500;

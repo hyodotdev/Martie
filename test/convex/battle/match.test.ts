@@ -5,6 +5,7 @@ import {
   createRoom,
   joinRoom,
   kickGuest,
+  launch,
   leave,
   requestRematch,
   setReady,
@@ -19,6 +20,7 @@ import {
   BATTLE_BUZZ_GRACE_MS,
   BATTLE_JUDGE_MS,
   BATTLE_COUNTDOWN_MS,
+  BATTLE_LAUNCH_MS,
   BATTLE_PRESENCE_STALE_MS,
   BATTLE_QUESTION_COUNT,
 } from '../../../convex/battle/logic';
@@ -43,6 +45,7 @@ const call = {
   kickGuest: handlerOf<CodeArgs, Result>(kickGuest),
   requestRematch: handlerOf<CodeArgs, Result & {code?: string}>(requestRematch),
   advance: handlerOf<{battleId: string; phaseVersion: number}, void>(advance),
+  launch: handlerOf<{battleId: string; launchAt: number}, void>(launch),
   sweep: handlerOf<Record<string, never>, number>(sweepStaleRooms),
   getRoom: handlerOf<CodeArgs & {language?: 'en'}, Record<string, unknown> | null>(
     getRoom,
@@ -85,6 +88,13 @@ async function runScheduled() {
   });
 }
 
+// The lobby countdown reaching zero.
+async function runLaunch() {
+  const {_id, launchAt} = battle();
+  clock = launchAt as number;
+  await call.launch(ctx, {battleId: _id, launchAt: launchAt as number});
+}
+
 async function openMatch(): Promise<string> {
   as(HOST);
   const created = await call.createRoom(ctx, {});
@@ -97,13 +107,14 @@ async function openMatch(): Promise<string> {
   as(HOST);
   await expect(call.setReady(ctx, {code, ready: true})).resolves.toEqual({
     ok: true,
-    started: false,
+    launching: false,
   });
   as(GUEST);
   await expect(call.setReady(ctx, {code, ready: true})).resolves.toEqual({
     ok: true,
-    started: true,
+    launching: true,
   });
+  await runLaunch();
   return code;
 }
 
@@ -150,7 +161,7 @@ describe('battle match', () => {
     expect(battle().quizIds).toHaveLength(BATTLE_QUESTION_COUNT);
     expect(profile(HOST).bulbCount).toBe(2);
     expect(profile(GUEST).bulbCount).toBe(2);
-    expect(fake.scheduled[0].runAt).toBe(clock + BATTLE_COUNTDOWN_MS);
+    expect(fake.scheduled.at(-1)!.runAt).toBe(clock + BATTLE_COUNTDOWN_MS);
 
     // No question is visible during the countdown.
     as(GUEST);
@@ -334,6 +345,7 @@ describe('battle match', () => {
       as(user);
       await call.setReady(ctx, {code: second, ready: true});
     }
+    await runLaunch();
     await winAll(second, HOST);
 
     as(HOST);
@@ -430,6 +442,57 @@ describe('battle lobby', () => {
     as(HOST);
     await call.leave(ctx, {code: code!});
     expect(battle()).toMatchObject({status: 'closed', endReason: 'host_left'});
+  });
+
+  it('counts down once both are ready and starts nothing if one backs out', async () => {
+    as(HOST);
+    const {code} = await call.createRoom(ctx, {});
+    as(GUEST);
+    await call.joinRoom(ctx, {code: code!});
+    await call.setReady(ctx, {code: code!, ready: true});
+    as(HOST);
+    await call.setReady(ctx, {code: code!, ready: true});
+    expect(battle()).toMatchObject({
+      status: 'waiting',
+      launchAt: clock + BATTLE_LAUNCH_MS,
+    });
+    await expect(call.getRoom(ctx, {code: code!})).resolves.toMatchObject({
+      launchAt: clock + BATTLE_LAUNCH_MS,
+    });
+    const {launchAt} = battle();
+
+    as(GUEST);
+    await call.setReady(ctx, {code: code!, ready: false});
+    expect(battle().launchAt).toBeUndefined();
+    clock = launchAt as number;
+    await call.launch(ctx, {battleId: battle()._id, launchAt: launchAt as number});
+    expect(battle().status).toBe('waiting');
+    expect(profile(HOST).bulbCount).toBe(3);
+
+    // Readying again restarts the countdown from the top.
+    await call.setReady(ctx, {code: code!, ready: true});
+    expect(battle().launchAt).toBe(clock + BATTLE_LAUNCH_MS);
+    await runLaunch();
+    expect(battle()).toMatchObject({status: 'playing', phase: 'countdown'});
+  });
+
+  it('drops the countdown when a bulb is spent before it ends', async () => {
+    as(HOST);
+    const {code} = await call.createRoom(ctx, {});
+    as(GUEST);
+    await call.joinRoom(ctx, {code: code!});
+    await call.setReady(ctx, {code: code!, ready: true});
+    as(HOST);
+    await call.setReady(ctx, {code: code!, ready: true});
+    await ctx.db.patch(profile(GUEST)._id, {bulbCount: 0});
+    await runLaunch();
+    expect(battle()).toMatchObject({
+      status: 'waiting',
+      hostReady: true,
+      guestReady: false,
+    });
+    expect(battle().launchAt).toBeUndefined();
+    expect(profile(HOST).bulbCount).toBe(3);
   });
 
   it('only the host can kick the guest, who then cannot come back', async () => {

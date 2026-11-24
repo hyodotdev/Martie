@@ -106,6 +106,7 @@ export async function startMatch(
     quizIds,
     currentIndex: 0,
     phase: 'countdown',
+    launchAt: undefined,
     phaseStartedAt: now,
     phaseEndsAt,
     phaseVersion,

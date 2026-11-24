@@ -1,10 +1,12 @@
 import {getAuthUserId} from '@convex-dev/auth/server';
 import {v} from 'convex/values';
+import {internal} from '../_generated/api';
 import {internalMutation, mutation} from '../_generated/server';
-import type {Id} from '../_generated/dataModel';
+import type {Doc, Id} from '../_generated/dataModel';
 import type {MutationCtx} from '../_generated/server';
 import {
   BATTLE_JUDGE_MS,
+  BATTLE_LAUNCH_MS,
   BATTLE_MAX_ROOMS_PER_DAY,
   BATTLE_PRESENCE_STALE_MS,
   BATTLE_REVEAL_MS,
@@ -185,7 +187,12 @@ export const joinRoom = mutation({
         battle._id,
         check.role === 'host'
           ? {hostSeenAt: now}
-          : {guestUserId: userId, guestSeenAt: now, guestReady: false},
+          : {
+              guestUserId: userId,
+              guestSeenAt: now,
+              guestReady: false,
+              launchAt: undefined,
+            },
       );
     }
     return {ok: true, role: check.role, serverNow: now};
@@ -211,6 +218,7 @@ export const kickGuest = mutation({
       guestSeenAt: undefined,
       guestReady: false,
       hostReady: false,
+      launchAt: undefined,
       kickedUserIds: [...(battle.kickedUserIds ?? []), battle.guestUserId],
     });
     return {ok: true};
@@ -236,7 +244,7 @@ export const heartbeat = mutation({
 });
 
 type ReadyResult =
-  | {ok: true; started: boolean}
+  | {ok: true; launching: boolean}
   | {
       ok: false;
       reason:
@@ -245,10 +253,46 @@ type ReadyResult =
         | 'no_opponent'
         | 'opponent_offline'
         | 'insufficient_bulbs'
-        | 'opponent_insufficient_bulbs'
-        | 'no_quizzes';
+        | 'opponent_insufficient_bulbs';
     };
 
+type LaunchCheck =
+  | {
+      ok: true;
+      hostProfile: Doc<'userProfiles'>;
+      guestProfile: Doc<'userProfiles'>;
+    }
+  | {ok: false; role: BattleRole; problem: 'offline' | 'bulbs'};
+
+/** Both players must still be here and able to pay the stake. */
+async function checkLaunch(
+  ctx: MutationCtx,
+  battle: Doc<'battles'>,
+  now: number,
+): Promise<LaunchCheck> {
+  if (!isPresent(battle.hostSeenAt, now)) {
+    return {ok: false, role: 'host', problem: 'offline'};
+  }
+  if (!isPresent(battle.guestSeenAt, now)) {
+    return {ok: false, role: 'guest', problem: 'offline'};
+  }
+  const hostProfile = await getProfile(ctx, battle.hostUserId);
+  if (!hostProfile || (hostProfile.bulbCount ?? 0) < BATTLE_STAKE_BULBS) {
+    return {ok: false, role: 'host', problem: 'bulbs'};
+  }
+  const guestProfile = battle.guestUserId
+    ? await getProfile(ctx, battle.guestUserId)
+    : null;
+  if (!guestProfile || (guestProfile.bulbCount ?? 0) < BATTLE_STAKE_BULBS) {
+    return {ok: false, role: 'guest', problem: 'bulbs'};
+  }
+  return {ok: true, hostProfile, guestProfile};
+}
+
+/**
+ * Once both are ready the lobby counts down, like a LAN game lobby; either
+ * player can still back out by un-readying until it hits zero.
+ */
 export const setReady = mutation({
   args: {code: v.string(), ready: v.boolean()},
   handler: async (ctx, {code, ready}): Promise<ReadyResult> => {
@@ -264,41 +308,76 @@ export const setReady = mutation({
     await ctx.db.patch(battle._id, {
       ...seen,
       ...(role === 'host' ? {hostReady: ready} : {guestReady: ready}),
+      launchAt: undefined,
     });
     const otherReady = role === 'host' ? battle.guestReady : battle.hostReady;
-    if (!ready || !otherReady) return {ok: true, started: false};
-
-    const otherSeenAt = role === 'host' ? battle.guestSeenAt : battle.hostSeenAt;
-    if (!isPresent(otherSeenAt, now)) {
-      return {ok: false, reason: 'opponent_offline'};
-    }
-
-    const hostProfile = await getProfile(ctx, battle.hostUserId);
-    const guestProfile = await getProfile(ctx, battle.guestUserId);
-    const mine = role === 'host' ? hostProfile : guestProfile;
-    const theirs = role === 'host' ? guestProfile : hostProfile;
-    if ((mine?.bulbCount ?? 0) < BATTLE_STAKE_BULBS || !mine) {
-      await ctx.db.patch(
-        battle._id,
-        role === 'host' ? {hostReady: false} : {guestReady: false},
-      );
-      return {ok: false, reason: 'insufficient_bulbs'};
-    }
-    if ((theirs?.bulbCount ?? 0) < BATTLE_STAKE_BULBS || !theirs) {
-      await ctx.db.patch(
-        battle._id,
-        role === 'host' ? {guestReady: false} : {hostReady: false},
-      );
-      return {ok: false, reason: 'opponent_insufficient_bulbs'};
-    }
+    if (!ready || !otherReady) return {ok: true, launching: false};
 
     const fresh = await ctx.db.get(battle._id);
-    if (!fresh || !hostProfile || !guestProfile) {
-      return {ok: false, reason: 'not_found'};
+    if (!fresh) return {ok: false, reason: 'not_found'};
+    const check = await checkLaunch(ctx, fresh, now);
+    if (!check.ok) {
+      if (check.problem === 'offline') {
+        return {ok: false, reason: 'opponent_offline'};
+      }
+      await ctx.db.patch(
+        battle._id,
+        check.role === 'host' ? {hostReady: false} : {guestReady: false},
+      );
+      return {
+        ok: false,
+        reason:
+          check.role === role ? 'insufficient_bulbs' : 'opponent_insufficient_bulbs',
+      };
     }
-    const started = await startMatch(ctx, fresh, hostProfile, guestProfile, now);
-    if (started === 'no_quizzes') return {ok: false, reason: 'no_quizzes'};
-    return {ok: true, started: true};
+
+    const launchAt = now + BATTLE_LAUNCH_MS;
+    await ctx.db.patch(battle._id, {launchAt});
+    await ctx.scheduler.runAt(launchAt, internal.battle.mutations.launch, {
+      battleId: battle._id,
+      launchAt,
+    });
+    return {ok: true, launching: true};
+  },
+});
+
+/** The lobby countdown hit zero: start the match if nobody backed out. */
+export const launch = internalMutation({
+  args: {battleId: v.id('battles'), launchAt: v.number()},
+  handler: async (ctx, {battleId, launchAt}) => {
+    const battle = await ctx.db.get(battleId);
+    if (
+      !battle ||
+      battle.status !== 'waiting' ||
+      battle.launchAt !== launchAt ||
+      !battle.hostReady ||
+      !battle.guestReady
+    ) {
+      return;
+    }
+    const now = Date.now();
+    const check = await checkLaunch(ctx, battle, now);
+    if (!check.ok) {
+      await ctx.db.patch(battle._id, {
+        launchAt: undefined,
+        ...(check.role === 'host' ? {hostReady: false} : {guestReady: false}),
+      });
+      return;
+    }
+    const started = await startMatch(
+      ctx,
+      battle,
+      check.hostProfile,
+      check.guestProfile,
+      now,
+    );
+    if (started === 'no_quizzes') {
+      await ctx.db.patch(battle._id, {
+        launchAt: undefined,
+        hostReady: false,
+        guestReady: false,
+      });
+    }
   },
 });
 
@@ -386,6 +465,7 @@ export const leave = mutation({
           guestSeenAt: undefined,
           guestReady: false,
           hostReady: false,
+          launchAt: undefined,
         });
       }
       return {ok: true};

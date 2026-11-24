@@ -8,6 +8,7 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withSequence,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import {otherRole, type BattleRole} from '../../../convex/battle/logic';
@@ -307,6 +308,62 @@ function OptionCard({
   );
 }
 
+/** The match opens with a slam, right after the lobby countdown. */
+function GoBurst({color}: {color: string}): JSX.Element {
+  const slam = useSharedValue(2.4);
+  const ring = useSharedValue(0);
+  useEffect(() => {
+    slam.set(withSpring(1, {damping: 15, stiffness: 220}));
+    ring.set(withTiming(1, {duration: 900}));
+  }, [ring, slam]);
+  const slamStyle = useAnimatedStyle(() => ({
+    opacity: Math.min(1, 2.8 - slam.get()),
+    transform: [{scale: slam.get()}, {rotate: '-6deg'}],
+  }));
+  const ringStyle = useAnimatedStyle(() => ({
+    opacity: 1 - ring.get(),
+    transform: [{scale: 0.5 + ring.get() * 1.6}],
+  }));
+
+  return (
+    <View
+      style={css`
+        width: 180px;
+        height: 180px;
+        align-items: center;
+        justify-content: center;
+      `}
+    >
+      <Animated.View
+        style={[
+          {
+            position: 'absolute',
+            width: 160,
+            height: 160,
+            borderRadius: 80,
+            borderWidth: 5,
+            borderColor: color,
+          },
+          ringStyle,
+        ]}
+      />
+      <Animated.View style={slamStyle}>
+        <Typography.Heading1
+          accessibilityLiveRegion="assertive"
+          style={css`
+            color: ${color};
+            font-size: 52px;
+            line-height: 64px;
+            font-weight: 900;
+          `}
+        >
+          {t('battle.go')}
+        </Typography.Heading1>
+      </Animated.View>
+    </View>
+  );
+}
+
 export default function BattlePlay({
   room,
   myRole,
@@ -378,18 +435,7 @@ export default function BattlePlay({
         {scoreboard}
         <Center>
           <MartieHost mood={line.mood} message={line.message} size={96} />
-          <CountdownBadge
-            seconds={Math.max(1, Math.ceil(leftMs / 1000))}
-            color={myColor}
-            size={120}
-          />
-          <Typography.Heading4
-            style={css`
-              font-weight: 800;
-            `}
-          >
-            {t('battle.getReady')}
-          </Typography.Heading4>
+          <GoBurst color={myColor} />
         </Center>
       </Container>
     );
