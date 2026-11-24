@@ -32,6 +32,7 @@ import {
 } from '../src/utils/analytics';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {storage, Storage} from '../src/utils/storage';
+import {decodePendingBattle} from '../src/utils/battle';
 import {toast} from '@backpackapp-io/react-native-toast';
 import {getAcquisitionSource} from '../src/utils/acquisition';
 
@@ -138,6 +139,20 @@ export default function SignInCode(): JSX.Element {
             try {
               dismissAll();
             } catch {}
+
+            // A battle link opened while signed out resumes in its room.
+            const pendingBattleCode = decodePendingBattle(
+              storage.getString(Storage.PendingBattleCode),
+              Date.now(),
+            );
+            storage.delete(Storage.PendingBattleCode);
+            if (pendingBattleCode) {
+              replace({
+                pathname: '/battle/[code]',
+                params: {code: pendingBattleCode},
+              });
+              return;
+            }
             replace('/my');
           } else {
             setError(t('signInCode.error'));

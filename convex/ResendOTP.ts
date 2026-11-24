@@ -7,6 +7,7 @@ import {internal} from './_generated/api';
 import {emailTemplatesMartie} from './emailTemplates';
 import {sendResendEmail} from './utils/resendClient';
 import {parseEmailList} from './utils/emailList';
+import {fixedOtpCodeFor} from './utils/fixedOtp';
 
 interface SendVerificationRequestArgs {
   identifier: string;
@@ -51,10 +52,11 @@ async function tryApplyFixedOtp(
   const isEmailAllowed = allowedEmails.has(normalizedEmail);
   const accountEmail = email.trim();
 
-  const targetCodeRaw = isProduction
-    ? FIXED_OTP_CODE
-    : (FIXED_OTP_CODE ?? DEV_FIXED_OTP_CODE);
-  const targetCode = targetCodeRaw?.trim();
+  const targetCode = fixedOtpCodeFor({
+    isProduction,
+    reviewCode: FIXED_OTP_CODE,
+    devCode: DEV_FIXED_OTP_CODE,
+  });
 
   if (!ctx) {
     console.warn('[auth] Fixed OTP override skipped: missing ctx');

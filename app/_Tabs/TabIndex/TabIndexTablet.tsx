@@ -41,6 +41,7 @@ import DailyChallengeCard, {
   DailyChallengeCardSkeleton,
 } from '../../../src/uis/DailyChallenge/DailyChallengeCard';
 import LeagueProgressCard from '../../../src/uis/League/LeagueProgressCard';
+import BattleEntryCard from '../../../src/uis/Battle/BattleEntryCard';
 import {useSignInRequireModalStore} from '../../../src/stores/signInRequireModalStore';
 import {categoriesMap} from '../../../src/utils/categoriesMap';
 import {
@@ -175,6 +176,10 @@ export default function TabIndexTablet(): JSX.Element {
     });
     push('/daily-quiz');
   }, [dailyChallenge, dailyReturnPrompt, isDailyCompleted, push]);
+
+  const handleBattlePress = useCallback(() => {
+    push('/battles');
+  }, [push]);
 
   const handleLeaguePress = useCallback(async () => {
     if (!isAuthenticated) {
@@ -389,6 +394,9 @@ export default function TabIndexTablet(): JSX.Element {
             />
           </View>
         </View>
+
+        {/* 1:1 퀴즈 대결 */}
+        <BattleEntryCard onPress={handleBattlePress} />
 
         {/* 퀴즈 시작 */}
         <Pressable
