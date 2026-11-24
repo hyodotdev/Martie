@@ -109,12 +109,16 @@ async function roundView(
   );
   const revealed = battle.phase === 'reveal';
   const judging = battle.phase === 'judging';
+  // Options travel as their shuffled position, never as the quiz's own keys:
+  // those keep the author's order, and authors put the answer second most
+  // of the time.
+  const slotOf = (key: string) => String(round.optionKeys.indexOf(key));
   const pending = judging ? (round.second ?? round.first) : undefined;
   const toView = (buzz: Doc<'battleRounds'>['first']): BuzzView | null =>
     buzz
       ? {
           role: buzz.role,
-          optionKey: buzz.optionKey,
+          optionKey: slotOf(buzz.optionKey),
           correct: buzz === pending ? null : buzz.correct,
         }
       : null;
@@ -122,14 +126,14 @@ async function roundView(
   return {
     index: round.index,
     question: langMap.get(quiz.key) || quiz.key,
-    options: round.optionKeys.map((key) => ({
-      key,
-      description: langMap.get(key) || key,
+    options: round.optionKeys.map((key, slot) => ({
+      key: String(slot),
+      description: langMap.get(key) || '',
     })),
     first: toView(round.first),
     second: toView(round.second),
     winner: round.winner ?? null,
-    correctOptionKey: revealed ? round.correctOptionKey : null,
+    correctOptionKey: revealed ? slotOf(round.correctOptionKey) : null,
     answerDescription: revealed ? langMap.get(quiz.answerKey) || null : null,
   };
 }

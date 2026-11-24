@@ -79,6 +79,7 @@
     "launchHint": "Cualquiera puede echarse atrás antes de llegar a cero.",
     "launchTitle": "El duelo empieza en",
     "leave": "Salir",
+    "leaveCountdownMessage": "El duelo está por empezar. Si sales, se cancela la cuenta atrás.",
     "leaveMessage": "Si sales ahora, cuenta como derrota.",
     "leaveTitle": "¿Salir del duelo?",
     "loss": "Derrota",

@@ -79,6 +79,7 @@
     "launchHint": "Either player can still back out before it hits zero.",
     "launchTitle": "Battle starts in",
     "leave": "Leave",
+    "leaveCountdownMessage": "The battle is about to start. Leaving cancels the countdown.",
     "leaveMessage": "Leaving now counts as a loss.",
     "leaveTitle": "Leave the battle?",
     "loss": "Loss",

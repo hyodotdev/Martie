@@ -42,7 +42,14 @@ const call = {
   createRoom: handlerOf<Record<string, never>, Result & {code?: string}>(createRoom),
   joinRoom: handlerOf<CodeArgs, Result>(joinRoom),
   setReady: handlerOf<CodeArgs & {ready: boolean}, Result>(setReady),
-  buzz: handlerOf<CodeArgs & {index: number; optionKey: string}, Result>(buzz),
+  // Tests name options by their quiz key; clients send the shuffled slot.
+  buzz: (c: FakeCtx, args: CodeArgs & {index: number; optionKey: string}) =>
+    handlerOf<CodeArgs & {index: number; optionKey: string}, Result>(buzz)(c, {
+      ...args,
+      optionKey: String(
+        (currentRound().optionKeys as string[]).indexOf(args.optionKey),
+      ),
+    }),
   leave: handlerOf<CodeArgs, Result>(leave),
   heartbeat: handlerOf<CodeArgs, {serverNow: number}>(heartbeat),
   kickGuest: handlerOf<CodeArgs, Result>(kickGuest),
@@ -224,7 +231,14 @@ describe('battle match', () => {
       guestCorrectMs: 1500,
     });
     expect(await call.getRoom(ctx, {code})).toMatchObject({
-      round: {winner: 'guest', correctOptionKey: currentRound().correctOptionKey},
+      round: {
+        winner: 'guest',
+        correctOptionKey: String(
+          (currentRound().optionKeys as string[]).indexOf(
+            currentRound().correctOptionKey as string,
+          ),
+        ),
+      },
     });
 
     // Host answers every remaining question first and right.
@@ -422,6 +436,44 @@ describe('battle match', () => {
   });
 });
 
+describe('battle fairness', () => {
+  it('never sends quiz option keys, only shuffled slots', async () => {
+    const code = await openMatch();
+    await runScheduled();
+    as(GUEST);
+    const room = (await call.getRoom(ctx, {code})) as {
+      round: {options: {key: string}[]; correctOptionKey: string | null};
+    };
+    expect(room.round.options.map((o) => o.key)).toEqual(['0', '1', '2']);
+    expect(room.round.correctOptionKey).toBeNull();
+
+    const correct = currentRound().correctOptionKey as string;
+    await call.buzz(ctx, {code, index: 0, optionKey: correct});
+    await runScheduled(); // judging ends
+    const revealed = (await call.getRoom(ctx, {code})) as {
+      round: {first: {optionKey: string}; correctOptionKey: string};
+    };
+    const slot = String((currentRound().optionKeys as string[]).indexOf(correct));
+    expect(revealed.round.correctOptionKey).toBe(slot);
+    expect(revealed.round.first.optionKey).toBe(slot);
+  });
+
+  it('rejects answers that are not a slot of this round', async () => {
+    const code = await openMatch();
+    await runScheduled();
+    as(HOST);
+    const raw = handlerOf<CodeArgs & {index: number; optionKey: string}, Result>(
+      buzz,
+    );
+    for (const optionKey of ['9', '-1', '1.5', currentRound().correctOptionKey as string]) {
+      await expect(raw(ctx, {code, index: 0, optionKey})).resolves.toEqual({
+        ok: false,
+        reason: 'invalid_option',
+      });
+    }
+  });
+});
+
 describe('battle costs', () => {
   it('starts a match without reading whole categories', async () => {
     for (let c = 0; c < 4; c++) {
@@ -554,6 +606,29 @@ describe('battle lobby', () => {
     expect(battle().launchAt).toBe(clock + BATTLE_LAUNCH_MS);
     await runLaunch();
     expect(battle()).toMatchObject({status: 'playing', phase: 'countdown'});
+  });
+
+  it('unreadies an opponent who went offline so the lobby can start again', async () => {
+    as(HOST);
+    const {code} = await call.createRoom(ctx, {});
+    as(GUEST);
+    await call.joinRoom(ctx, {code: code!});
+    await call.setReady(ctx, {code: code!, ready: true});
+    clock += BATTLE_PRESENCE_STALE_MS + 1;
+    as(HOST);
+    await expect(call.setReady(ctx, {code: code!, ready: true})).resolves.toEqual({
+      ok: false,
+      reason: 'opponent_offline',
+    });
+    expect(battle()).toMatchObject({hostReady: true, guestReady: false});
+
+    // Once the guest is back and readies, the countdown starts as usual.
+    as(GUEST);
+    await call.heartbeat(ctx, {code: code!});
+    await expect(call.setReady(ctx, {code: code!, ready: true})).resolves.toEqual({
+      ok: true,
+      launching: true,
+    });
   });
 
   it('drops the countdown when a bulb is spent before it ends', async () => {

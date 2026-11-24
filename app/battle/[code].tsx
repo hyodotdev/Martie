@@ -110,21 +110,31 @@ function BattleRoomPage(): JSX.Element {
   // Leaving the lobby frees the seat (the host's room closes).
   useEffect(() => {
     return () => {
-      if (statusRef.current === 'waiting' && myRoleRef.current) {
+      // A confirmed leave already ran from the prompt below.
+      if (
+        statusRef.current === 'waiting' &&
+        myRoleRef.current &&
+        !allowLeaveRef.current
+      ) {
         logEvent(LOG_EVENTS.BATTLE_LEFT, {phase: 'lobby'});
         void leave();
       }
     };
   }, [leave]);
 
-  usePreventRemove(status === 'playing' && !!myRole, ({data}) => {
+  // The countdown asks too: the match may start while the back swipe lands.
+  const launching = status === 'waiting' && (room?.launchAt ?? null) !== null;
+  usePreventRemove((status === 'playing' || launching) && !!myRole, ({data}) => {
     if (allowLeaveRef.current) {
       navigation.dispatch(data.action);
       return;
     }
     if (leavePromptOpenRef.current) return;
     leavePromptOpenRef.current = true;
-    Alert.alert(t('battle.leaveTitle'), t('battle.leaveMessage'), [
+    Alert.alert(
+      t('battle.leaveTitle'),
+      launching ? t('battle.leaveCountdownMessage') : t('battle.leaveMessage'),
+      [
       {
         text: t('common.cancel'),
         style: 'cancel',
@@ -138,7 +148,9 @@ function BattleRoomPage(): JSX.Element {
         onPress: () => {
           leavePromptOpenRef.current = false;
           allowLeaveRef.current = true;
-          logEvent(LOG_EVENTS.BATTLE_LEFT, {phase: 'match'});
+          logEvent(LOG_EVENTS.BATTLE_LEFT, {
+            phase: launching ? 'countdown' : 'match',
+          });
           void leave().finally(() => navigation.dispatch(data.action));
         },
       },

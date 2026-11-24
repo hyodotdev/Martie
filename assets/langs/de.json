@@ -79,6 +79,7 @@
     "launchHint": "Bis null kann noch jeder abbrechen.",
     "launchTitle": "Das Duell beginnt in",
     "leave": "Verlassen",
+    "leaveCountdownMessage": "Das Duell beginnt gleich. Wenn du gehst, wird der Countdown abgebrochen.",
     "leaveMessage": "Wenn du jetzt gehst, zählt das als Niederlage.",
     "leaveTitle": "Duell verlassen?",
     "loss": "Niederlage",

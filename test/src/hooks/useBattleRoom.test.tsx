@@ -1,4 +1,5 @@
 import {act, renderHook, waitFor} from '@testing-library/react-native';
+import {AppState, type AppStateStatus} from 'react-native';
 import {BATTLE_HEARTBEAT_MS} from '../../../convex/battle/logic';
 import {useBattleRoom} from '../../../src/hooks/useBattleRoom';
 
@@ -30,7 +31,10 @@ beforeEach(() => {
   mockAuth = {isAuthenticated: true, isLoading: false};
   mockRoom = {status: 'waiting', myRole: 'guest'};
   mockJoin.mockResolvedValue({ok: true, role: 'guest', serverNow: 6000});
-  mockHeartbeat.mockResolvedValue({serverNow: 1000});
+  // The server clock runs 5 s ahead of the device in every reply.
+  mockHeartbeat.mockImplementation(() =>
+    Promise.resolve({serverNow: Date.now() + 5000}),
+  );
 });
 
 afterEach(() => {
@@ -49,13 +53,29 @@ describe('useBattleRoom', () => {
     expect(result.current.offsetMs).toBeLessThanOrEqual(5000);
   });
 
-  it('sends heartbeats while the room is live', async () => {
+  it('beats at once, then on the interval while the room is live', async () => {
     const {result} = renderHook(() => useBattleRoom('abcd2345'));
     await waitFor(() => expect(result.current.hasJoined).toBe(true));
+    expect(mockHeartbeat).toHaveBeenCalledTimes(1);
     await act(async () => {
       jest.advanceTimersByTime(BATTLE_HEARTBEAT_MS * 2);
     });
-    expect(mockHeartbeat).toHaveBeenCalledTimes(2);
+    expect(mockHeartbeat).toHaveBeenCalledTimes(3);
+  });
+
+  it('beats again when the app comes back to the foreground', async () => {
+    let onChange: ((state: AppStateStatus) => void) | undefined;
+    jest.spyOn(AppState, 'addEventListener').mockImplementation((_, handler) => {
+      onChange = handler;
+      return {remove: jest.fn()};
+    });
+    const {result} = renderHook(() => useBattleRoom('abcd2345'));
+    await waitFor(() => expect(result.current.hasJoined).toBe(true));
+    const before = mockHeartbeat.mock.calls.length;
+    act(() => onChange?.('background'));
+    expect(mockHeartbeat).toHaveBeenCalledTimes(before);
+    act(() => onChange?.('active'));
+    expect(mockHeartbeat).toHaveBeenCalledTimes(before + 1);
   });
 
   it('does not join while signed out', () => {

@@ -79,6 +79,7 @@
     "launchHint": "0になるまでは、どちらも取り消せます。",
     "launchTitle": "バトル開始まで",
     "leave": "抜ける",
+    "leaveCountdownMessage": "まもなくバトルが始まります。退出するとカウントダウンが取り消されます。",
     "leaveMessage": "今抜けると負けになります。",
     "leaveTitle": "バトルを抜けますか？",
     "loss": "敗北",

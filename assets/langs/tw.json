@@ -79,6 +79,7 @@
     "launchHint": "倒數到 0 之前，雙方都還能取消。",
     "launchTitle": "對決倒數",
     "leave": "離開",
+    "leaveCountdownMessage": "對決即將開始。現在離開會取消倒數。",
     "leaveMessage": "現在離開將判定為落敗。",
     "leaveTitle": "要離開對決嗎？",
     "loss": "落敗",

@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
+import {AppState} from 'react-native';
 import {useConvexAuth, useMutation, useQuery} from 'convex/react';
 import {api} from '../../convex/_generated/api';
 import {BATTLE_HEARTBEAT_MS} from '../../convex/battle/logic';
@@ -88,8 +89,17 @@ export function useBattleRoom(code: string) {
         .then((result) => syncClock(sentAt, result.serverNow))
         .catch((error: unknown) => logError(error, 'battle-heartbeat'));
     };
+    // Beat right away and on every return to the app: a host who stepped out
+    // to share the link would otherwise read as offline for up to a beat.
+    beat();
     const interval = setInterval(beat, BATTLE_HEARTBEAT_MS);
-    return () => clearInterval(interval);
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') beat();
+    });
+    return () => {
+      clearInterval(interval);
+      subscription.remove();
+    };
   }, [code, heartbeat, isLive, syncClock]);
 
   const leave = useCallback(async () => {

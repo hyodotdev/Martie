@@ -79,6 +79,7 @@
     "launchHint": "Chacun peut encore annuler avant zéro.",
     "launchTitle": "Le duel commence dans",
     "leave": "Quitter",
+    "leaveCountdownMessage": "Le duel va commencer. Si tu pars, le compte à rebours est annulé.",
     "leaveMessage": "Partir maintenant compte comme une défaite.",
     "leaveTitle": "Quitter le duel ?",
     "loss": "Défaite",

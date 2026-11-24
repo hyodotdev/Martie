@@ -321,6 +321,12 @@ export const setReady = mutation({
     const check = await checkLaunch(ctx, fresh, now);
     if (!check.ok) {
       if (check.problem === 'offline') {
+        // Left ready, the absent player would leave the lobby stuck with
+        // both seats ready and no countdown once they came back.
+        await ctx.db.patch(
+          battle._id,
+          check.role === 'host' ? {hostReady: false} : {guestReady: false},
+        );
         return {ok: false, reason: 'opponent_offline'};
       }
       await ctx.db.patch(
@@ -416,9 +422,10 @@ export const buzz = mutation({
     }
     const round = await getRound(ctx, battle._id, index);
     if (!round) return {ok: false, reason: 'not_in_round'};
-    if (!round.optionKeys.includes(optionKey)) {
-      return {ok: false, reason: 'invalid_option'};
-    }
+    // Clients answer with the option's shuffled position (see roundView).
+    const slot = Number(optionKey);
+    const realKey = Number.isInteger(slot) ? round.optionKeys[slot] : undefined;
+    if (!realKey) return {ok: false, reason: 'invalid_option'};
 
     const now = Date.now();
     const result = evaluateBuzz(
@@ -430,7 +437,7 @@ export const buzz = mutation({
         first: round.first,
       },
       role,
-      optionKey,
+      realKey,
       now,
     );
     if (!result.ok) return result;
