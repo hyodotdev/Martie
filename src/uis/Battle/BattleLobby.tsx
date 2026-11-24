@@ -1,4 +1,3 @@
-import {Image, View} from 'react-native';
 import {Typography, useCPK} from 'cpk-ui';
 import {styled, css} from 'kstyled';
 import {ImpactFeedbackStyle} from 'expo-haptics';
@@ -11,6 +10,7 @@ import {t} from '../../STRINGS';
 import {isSeenRecently} from '../../utils/battle';
 import {useNow} from '../../hooks/useBattleCountdown';
 import ButtonMartie from '../ButtonMartie';
+import {MartieHost, PlayerAvatar, RIVAL_COLOR} from './BattleParts';
 import type {BattlePlayer, BattleRoom} from './types';
 
 const PRESENCE_REFRESH_MS = 5000;
@@ -23,46 +23,6 @@ type Props = {
   onReady: (ready: boolean) => void;
   onShare: () => void;
 };
-
-export function PlayerAvatar({
-  player,
-  size = 56,
-}: {
-  player: BattlePlayer;
-  size?: number;
-}): JSX.Element {
-  const {theme} = useCPK();
-  if (player.avatarUrl) {
-    return (
-      <Image
-        accessibilityIgnoresInvertColors
-        source={{uri: player.avatarUrl}}
-        style={{width: size, height: size, borderRadius: size / 2}}
-      />
-    );
-  }
-  return (
-    <View
-      style={css`
-        width: ${size}px;
-        height: ${size}px;
-        border-radius: ${size / 2}px;
-        background-color: ${theme.role.primary + '26'};
-        align-items: center;
-        justify-content: center;
-      `}
-    >
-      <Typography.Heading4
-        style={css`
-          color: ${theme.role.primary};
-          font-weight: 800;
-        `}
-      >
-        {player.displayName.slice(0, 1).toUpperCase() || '?'}
-      </Typography.Heading4>
-    </View>
-  );
-}
 
 function PlayerSlot({
   player,
@@ -78,6 +38,7 @@ function PlayerSlot({
   now: number;
 }): JSX.Element {
   const {theme} = useCPK();
+  const color = isMe ? theme.role.primary : RIVAL_COLOR;
   if (!player) {
     return (
       <Slot accessibilityLabel={t('battle.emptySeat')}>
@@ -107,8 +68,14 @@ function PlayerSlot({
   const name = isMe ? `${player.displayName} (${t('battle.me')})` : player.displayName;
 
   return (
-    <Slot accessibilityLabel={[name, isHost ? t('battle.host') : '', status].filter(Boolean).join(', ')}>
-      <PlayerAvatar player={player} />
+    <Slot
+      accessibilityLabel={[name, isHost ? t('battle.host') : '', status].filter(Boolean).join(', ')}
+      style={css`
+        border-color: ${player.ready && online ? color : theme.role.border};
+        background-color: ${player.ready && online ? color + '14' : theme.bg.paper};
+      `}
+    >
+      <PlayerAvatar player={player} size={60} ringColor={color} />
       <Typography.Body2
         numberOfLines={1}
         style={css`
@@ -123,21 +90,28 @@ function PlayerSlot({
             opacity: 0.6;
           `}
         >
-          {t('battle.host')}
+          👑 {t('battle.host')}
         </Typography.Body4>
       ) : null}
-      <Typography.Body3
+      <StatusPill
         style={css`
-          font-weight: 700;
-          color: ${!online
+          background-color: ${!online
             ? theme.text.placeholder
             : player.ready
-              ? theme.role.success
-              : theme.text.label};
+              ? color
+              : theme.role.border};
         `}
       >
-        {status}
-      </Typography.Body3>
+        <Typography.Body4
+          style={css`
+            font-weight: 800;
+            color: ${!online || player.ready ? '#FFFFFF' : theme.text.basic};
+          `}
+        >
+          {player.ready && online ? '✓ ' : ''}
+          {status}
+        </Typography.Body4>
+      </StatusPill>
     </Slot>
   );
 }
@@ -152,10 +126,17 @@ export default function BattleLobby({
 }: Props): JSX.Element {
   const now = useNow(PRESENCE_REFRESH_MS);
   const me = myRole === 'host' ? room.host : room.guest;
+  const opponent = myRole === 'host' ? room.guest : room.host;
   const hasOpponent = room.guest !== null;
+  const mc = !hasOpponent
+    ? t('battle.mcWaiting')
+    : me?.ready && !opponent?.ready
+      ? t('battle.mcWaitingReady', {name: opponent?.displayName ?? ''})
+      : t('battle.mcReady');
 
   return (
     <Container>
+      <MartieHost mood={hasOpponent ? 'smile' : 'basic'} message={mc} size={80} />
       <SlotsRow>
         <PlayerSlot
           player={room.host}
@@ -164,13 +145,16 @@ export default function BattleLobby({
           offsetMs={offsetMs}
           now={now}
         />
-        <Typography.Heading3
-          style={css`
-            font-weight: 900;
-          `}
-        >
-          VS
-        </Typography.Heading3>
+        <VsBadge>
+          <Typography.Body2
+            style={css`
+              color: #ffffff;
+              font-weight: 900;
+            `}
+          >
+            VS
+          </Typography.Body2>
+        </VsBadge>
         <PlayerSlot
           player={room.guest}
           isMe={myRole === 'guest'}
@@ -180,16 +164,16 @@ export default function BattleLobby({
         />
       </SlotsRow>
 
-      <Typography.Body3
-        style={css`
-          text-align: center;
-          opacity: 0.7;
-        `}
-      >
-        {hasOpponent
-          ? t('battle.readyHint', {stake: BATTLE_STAKE_BULBS})
-          : t('battle.waitingForOpponent')}
-      </Typography.Body3>
+      {hasOpponent ? (
+        <Typography.Body3
+          style={css`
+            text-align: center;
+            opacity: 0.7;
+          `}
+        >
+          {t('battle.readyHint', {stake: BATTLE_STAKE_BULBS})}
+        </Typography.Body3>
+      ) : null}
 
       {hasOpponent ? (
         <ButtonMartie
@@ -245,24 +229,40 @@ const SlotsRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
+`;
+
+const VsBadge = styled.View`
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({theme}) => theme.text.basic};
+  margin: 0 -14px;
+  z-index: 1;
+`;
+
+const StatusPill = styled.View`
+  padding: 4px 10px;
+  border-radius: 12px;
 `;
 
 const Slot = styled.View`
   flex: 1;
   align-items: center;
   gap: 6px;
-  padding: 16px 8px;
-  border-radius: 16px;
-  border-width: 1px;
+  padding: 18px 8px;
+  border-radius: 20px;
+  border-width: 2px;
   border-color: ${({theme}) => theme.role.border};
   background-color: ${({theme}) => theme.bg.paper};
 `;
 
 const EmptyAvatar = styled.View`
-  width: 56px;
-  height: 56px;
-  border-radius: 28px;
+  width: 66px;
+  height: 66px;
+  border-radius: 33px;
   border-width: 2px;
   border-style: dashed;
   border-color: ${({theme}) => theme.role.border};

@@ -28,6 +28,7 @@ export const battlesTable = defineTable({
       v.literal('countdown'),
       v.literal('question'),
       v.literal('second_chance'),
+      v.literal('judging'),
       v.literal('reveal'),
     ),
   ),

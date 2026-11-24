@@ -39,7 +39,7 @@ export default function BattleEntryCard({onPress}: Props): JSX.Element {
           onPress={onPress}
           text={t('battle.cardCta')}
           borderRadius={14}
-          color="light"
+          color="primary"
           styles={{
             container: css`
               height: 44px;

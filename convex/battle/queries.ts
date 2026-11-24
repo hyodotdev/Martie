@@ -48,7 +48,8 @@ async function playerView(
   };
 }
 
-type BuzzView = {role: BattleRole; optionKey: string; correct: boolean};
+// `correct` is null while that buzz is still being judged.
+type BuzzView = {role: BattleRole; optionKey: string; correct: boolean | null};
 
 export type BattleRoundView = {
   index: number;
@@ -84,8 +85,16 @@ async function roundView(
     language,
   );
   const revealed = battle.phase === 'reveal';
+  const judging = battle.phase === 'judging';
+  const pending = judging ? (round.second ?? round.first) : undefined;
   const toView = (buzz: Doc<'battleRounds'>['first']): BuzzView | null =>
-    buzz ? {role: buzz.role, optionKey: buzz.optionKey, correct: buzz.correct} : null;
+    buzz
+      ? {
+          role: buzz.role,
+          optionKey: buzz.optionKey,
+          correct: buzz === pending ? null : buzz.correct,
+        }
+      : null;
 
   return {
     index: round.index,

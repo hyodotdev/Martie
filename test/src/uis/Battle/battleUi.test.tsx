@@ -4,7 +4,9 @@ import {ThemeProvider, type DefaultTheme} from 'kstyled';
 import {light} from '../../../../src/theme';
 import BattlePlay, {
   canAnswer,
+  hostLine,
   optionState,
+  pickedBy,
 } from '../../../../src/uis/Battle/BattlePlay';
 import BattleResult, {myResult} from '../../../../src/uis/Battle/BattleResult';
 import {
@@ -97,6 +99,32 @@ describe('answer rules on the client', () => {
     expect(optionState('mars', r, null)).toBe('correct');
     expect(optionState('mars', round(), 'mars')).toBe('pending');
     expect(optionState('mars', round(), null)).toBe('idle');
+  });
+
+  it('holds a buzz as judging until the verdict, and tracks who picked it', () => {
+    const judged = round({first: {role: 'guest', optionKey: 'mars', correct: null}});
+    expect(canAnswer('judging', judged, 'host')).toBe(false);
+    expect(optionState('mars', judged, null)).toBe('judging');
+    expect(pickedBy('mars', judged)).toBe('guest');
+    expect(pickedBy('venus', judged)).toBeNull();
+  });
+
+  it('has Martie announce who buzzed and who scored', () => {
+    const buzzedByGil = round({first: {role: 'guest', optionKey: 'mars', correct: null}});
+    expect(
+      hostLine(room({phase: 'judging', round: buzzedByGil}), 'host').message,
+    ).toBe('Gil buzzed in! Is it right…?');
+    expect(
+      hostLine(room({phase: 'judging', round: buzzedByGil}), 'guest').message,
+    ).toBe('You buzzed in! Is it right…?');
+    const hostWon = round({winner: 'host', correctOptionKey: 'mars'});
+    expect(hostLine(room({phase: 'reveal', round: hostWon}), 'host')).toEqual({
+      mood: 'smart',
+      message: 'You got it!',
+    });
+    expect(hostLine(room({phase: 'reveal', round: hostWon}), 'guest').message).toBe(
+      'Hana got it!',
+    );
   });
 
   it('maps the outcome to my result', () => {

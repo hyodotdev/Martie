@@ -4,6 +4,7 @@ import {internalMutation, mutation} from '../_generated/server';
 import type {Id} from '../_generated/dataModel';
 import type {MutationCtx} from '../_generated/server';
 import {
+  BATTLE_JUDGE_MS,
   BATTLE_MAX_ROOMS_PER_DAY,
   BATTLE_PRESENCE_STALE_MS,
   BATTLE_REVEAL_MS,
@@ -14,6 +15,7 @@ import {
   evaluateBuzz,
   generateBattleCode,
   isPresent,
+  judgeRound,
   normalizeBattleCode,
   otherRole,
   roleOf,
@@ -328,18 +330,11 @@ export const buzz = mutation({
 
     await ctx.db.patch(
       round._id,
-      round.first
-        ? {second: result.record, winner: result.winner ?? undefined}
-        : {first: result.record, winner: result.winner ?? undefined},
+      round.first ? {second: result.record} : {first: result.record},
     );
-
-    if (result.next === 'second_chance') {
-      await enterPhase(ctx, battle, 'second_chance', BATTLE_SECOND_CHANCE_MS, now);
-    } else {
-      const score = addPoint(battle, result.winner, result.record.elapsedMs);
-      await ctx.db.patch(round._id, {endedAt: now});
-      await enterPhase(ctx, battle, 'reveal', BATTLE_REVEAL_MS, now, score);
-    }
+    // The verdict waits for the judging pause so both players see who
+    // answered before anyone learns whether it was right.
+    await enterPhase(ctx, battle, 'judging', BATTLE_JUDGE_MS, now);
     return {ok: true, correct: result.record.correct};
   },
 });
@@ -394,6 +389,23 @@ export const advance = internalMutation({
 
     if (battle.phase === 'countdown') {
       await startRound(ctx, battle, 0, now);
+      return;
+    }
+    if (battle.phase === 'judging') {
+      const round = await getRound(ctx, battle._id, battle.currentIndex);
+      const verdict = judgeRound(round ?? {});
+      if (verdict.next === 'second_chance') {
+        await enterPhase(ctx, battle, 'second_chance', BATTLE_SECOND_CHANCE_MS, now);
+        return;
+      }
+      if (round) {
+        await ctx.db.patch(round._id, {
+          winner: verdict.winner ?? undefined,
+          endedAt: now,
+        });
+      }
+      const score = addPoint(battle, verdict.winner, verdict.elapsedMs);
+      await enterPhase(ctx, battle, 'reveal', BATTLE_REVEAL_MS, now, score);
       return;
     }
     if (battle.phase === 'question' || battle.phase === 'second_chance') {

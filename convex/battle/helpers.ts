@@ -180,7 +180,7 @@ export async function startRound(
 export async function enterPhase(
   ctx: MutationCtx,
   battle: Doc<'battles'>,
-  phase: 'second_chance' | 'reveal',
+  phase: 'second_chance' | 'judging' | 'reveal',
   durationMs: number,
   now: number,
   extra: Partial<Doc<'battles'>> = {},

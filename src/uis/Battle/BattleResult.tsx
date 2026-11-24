@@ -8,7 +8,7 @@ import {
 } from '../../../convex/battle/logic';
 import {t} from '../../STRINGS';
 import ButtonMartie from '../ButtonMartie';
-import {PlayerAvatar} from './BattleLobby';
+import {MartieHost, PlayerAvatar, RIVAL_COLOR} from './BattleParts';
 import type {BattleRoom} from './types';
 
 type Props = {
@@ -60,30 +60,74 @@ export default function BattleResult({
         ? theme.role.danger
         : theme.text.label;
 
+  const mood = result === 'win' ? 'smile' : result === 'loss' ? 'sweat' : 'impressed';
+  const mc =
+    result === 'win'
+      ? t('battle.mcWin')
+      : result === 'loss'
+        ? t('battle.mcLoss')
+        : t('battle.mcDraw');
+  const bulbDelta =
+    result === 'win'
+      ? `+${BATTLE_STAKE_BULBS * 2}`
+      : result === 'draw'
+        ? `+${BATTLE_STAKE_BULBS}`
+        : '0';
+
   return (
     <Container>
-      <Typography.Heading2
-        accessibilityLiveRegion="polite"
+      <MartieHost mood={mood} message={mc} size={96} />
+
+      <Hero
         style={css`
-          text-align: center;
-          font-weight: 900;
-          color: ${color};
+          background-color: ${color + '14'};
+          border-color: ${color};
         `}
       >
-        {result === 'win'
-          ? t('battle.win')
-          : result === 'loss'
-            ? t('battle.loss')
-            : t('battle.draw')}
-      </Typography.Heading2>
-      <Typography.Body1
-        style={css`
-          text-align: center;
-          font-weight: 700;
-        `}
-      >
-        {headline}
-      </Typography.Body1>
+        <Typography.Heading1
+          accessibilityLiveRegion="polite"
+          style={css`
+            text-align: center;
+            font-size: 44px;
+            line-height: 52px;
+            font-weight: 900;
+            color: ${color};
+          `}
+        >
+          {result === 'win'
+            ? t('battle.win')
+            : result === 'loss'
+              ? t('battle.loss')
+              : t('battle.draw')}
+        </Typography.Heading1>
+        <Typography.Body1
+          style={css`
+            text-align: center;
+            font-weight: 700;
+          `}
+        >
+          {headline}
+        </Typography.Body1>
+        <BulbChip>
+          <Typography.Body2
+            style={css`
+              font-weight: 900;
+            `}
+          >
+            💡 {bulbDelta}
+          </Typography.Body2>
+        </BulbChip>
+      </Hero>
+      {result !== 'draw' && !opponentLeft && myScore === opponentScore ? (
+        <Typography.Body3
+          style={css`
+            text-align: center;
+            opacity: 0.7;
+          `}
+        >
+          {t('battle.tieBreak')}
+        </Typography.Body3>
+      ) : null}
       {opponentLeft ? (
         <Typography.Body3
           style={css`
@@ -101,7 +145,14 @@ export default function BattleResult({
           theirs: opponentScore,
         })}
       >
-        {me ? <PlayerAvatar player={me} size={48} /> : null}
+        <PlayerColumn>
+          {me ? (
+            <PlayerAvatar player={me} size={52} ringColor={theme.role.primary} />
+          ) : null}
+          <Typography.Body4 numberOfLines={1} style={css`font-weight: 700;`}>
+            {t('battle.me')}
+          </Typography.Body4>
+        </PlayerColumn>
         <Typography.Heading1
           style={css`
             font-weight: 900;
@@ -109,7 +160,14 @@ export default function BattleResult({
         >
           {t('battle.score', {mine: myScore, theirs: opponentScore})}
         </Typography.Heading1>
-        {opponent ? <PlayerAvatar player={opponent} size={48} /> : null}
+        <PlayerColumn>
+          {opponent ? (
+            <PlayerAvatar player={opponent} size={52} ringColor={RIVAL_COLOR} />
+          ) : null}
+          <Typography.Body4 numberOfLines={1} style={css`font-weight: 700;`}>
+            {opponent?.displayName ?? ''}
+          </Typography.Body4>
+        </PlayerColumn>
       </ScoreCard>
 
       {room.rematchCode ? (
@@ -171,8 +229,28 @@ export default function BattleResult({
 }
 
 const Container = styled.View`
-  padding: 32px 20px;
+  padding: 24px 20px 32px;
   gap: 16px;
+`;
+
+const Hero = styled.View`
+  align-items: center;
+  gap: 8px;
+  padding: 22px 16px;
+  border-radius: 24px;
+  border-width: 2px;
+`;
+
+const BulbChip = styled.View`
+  padding: 6px 14px;
+  border-radius: 14px;
+  background-color: ${({theme}) => theme.bg.basic};
+`;
+
+const PlayerColumn = styled.View`
+  width: 84px;
+  align-items: center;
+  gap: 6px;
 `;
 
 const ScoreCard = styled.View`

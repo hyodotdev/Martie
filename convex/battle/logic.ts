@@ -4,6 +4,7 @@
  * A battle is a quiz-show buzzer round: whoever answers first wins the
  * question if right; if wrong, the other player gets one chance; if both
  * miss (or time runs out) the answer is revealed and the next one starts.
+ * Every buzz is held for a short judging pause before its verdict is shown.
  */
 
 export const BATTLE_QUESTION_COUNT = 10;
@@ -11,6 +12,8 @@ export const BATTLE_COUNTDOWN_MS = 3000;
 export const BATTLE_FIRST_BUZZ_MS = 15000;
 export const BATTLE_SECOND_CHANCE_MS = 7000;
 export const BATTLE_REVEAL_MS = 2500;
+// After a buzz both players see who answered and wait this long for the verdict.
+export const BATTLE_JUDGE_MS = 3000;
 // Answers sent right at the deadline still count if they arrive this late.
 export const BATTLE_BUZZ_GRACE_MS = 500;
 export const BATTLE_HEARTBEAT_MS = 15000;
@@ -24,7 +27,12 @@ const CODE_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789';
 
 export type BattleRole = 'host' | 'guest';
 export type BattleStatus = 'waiting' | 'playing' | 'finished' | 'closed';
-export type BattlePhase = 'countdown' | 'question' | 'second_chance' | 'reveal';
+export type BattlePhase =
+  | 'countdown'
+  | 'question'
+  | 'second_chance'
+  | 'judging'
+  | 'reveal';
 export type BattleOutcome = 'host' | 'guest' | 'draw';
 export type BattleEndReason = 'completed' | 'forfeit' | 'host_left';
 
@@ -117,6 +125,20 @@ export function evaluateBuzz(
     return {ok: true, record, next: 'second_chance', winner: null};
   }
   return {ok: true, record, next: 'reveal', winner: null};
+}
+
+export type Verdict =
+  | {next: 'second_chance'}
+  | {next: 'reveal'; winner: BattleRole | null; elapsedMs: number};
+
+/** What the judging pause resolves to, from the buzzes recorded so far. */
+export function judgeRound(round: {first?: BuzzRecord; second?: BuzzRecord}): Verdict {
+  const latest = round.second ?? round.first;
+  if (latest?.correct) {
+    return {next: 'reveal', winner: latest.role, elapsedMs: latest.elapsedMs};
+  }
+  if (round.first && !round.second) return {next: 'second_chance'};
+  return {next: 'reveal', winner: null, elapsedMs: 0};
 }
 
 export function addPoint(

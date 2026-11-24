@@ -12,6 +12,7 @@ import {
 import {getRoom, listMyBattles} from '../../../convex/battle/queries';
 import {
   BATTLE_BUZZ_GRACE_MS,
+  BATTLE_JUDGE_MS,
   BATTLE_COUNTDOWN_MS,
   BATTLE_PRESENCE_STALE_MS,
   BATTLE_QUESTION_COUNT,
@@ -158,7 +159,22 @@ describe('battle match', () => {
     await expect(
       call.buzz(ctx, {code, index: 0, optionKey: wrongKey()}),
     ).resolves.toEqual({ok: true, correct: false});
+    // Both see who buzzed, but not the verdict, during the judging pause.
+    expect(battle().phase).toBe('judging');
+    as(GUEST);
+    expect(await call.getRoom(ctx, {code})).toMatchObject({
+      hostScore: 0,
+      round: {first: {role: 'host', correct: null}, winner: null},
+    });
+    await expect(
+      call.buzz(ctx, {code, index: 0, optionKey: wrongKey()}),
+    ).resolves.toEqual({ok: false, reason: 'not_in_round'});
+    await runScheduled();
     expect(battle().phase).toBe('second_chance');
+    expect(await call.getRoom(ctx, {code})).toMatchObject({
+      round: {first: {role: 'host', correct: false}},
+    });
+    as(HOST);
     await expect(
       call.buzz(ctx, {code, index: 0, optionKey: wrongKey()}),
     ).resolves.toEqual({ok: false, reason: 'not_your_turn'});
@@ -172,6 +188,8 @@ describe('battle match', () => {
         optionKey: currentRound().correctOptionKey as string,
       }),
     ).resolves.toEqual({ok: true, correct: true});
+    expect(battle()).toMatchObject({phase: 'judging', guestScore: 0});
+    await runScheduled();
     expect(battle()).toMatchObject({
       phase: 'reveal',
       guestScore: 1,
@@ -192,6 +210,7 @@ describe('battle match', () => {
         index,
         optionKey: currentRound().correctOptionKey as string,
       });
+      await runScheduled(); // judging ends
     }
     await runScheduled();
 
@@ -239,6 +258,11 @@ describe('battle match', () => {
     await expect(
       call.buzz(ctx, {code, index: 0, optionKey: wrongKey()}),
     ).resolves.toEqual({ok: true, correct: false});
+    expect(battle()).toMatchObject({phase: 'judging'});
+    expect(fake.scheduled.at(-1)?.runAt).toBe(clock + BATTLE_JUDGE_MS);
+
+    await runScheduled();
+    expect(battle().phase).toBe('second_chance');
     expect(fake.scheduled.at(-1)?.runAt).toBe(
       (battle().phaseEndsAt as number) + BATTLE_BUZZ_GRACE_MS,
     );

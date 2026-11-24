@@ -8,6 +8,7 @@ import {
   evaluateBuzz,
   generateBattleCode,
   isPresent,
+  judgeRound,
   normalizeBattleCode,
   payout,
   roleOf,
@@ -77,6 +78,38 @@ describe('evaluateBuzz', () => {
   it('caps the measured time at the deadline inside the grace period', () => {
     const result = evaluateBuzz(round(), 'host', 'right', 16200);
     expect(result).toMatchObject({record: {elapsedMs: 15000}});
+  });
+});
+
+describe('judgeRound', () => {
+  const buzz = (role: 'host' | 'guest', correct: boolean, elapsedMs = 1000) => ({
+    role,
+    optionKey: 'x',
+    correct,
+    elapsedMs,
+  });
+
+  it('awards a right first buzz', () => {
+    expect(judgeRound({first: buzz('host', true, 1200)})).toEqual({
+      next: 'reveal',
+      winner: 'host',
+      elapsedMs: 1200,
+    });
+  });
+
+  it('hands a wrong first buzz to the other player', () => {
+    expect(judgeRound({first: buzz('host', false)})).toEqual({
+      next: 'second_chance',
+    });
+  });
+
+  it('awards a right second chance and reveals a double miss', () => {
+    expect(
+      judgeRound({first: buzz('host', false), second: buzz('guest', true, 800)}),
+    ).toEqual({next: 'reveal', winner: 'guest', elapsedMs: 800});
+    expect(
+      judgeRound({first: buzz('host', false), second: buzz('guest', false)}),
+    ).toEqual({next: 'reveal', winner: null, elapsedMs: 0});
   });
 });
 

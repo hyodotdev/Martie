@@ -18,6 +18,7 @@ import {t} from '../src/STRINGS';
 import {logScreenView} from '../src/utils/analytics';
 import {withErrorBoundary} from '../src/hoc/withErrorBoundary';
 import ButtonMartie from '../src/uis/ButtonMartie';
+import {MartieHost} from '../src/uis/Battle/BattleParts';
 import {needsInviteAd, useBattleInvite} from '../src/hooks/useBattleInvite';
 import {useUserStore} from '../src/stores/userStore';
 
@@ -123,6 +124,7 @@ function BattlesPage(): JSX.Element {
           padding-bottom: 16px;
         `}
       >
+        <MartieHost mood="smart" message={t('battle.mcHub')} size={84} />
         <HeroCard>
           <Typography.Heading4
             style={css`
