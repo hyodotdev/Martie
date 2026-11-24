@@ -10,6 +10,7 @@ import BattlePlay, {
 } from '../../../../src/uis/Battle/BattlePlay';
 import BattleResult, {myResult} from '../../../../src/uis/Battle/BattleResult';
 import BattleRecordCard from '../../../../src/uis/Battle/BattleRecordCard';
+import BattleLobby from '../../../../src/uis/Battle/BattleLobby';
 import {
   battleErrorMessage,
   type BattleErrorReason,
@@ -269,5 +270,55 @@ describe('battle records', () => {
 
     render(finished({wins: 0, losses: 0, draws: 0}));
     expect(await screen.findByText('Your first match!')).toBeTruthy();
+  });
+});
+
+describe('BattleLobby', () => {
+  const lobby = () =>
+    createTestElement(
+      <BattleLobby
+        room={room({
+          status: 'waiting',
+          round: null,
+          headToHead: {wins: 2, losses: 1, draws: 0},
+          guest: {
+            displayName: 'Gil',
+            avatarUrl: null,
+            ready: false,
+            seenAt: 0,
+            record: {wins: 5, losses: 3, draws: 2},
+          },
+        })}
+        myRole="host"
+        offsetMs={0}
+        isBusy={false}
+        onReady={jest.fn()}
+        onShare={jest.fn()}
+      />,
+    );
+
+  it('keeps seats compact and opens the profile on a tap', async () => {
+    render(lobby());
+    const seat = await screen.findByLabelText('Gil, Offline');
+    expect(screen.queryByText('5W 3L 2D')).toBeNull();
+
+    fireEvent.press(seat);
+    expect(await screen.findByText('Win rate 50%')).toBeTruthy();
+    // The lobby's own head-to-head card plus the one in the profile.
+    expect(screen.getAllByText('⚔️ Record vs Gil')).toHaveLength(2);
+    // A tapped profile stays open until the backdrop is tapped.
+    fireEvent(seat, 'pressOut');
+    expect(screen.getByText('Win rate 50%')).toBeTruthy();
+    fireEvent.press(screen.getByLabelText('Close profile'));
+    expect(screen.queryByText('Win rate 50%')).toBeNull();
+  });
+
+  it('shows a held profile only while the finger stays down', async () => {
+    render(lobby());
+    const seat = await screen.findByLabelText('Gil, Offline');
+    fireEvent(seat, 'longPress');
+    expect(await screen.findByText('Win rate 50%')).toBeTruthy();
+    fireEvent(seat, 'pressOut');
+    expect(screen.queryByText('Win rate 50%')).toBeNull();
   });
 });

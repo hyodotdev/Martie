@@ -17,6 +17,51 @@ export function recordText(record: BattleRecord): string {
   });
 }
 
+/** Wins, losses and draws side by side in their result colors. */
+export function RecordColumns({
+  record,
+}: {
+  record: BattleRecord;
+}): JSX.Element {
+  const {theme} = useCPK();
+  const columns = [
+    {label: t('battle.winsLabel'), value: record.wins, color: theme.role.success},
+    {label: t('battle.lossesLabel'), value: record.losses, color: theme.role.danger},
+    {label: t('battle.drawsLabel'), value: record.draws, color: theme.text.label},
+  ];
+  return (
+    <Columns>
+      {columns.map((column) => (
+        <View
+          key={column.label}
+          style={css`
+            flex: 1;
+            align-items: center;
+            gap: 2px;
+          `}
+        >
+          <Typography.Heading2
+            style={css`
+              font-weight: 900;
+              color: ${column.color};
+            `}
+          >
+            {column.value}
+          </Typography.Heading2>
+          <Typography.Body4
+            style={css`
+              font-weight: 700;
+              opacity: 0.6;
+            `}
+          >
+            {column.label}
+          </Typography.Body4>
+        </View>
+      ))}
+    </Columns>
+  );
+}
+
 /** My lifetime 1:1 record, shown on the battle hub. */
 export default function BattleRecordCard({
   stats,
@@ -25,11 +70,6 @@ export default function BattleRecordCard({
 }): JSX.Element {
   const {theme} = useCPK();
   const rate = winRate(stats);
-  const columns = [
-    {label: t('battle.winsLabel'), value: stats.wins, color: theme.role.success},
-    {label: t('battle.lossesLabel'), value: stats.losses, color: theme.role.danger},
-    {label: t('battle.drawsLabel'), value: stats.draws, color: theme.text.label},
-  ];
 
   return (
     <Card
@@ -59,35 +99,7 @@ export default function BattleRecordCard({
         </Typography.Body3>
       </Header>
 
-      <Columns>
-        {columns.map((column) => (
-          <View
-            key={column.label}
-            style={css`
-              flex: 1;
-              align-items: center;
-              gap: 2px;
-            `}
-          >
-            <Typography.Heading2
-              style={css`
-                font-weight: 900;
-                color: ${column.color};
-              `}
-            >
-              {column.value}
-            </Typography.Heading2>
-            <Typography.Body4
-              style={css`
-                font-weight: 700;
-                opacity: 0.6;
-              `}
-            >
-              {column.label}
-            </Typography.Body4>
-          </View>
-        ))}
-      </Columns>
+      <RecordColumns record={stats} />
 
       {stats.streak > 1 || stats.bestStreak > 1 ? (
         <StreakRow>
