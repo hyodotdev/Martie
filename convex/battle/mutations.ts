@@ -423,8 +423,9 @@ export const buzz = mutation({
     const round = await getRound(ctx, battle._id, index);
     if (!round) return {ok: false, reason: 'not_in_round'};
     // Clients answer with the option's shuffled position (see roundView).
-    const slot = Number(optionKey);
-    const realKey = Number.isInteger(slot) ? round.optionKeys[slot] : undefined;
+    const realKey = /^\d+$/.test(optionKey)
+      ? round.optionKeys[Number(optionKey)]
+      : undefined;
     if (!realKey) return {ok: false, reason: 'invalid_option'};
 
     const now = Date.now();

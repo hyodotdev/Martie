@@ -465,7 +465,7 @@ describe('battle fairness', () => {
     const raw = handlerOf<CodeArgs & {index: number; optionKey: string}, Result>(
       buzz,
     );
-    for (const optionKey of ['9', '-1', '1.5', currentRound().correctOptionKey as string]) {
+    for (const optionKey of ['9', '-1', '1.5', '', ' 1', currentRound().correctOptionKey as string]) {
       await expect(raw(ctx, {code, index: 0, optionKey})).resolves.toEqual({
         ok: false,
         reason: 'invalid_option',
