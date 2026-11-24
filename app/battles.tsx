@@ -296,7 +296,7 @@ function BattlesPage(): JSX.Element {
           <StickerButton
             text={t('battle.createRoom')}
             onPress={handleCreate}
-            disabled={isStarting}
+            loading={isStarting}
             color={theme.role.primary}
           />
           <Typography.Body4

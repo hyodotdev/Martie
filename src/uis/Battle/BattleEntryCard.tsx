@@ -137,16 +137,17 @@ export default function BattleEntryCard({onPress}: Props): JSX.Element {
           </Typography.Body3>
         )}
 
+        {/* Outlined, so the home screen is not a wall of red buttons. */}
         <ButtonMartie
           hapticFeedback={ImpactFeedbackStyle.Soft}
           onPress={onPress}
           text={t('battle.cardCta')}
           borderRadius={14}
+          type="outlined"
           color="primary"
           styles={{
             container: css`
               height: 44px;
-              border-width: 0;
             `,
             text: css`
               font-size: 15px;

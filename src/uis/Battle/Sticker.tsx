@@ -1,5 +1,11 @@
 import type {ReactNode} from 'react';
-import {Pressable, View, type StyleProp, type ViewStyle} from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import {Typography} from 'cpk-ui';
 import {css} from 'kstyled';
 import {useAudioPlayer} from 'expo-audio';
@@ -143,6 +149,7 @@ export function StickerButton({
   textColor = '#FFFFFF',
   shadow = SOFT_SHADOW,
   disabled = false,
+  loading = false,
 }: {
   text: string;
   onPress: () => void;
@@ -150,14 +157,17 @@ export function StickerButton({
   textColor?: string;
   shadow?: string;
   disabled?: boolean;
+  // Shows a spinner and ignores presses, like cpk-ui's Button.
+  loading?: boolean;
 }): JSX.Element {
+  const inactive = disabled || loading;
   const click = useAudioPlayer(AUDIO_PRESS);
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={text}
-      accessibilityState={{disabled}}
-      disabled={disabled}
+      accessibilityState={{disabled: inactive, busy: loading}}
+      disabled={inactive}
       onPress={() => {
         void impactAsync(ImpactFeedbackStyle.Medium).catch(() => {});
         safeSeekAudioPlayerToStart(click);
@@ -171,7 +181,7 @@ export function StickerButton({
           radius={16}
           shadow={shadow}
           style={{
-            opacity: disabled ? 0.5 : 1,
+            opacity: disabled && !loading ? 0.5 : 1,
             transform: [{translateY: pressed ? 3 : 0}],
           }}
           faceStyle={{
@@ -181,14 +191,18 @@ export function StickerButton({
             backgroundColor: color,
           }}
         >
-          <Typography.Body1
-            style={css`
-              color: ${textColor};
-              font-weight: 900;
-            `}
-          >
-            {text}
-          </Typography.Body1>
+          {loading ? (
+            <ActivityIndicator color={textColor} />
+          ) : (
+            <Typography.Body1
+              style={css`
+                color: ${textColor};
+                font-weight: 900;
+              `}
+            >
+              {text}
+            </Typography.Body1>
+          )}
         </Sticker>
       )}
     </Pressable>

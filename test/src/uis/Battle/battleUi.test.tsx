@@ -13,7 +13,7 @@ import BattleResult, {myResult} from '../../../../src/uis/Battle/BattleResult';
 import BattleRecordCard from '../../../../src/uis/Battle/BattleRecordCard';
 import BattleLobby from '../../../../src/uis/Battle/BattleLobby';
 import {noticeArt} from '../../../../src/uis/Battle/BattleNotice';
-import {paperTint} from '../../../../src/uis/Battle/Sticker';
+import {StickerButton, paperTint} from '../../../../src/uis/Battle/Sticker';
 import {
   battleErrorMessage,
   type BattleErrorReason,
@@ -465,6 +465,28 @@ describe('kicking the guest', () => {
     fireEvent.press(await screen.findByLabelText('Hana, Host, Offline'));
     expect(await screen.findByText('🏆 Record')).toBeTruthy();
     expect(screen.queryByText('Kick out')).toBeNull();
+  });
+
+  it('spins instead of taking presses while busy', async () => {
+    const onPress = jest.fn();
+    const {rerender} = render(
+      createTestElement(
+        <StickerButton text="Ready" onPress={onPress} color="#FF5B50" loading />,
+      ),
+    );
+    const button = await screen.findByRole('button');
+    expect(button.props.accessibilityState).toMatchObject({busy: true, disabled: true});
+    expect(screen.queryByText('Ready')).toBeNull();
+    fireEvent.press(button);
+    expect(onPress).not.toHaveBeenCalled();
+
+    rerender(
+      createTestElement(
+        <StickerButton text="Ready" onPress={onPress} color="#FF5B50" />,
+      ),
+    );
+    fireEvent.press(screen.getByText('Ready'));
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
   it('tints sticker faces with solid colors so shadows never show through', () => {

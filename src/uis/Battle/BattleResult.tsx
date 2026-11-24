@@ -208,7 +208,7 @@ export default function BattleResult({
       ) : (
         <StickerButton
           text={t('battle.rematch')}
-          disabled={isBusy}
+          loading={isBusy}
           onPress={onRematch}
           color={theme.role.primary}
         />

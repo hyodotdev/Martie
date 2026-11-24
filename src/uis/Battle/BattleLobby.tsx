@@ -390,7 +390,7 @@ export default function BattleLobby({
         <StickerButton
           text={me?.ready ? t('battle.unready') : t('battle.ready')}
           onPress={() => onReady(!me?.ready)}
-          disabled={isBusy}
+          loading={isBusy}
           color={me?.ready ? CREAM : theme.role.primary}
           textColor={me?.ready ? INK : '#FFFFFF'}
         />
