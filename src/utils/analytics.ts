@@ -93,6 +93,7 @@ export const LOG_EVENTS = {
   BATTLE_ROOM_CREATED: 'battle_room_created',
   BATTLE_INVITE_SHARED: 'battle_invite_shared',
   BATTLE_LINK_OPENED: 'battle_link_opened',
+  BATTLE_GUEST_KICKED: 'battle_guest_kicked',
   BATTLE_JOINED: 'battle_joined',
   BATTLE_JOIN_FAILED: 'battle_join_failed',
   BATTLE_READY: 'battle_ready',

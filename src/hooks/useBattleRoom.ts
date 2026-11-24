@@ -19,6 +19,7 @@ export type BattleJoinError =
   | 'full'
   | 'host_offline'
   | 'insufficient_bulbs'
+  | 'kicked'
   | 'network';
 
 function quizLanguage(): QuizLanguage {

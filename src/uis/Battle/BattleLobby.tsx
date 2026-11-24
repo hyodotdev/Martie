@@ -31,6 +31,7 @@ type Props = {
   isBusy: boolean;
   onReady: (ready: boolean) => void;
   onShare: () => void;
+  onKick: () => void;
 };
 
 type Peek = {role: BattleRole; sticky: boolean};
@@ -192,6 +193,7 @@ export default function BattleLobby({
   isBusy,
   onReady,
   onShare,
+  onKick,
 }: Props): JSX.Element {
   const {theme} = useCPK();
   const now = useNow(PRESENCE_REFRESH_MS);
@@ -287,13 +289,14 @@ export default function BattleLobby({
         />
       ) : null}
 
-      {myRole === 'host' ? (
+      {/* The room is 1:1, so inviting stops once the other seat is taken. */}
+      {myRole === 'host' && !hasOpponent ? (
         <ButtonMartie
           hapticFeedback={ImpactFeedbackStyle.Light}
           onPress={onShare}
           text={t('battle.invite')}
           borderRadius={14}
-          color={hasOpponent ? 'light' : 'primary'}
+          color="primary"
           styles={{
             container: css`
               height: 48px;
@@ -316,6 +319,14 @@ export default function BattleLobby({
         status={peekPlayer ? presenceStatus(peekPlayer, now, offsetMs).label : ''}
         sticky={peek?.sticky ?? false}
         onClose={() => setPeek(null)}
+        onKick={
+          myRole === 'host' && peek?.role === 'guest'
+            ? () => {
+                setPeek(null);
+                onKick();
+              }
+            : undefined
+        }
       />
     </Container>
   );

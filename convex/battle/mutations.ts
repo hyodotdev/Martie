@@ -192,6 +192,31 @@ export const joinRoom = mutation({
   },
 });
 
+/** The host removes the guest before the match; they cannot rejoin. */
+export const kickGuest = mutation({
+  args: {code: v.string()},
+  handler: async (ctx, {code}): Promise<{ok: boolean}> => {
+    const userId = await getAuthUserId(ctx);
+    const battle = await getBattleByCode(ctx, code);
+    if (
+      !battle ||
+      roleOf(battle, userId) !== 'host' ||
+      battle.status !== 'waiting' ||
+      !battle.guestUserId
+    ) {
+      return {ok: false};
+    }
+    await ctx.db.patch(battle._id, {
+      guestUserId: undefined,
+      guestSeenAt: undefined,
+      guestReady: false,
+      hostReady: false,
+      kickedUserIds: [...(battle.kickedUserIds ?? []), battle.guestUserId],
+    });
+    return {ok: true};
+  },
+});
+
 /** Keeps the player marked present; the reply lets the client sync clocks. */
 export const heartbeat = mutation({
   args: {code: v.string()},

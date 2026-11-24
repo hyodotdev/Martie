@@ -55,6 +55,8 @@ export const battlesTable = defineTable({
   ),
   forfeitedBy: v.optional(battleRole),
   rematchCode: v.optional(v.string()),
+  // Guests the host removed; they cannot take the seat again.
+  kickedUserIds: v.optional(v.array(v.id('users'))),
 })
   .index('by_code', ['code'])
   .index('by_host_and_created', ['hostUserId', 'createdAt'])

@@ -5,10 +5,9 @@
  * 링크(https://hyo.dev/martie/battle/<code>)로 들어온 사용자도 여기로 온다.
  */
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {Alert, ScrollView, Share, View} from 'react-native';
+import {Alert, ScrollView, Share} from 'react-native';
 import {Stack, useLocalSearchParams, useNavigation, useRouter} from 'expo-router';
 import {usePreventRemove} from 'expo-router/react-navigation';
-import {Typography} from 'cpk-ui';
 import {css} from 'kstyled';
 import {useMutation} from 'convex/react';
 import {toast} from '@backpackapp-io/react-native-toast';
@@ -23,54 +22,13 @@ import {battleShareUrl, encodePendingBattle} from '../../src/utils/battle';
 import {storage, Storage} from '../../src/utils/storage';
 import {withErrorBoundary} from '../../src/hoc/withErrorBoundary';
 import CustomLoadingIndicator from '../../src/uis/CustomLoadingIndicator';
-import ButtonMartie from '../../src/uis/ButtonMartie';
 import BattleLobby from '../../src/uis/Battle/BattleLobby';
+import BattleNotice from '../../src/uis/Battle/BattleNotice';
 import BattlePlay from '../../src/uis/Battle/BattlePlay';
 import BattleResult, {myResult} from '../../src/uis/Battle/BattleResult';
 import {battleErrorMessage} from '../../src/uis/Battle/battleMessages';
 
 const HOME_ROUTE = '/(tabs)' as const;
-
-function Notice({
-  message,
-  actionText,
-  onAction,
-}: {
-  message: string;
-  actionText: string;
-  onAction: () => void;
-}): JSX.Element {
-  return (
-    <View
-      style={css`
-        flex: 1;
-        padding: 32px 20px;
-        gap: 20px;
-        justify-content: center;
-      `}
-    >
-      <Typography.Heading5
-        accessibilityLiveRegion="polite"
-        style={css`
-          text-align: center;
-        `}
-      >
-        {message}
-      </Typography.Heading5>
-      <ButtonMartie
-        onPress={onAction}
-        text={actionText}
-        borderRadius={14}
-        styles={{
-          container: css`
-            height: 52px;
-            border-width: 0;
-          `,
-        }}
-      />
-    </View>
-  );
-}
 
 function BattleRoomPage(): JSX.Element {
   const {code: rawCode} = useLocalSearchParams<{code: string}>();
@@ -81,6 +39,7 @@ function BattleRoomPage(): JSX.Element {
     useBattleRoom(code);
   const setReady = useMutation(api.battle.mutations.setReady);
   const buzz = useMutation(api.battle.mutations.buzz);
+  const kickGuest = useMutation(api.battle.mutations.kickGuest);
   const {startInvite, isStarting} = useBattleInvite();
 
   const [isReadyBusy, setIsReadyBusy] = useState(false);
@@ -230,6 +189,31 @@ function BattleRoomPage(): JSX.Element {
     [code, myRole, setReady],
   );
 
+  const handleKick = useCallback(() => {
+    const name = room?.guest?.displayName ?? '';
+    Alert.alert(
+      t('battle.kickConfirmTitle', {name}),
+      t('battle.kickConfirmMessage'),
+      [
+        {text: t('common.cancel'), style: 'cancel'},
+        {
+          text: t('battle.kick'),
+          style: 'destructive',
+          onPress: () => {
+            kickGuest({code})
+              .then((result) => {
+                if (result.ok) logEvent(LOG_EVENTS.BATTLE_GUEST_KICKED);
+              })
+              .catch((error: unknown) => {
+                logError(error, 'battle-kick');
+                toast.error(battleErrorMessage('network'));
+              });
+          },
+        },
+      ],
+    );
+  }, [code, kickGuest, room?.guest?.displayName]);
+
   const handleAnswer = useCallback(
     async (index: number, optionKey: string) => {
       if (activePending) return;
@@ -279,7 +263,8 @@ function BattleRoomPage(): JSX.Element {
     return (
       <>
         {screenOptions}
-        <Notice
+        <BattleNotice
+          kind="not_found"
           message={battleErrorMessage('not_found')}
           actionText={t('battle.goHome')}
           onAction={goHome}
@@ -301,7 +286,8 @@ function BattleRoomPage(): JSX.Element {
     return (
       <>
         {screenOptions}
-        <Notice
+        <BattleNotice
+          kind="not_found"
           message={battleErrorMessage('not_found')}
           actionText={t('battle.goHome')}
           onAction={goHome}
@@ -314,7 +300,8 @@ function BattleRoomPage(): JSX.Element {
     return (
       <>
         {screenOptions}
-        <Notice
+        <BattleNotice
+          kind="invite"
           message={t('battle.invitedBy', {name: room.host?.displayName ?? ''})}
           actionText={t('battle.signInToJoin')}
           onAction={handleSignIn}
@@ -324,6 +311,19 @@ function BattleRoomPage(): JSX.Element {
   }
 
   if (!myRole) {
+    if (room.kicked) {
+      return (
+        <>
+          {screenOptions}
+          <BattleNotice
+            kind="kicked"
+            message={battleErrorMessage('kicked')}
+            actionText={t('battle.goHome')}
+            onAction={goHome}
+          />
+        </>
+      );
+    }
     if (!joinError) {
       return (
         <>
@@ -335,7 +335,8 @@ function BattleRoomPage(): JSX.Element {
     return (
       <>
         {screenOptions}
-        <Notice
+        <BattleNotice
+          kind={joinError}
           message={battleErrorMessage(joinError)}
           actionText={t('battle.goHome')}
           onAction={goHome}
@@ -348,7 +349,8 @@ function BattleRoomPage(): JSX.Element {
     return (
       <>
         {screenOptions}
-        <Notice
+        <BattleNotice
+          kind={myRole === 'guest' ? 'host_offline' : 'closed'}
           message={battleErrorMessage(
             myRole === 'guest' ? 'host_offline' : 'closed',
           )}
@@ -375,6 +377,7 @@ function BattleRoomPage(): JSX.Element {
             isBusy={isReadyBusy}
             onReady={handleReady}
             onShare={handleShare}
+            onKick={handleKick}
           />
         ) : room.status === 'playing' ? (
           <BattlePlay

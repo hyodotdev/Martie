@@ -233,7 +233,8 @@ export type JoinRejection =
   | 'started'
   | 'full'
   | 'host_offline'
-  | 'insufficient_bulbs';
+  | 'insufficient_bulbs'
+  | 'kicked';
 
 export function checkJoin(
   battle: {
@@ -241,6 +242,7 @@ export function checkJoin(
     hostUserId: string;
     guestUserId?: string;
     hostSeenAt: number;
+    kickedUserIds?: readonly string[];
   } | null,
   userId: string,
   bulbCount: number,
@@ -250,6 +252,9 @@ export function checkJoin(
   const role = roleOf(battle, userId);
   // Participants can always reopen their own room to see where it stands.
   if (role) return {ok: true, role};
+  if (battle.kickedUserIds?.includes(userId)) {
+    return {ok: false, reason: 'kicked'};
+  }
   if (battle.status === 'closed') return {ok: false, reason: 'closed'};
   if (battle.status === 'finished') return {ok: false, reason: 'finished'};
   if (battle.status === 'playing') return {ok: false, reason: 'started'};

@@ -4,6 +4,7 @@ import {
   buzz,
   createRoom,
   joinRoom,
+  kickGuest,
   leave,
   requestRematch,
   setReady,
@@ -39,6 +40,7 @@ const call = {
   setReady: handlerOf<CodeArgs & {ready: boolean}, Result>(setReady),
   buzz: handlerOf<CodeArgs & {index: number; optionKey: string}, Result>(buzz),
   leave: handlerOf<CodeArgs, Result>(leave),
+  kickGuest: handlerOf<CodeArgs, Result>(kickGuest),
   requestRematch: handlerOf<CodeArgs, Result & {code?: string}>(requestRematch),
   advance: handlerOf<{battleId: string; phaseVersion: number}, void>(advance),
   sweep: handlerOf<Record<string, never>, number>(sweepStaleRooms),
@@ -428,6 +430,38 @@ describe('battle lobby', () => {
     as(HOST);
     await call.leave(ctx, {code: code!});
     expect(battle()).toMatchObject({status: 'closed', endReason: 'host_left'});
+  });
+
+  it('only the host can kick the guest, who then cannot come back', async () => {
+    as(HOST);
+    const {code} = await call.createRoom(ctx, {});
+    as(GUEST);
+    await call.joinRoom(ctx, {code: code!});
+    await call.setReady(ctx, {code: code!, ready: true});
+
+    await expect(call.kickGuest(ctx, {code: code!})).resolves.toEqual({ok: false});
+
+    as(HOST);
+    await expect(call.kickGuest(ctx, {code: code!})).resolves.toEqual({ok: true});
+    expect(battle()).toMatchObject({status: 'waiting', guestReady: false});
+    expect(battle().guestUserId).toBeUndefined();
+
+    as(GUEST);
+    await expect(call.getRoom(ctx, {code: code!})).resolves.toMatchObject({
+      myRole: null,
+      kicked: true,
+    });
+    await expect(call.joinRoom(ctx, {code: code!})).resolves.toEqual({
+      ok: false,
+      reason: 'kicked',
+    });
+
+    as(HOST);
+    await expect(call.kickGuest(ctx, {code: code!})).resolves.toEqual({ok: false});
+    await expect(call.getRoom(ctx, {code: code!})).resolves.toMatchObject({
+      myRole: 'host',
+      kicked: false,
+    });
   });
 
   it('a new room replaces the host’s open one', async () => {

@@ -25,6 +25,8 @@ type Props = {
   // A held peek closes when the finger lifts; a tapped one waits for a tap.
   sticky: boolean;
   onClose: () => void;
+  // Only the host gets this, on the guest's card.
+  onKick?: () => void;
 };
 
 /** A player's profile card that pops over the lobby, Instagram-peek style. */
@@ -37,6 +39,7 @@ export default function PlayerPeek({
   status,
   sticky,
   onClose,
+  onKick,
 }: Props): JSX.Element {
   const {theme} = useCPK();
   const scale = useSharedValue(0.8);
@@ -182,6 +185,28 @@ export default function PlayerPeek({
 
               {!isMe && headToHead ? (
                 <HeadToHead record={headToHead} opponentName={player.displayName} />
+              ) : null}
+
+              {onKick && sticky ? (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={onKick}
+                  style={({pressed}) => ({
+                    alignSelf: 'center',
+                    paddingVertical: 8,
+                    paddingHorizontal: 16,
+                    opacity: pressed ? 0.5 : 1,
+                  })}
+                >
+                  <Typography.Body3
+                    style={css`
+                      font-weight: 700;
+                      color: ${theme.role.danger};
+                    `}
+                  >
+                    {t('battle.kick')}
+                  </Typography.Body3>
+                </Pressable>
               ) : null}
             </Card>
           </Animated.View>

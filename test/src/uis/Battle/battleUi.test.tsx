@@ -11,6 +11,7 @@ import BattlePlay, {
 import BattleResult, {myResult} from '../../../../src/uis/Battle/BattleResult';
 import BattleRecordCard from '../../../../src/uis/Battle/BattleRecordCard';
 import BattleLobby from '../../../../src/uis/Battle/BattleLobby';
+import {noticeArt} from '../../../../src/uis/Battle/BattleNotice';
 import {
   battleErrorMessage,
   type BattleErrorReason,
@@ -66,6 +67,7 @@ const room = (overrides: Partial<BattleRoom> = {}): BattleRoom => ({
   code: 'abcd2345',
   status: 'playing',
   myRole: 'host',
+  kicked: false,
   headToHead: {wins: 0, losses: 0, draws: 0},
   host: {
     displayName: 'Hana',
@@ -294,6 +296,7 @@ describe('BattleLobby', () => {
         isBusy={false}
         onReady={jest.fn()}
         onShare={jest.fn()}
+        onKick={jest.fn()}
       />,
     );
 
@@ -320,5 +323,76 @@ describe('BattleLobby', () => {
     expect(await screen.findByText('Win rate 50%')).toBeTruthy();
     fireEvent(seat, 'pressOut');
     expect(screen.queryByText('Win rate 50%')).toBeNull();
+  });
+});
+
+describe('BattleLobby invite', () => {
+  it('offers the invite only while the other seat is empty', async () => {
+    const lobby = (guest: BattleRoom['guest']) =>
+      createTestElement(
+        <BattleLobby
+          room={room({status: 'waiting', round: null, guest})}
+          myRole="host"
+          offsetMs={0}
+          isBusy={false}
+          onReady={jest.fn()}
+          onShare={jest.fn()}
+          onKick={jest.fn()}
+        />,
+      );
+    const {unmount} = render(lobby(null));
+    expect(await screen.findByText('Invite a friend')).toBeTruthy();
+    unmount();
+
+    render(lobby(room().guest));
+    expect(await screen.findByLabelText('Gil, Offline')).toBeTruthy();
+    expect(screen.queryByText('Invite a friend')).toBeNull();
+  });
+});
+
+describe('kicking the guest', () => {
+  const lobby = (myRole: 'host' | 'guest', onKick = jest.fn()) =>
+    createTestElement(
+      <BattleLobby
+        room={room({status: 'waiting', round: null, myRole})}
+        myRole={myRole}
+        offsetMs={0}
+        isBusy={false}
+        onReady={jest.fn()}
+        onShare={jest.fn()}
+        onKick={onKick}
+      />,
+    );
+
+  it('lets the host kick from the guest profile card', async () => {
+    const onKick = jest.fn();
+    render(lobby('host', onKick));
+    fireEvent.press(await screen.findByLabelText('Gil, Offline'));
+    fireEvent.press(await screen.findByText('Kick out'));
+    expect(onKick).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows no kick on a held peek, my own card, or for the guest', async () => {
+    const {unmount} = render(lobby('host'));
+    const guestSeat = await screen.findByLabelText('Gil, Offline');
+    fireEvent(guestSeat, 'longPress');
+    expect(await screen.findByText('🏆 Record')).toBeTruthy();
+    expect(screen.queryByText('Kick out')).toBeNull();
+    fireEvent(guestSeat, 'pressOut');
+    fireEvent.press(screen.getByLabelText('Hana, Me, Host, Offline'));
+    expect(await screen.findByText('🏆 My record')).toBeTruthy();
+    expect(screen.queryByText('Kick out')).toBeNull();
+    unmount();
+
+    render(lobby('guest'));
+    fireEvent.press(await screen.findByLabelText('Hana, Host, Offline'));
+    expect(await screen.findByText('🏆 Record')).toBeTruthy();
+    expect(screen.queryByText('Kick out')).toBeNull();
+  });
+
+  it('gives every dead end its own Martie prop', () => {
+    expect(noticeArt('kicked').emoji).toBe('👋');
+    expect(noticeArt('closed').emoji).toBe('🚪');
+    expect(noticeArt('host_offline').emoji).toBe('💤');
   });
 });

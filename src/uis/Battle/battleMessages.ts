@@ -12,6 +12,7 @@ export type BattleErrorReason =
   | 'full'
   | 'host_offline'
   | 'insufficient_bulbs'
+  | 'kicked'
   | 'opponent_insufficient_bulbs'
   | 'opponent_offline'
   | 'daily_limit'
@@ -46,6 +47,8 @@ export function battleErrorMessage(reason: BattleErrorReason): string {
       return t('battle.errors.hostOffline');
     case 'insufficient_bulbs':
       return t('battle.errors.insufficientBulbs', {count: BATTLE_STAKE_BULBS});
+    case 'kicked':
+      return t('battle.errors.kicked');
     case 'opponent_insufficient_bulbs':
       return t('battle.errors.opponentInsufficientBulbs');
     case 'opponent_offline':

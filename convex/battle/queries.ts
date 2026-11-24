@@ -152,6 +152,10 @@ export const getRoom = query({
       code: battle.code,
       status: battle.status,
       myRole,
+      kicked:
+        myRole === null &&
+        userId !== null &&
+        (battle.kickedUserIds ?? []).includes(userId),
       headToHead,
       host: await playerView(
         ctx,
