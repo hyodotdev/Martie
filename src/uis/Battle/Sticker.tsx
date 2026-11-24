@@ -16,6 +16,9 @@ import {
 export const INK = '#22225E';
 export const SUN = '#FFC83D';
 export const CREAM = '#FFFDF6';
+// A see-through ink shadow: enough to lift a card off the page without the
+// heavy black edge that fights the app's soft cards.
+export const SOFT_SHADOW = '#22225E47';
 
 /**
  * `color` mixed into white as a solid color. Sticker faces must be opaque,
@@ -74,7 +77,7 @@ export function Burst({
           points={burstPoints(size)}
           fill={color}
           stroke={stroke ?? 'none'}
-          strokeWidth={stroke ? 3 : 0}
+          strokeWidth={stroke ? 2 : 0}
           strokeLinejoin="round"
         />
       </Svg>
@@ -88,8 +91,8 @@ export function Burst({
  * The shadow is a real view so it looks the same on Android.
  */
 export function Sticker({
-  shadow = INK,
-  offset = 4,
+  shadow = SOFT_SHADOW,
+  offset = 3,
   radius = 18,
   style,
   faceStyle,
@@ -119,7 +122,7 @@ export function Sticker({
         style={[
           {
             borderRadius: radius,
-            borderWidth: 3,
+            borderWidth: 2,
             borderColor: INK,
             backgroundColor: '#FFFFFF',
           },
@@ -138,7 +141,7 @@ export function StickerButton({
   onPress,
   color,
   textColor = '#FFFFFF',
-  shadow = INK,
+  shadow = SOFT_SHADOW,
   disabled = false,
 }: {
   text: string;
@@ -164,12 +167,12 @@ export function StickerButton({
     >
       {({pressed}) => (
         <Sticker
-          offset={pressed ? 1 : 5}
+          offset={pressed ? 0 : 3}
           radius={16}
           shadow={shadow}
           style={{
             opacity: disabled ? 0.5 : 1,
-            transform: [{translateY: pressed ? 4 : 0}],
+            transform: [{translateY: pressed ? 3 : 0}],
           }}
           faceStyle={{
             height: 54,

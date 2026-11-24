@@ -15,6 +15,7 @@ import {
   getMyBattleStats,
   getRoom,
   listMyBattles,
+  listMyRivals,
 } from '../../../convex/battle/queries';
 import {
   BATTLE_BUZZ_GRACE_MS,
@@ -57,6 +58,10 @@ const call = {
     {paginationOpts: {numItems: number; cursor: string | null}},
     {page: Record<string, unknown>[]}
   >(listMyBattles),
+  listMyRivals: handlerOf<
+    {paginationOpts: {numItems: number; cursor: string | null}},
+    {page: Record<string, unknown>[]}
+  >(listMyRivals),
 };
 
 let clock = 1_000_000;
@@ -363,6 +368,20 @@ describe('battle match', () => {
       guest: {record: {wins: 0, losses: 2, draws: 0}},
     });
     expect(fake.table('battleRivals')).toHaveLength(2);
+
+    // Each player sees the other once in their rivals, from their own side.
+    const rivals = await call.listMyRivals(ctx, {
+      paginationOpts: {numItems: 10, cursor: null},
+    });
+    expect(rivals.page).toEqual([
+      expect.objectContaining({
+        opponentName: 'Host',
+        avatarUrl: null,
+        wins: 0,
+        losses: 2,
+        draws: 0,
+      }),
+    ]);
   });
 
   it('leaving a running match forfeits it to the other player', async () => {

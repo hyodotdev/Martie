@@ -79,7 +79,7 @@ function Fighter({
         shadow="#00000059"
         style={{transform: [{rotate: `${side * -4}deg`}]}}
         faceStyle={{
-          borderWidth: 2,
+          borderWidth: 1.5,
           paddingHorizontal: 8,
           paddingVertical: 2,
           backgroundColor: color,
@@ -217,7 +217,7 @@ export default function LaunchCountdown({
           offset={3}
           shadow="#00000059"
           faceStyle={{
-            borderWidth: 2,
+            borderWidth: 1.5,
             paddingHorizontal: 12,
             paddingVertical: 4,
             backgroundColor: CREAM,

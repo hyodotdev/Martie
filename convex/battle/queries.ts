@@ -42,6 +42,18 @@ const toRecord = (row: BattleRecord | null): BattleRecord => ({
   draws: row?.draws ?? 0,
 });
 
+async function avatarUrlOf(
+  ctx: QueryCtx,
+  profile: Doc<'userProfiles'> | null,
+): Promise<string | null> {
+  if (!profile?.avatarUrlId) return null;
+  try {
+    return await ctx.storage.getUrl(profile.avatarUrlId);
+  } catch {
+    return null;
+  }
+}
+
 async function playerView(
   ctx: QueryCtx,
   userId: Id<'users'> | undefined,
@@ -50,15 +62,9 @@ async function playerView(
 ): Promise<BattlePlayerView | null> {
   if (!userId) return null;
   const profile = await getProfile(ctx, userId);
-  let avatarUrl: string | null = null;
-  if (profile?.avatarUrlId) {
-    try {
-      avatarUrl = await ctx.storage.getUrl(profile.avatarUrlId);
-    } catch {}
-  }
   return {
     displayName: profile?.displayName ?? '',
-    avatarUrl,
+    avatarUrl: await avatarUrlOf(ctx, profile),
     ready,
     seenAt,
     record: toRecord(await getBattleStats(ctx, userId)),
@@ -229,6 +235,45 @@ export const listMyBattles = query({
           myScore: player.myScore ?? 0,
           opponentScore: player.opponentScore ?? 0,
           opponentName: opponent?.displayName ?? '',
+        };
+      }),
+    );
+    return {...paginated, page};
+  },
+});
+
+export type BattleRivalItem = BattleRecord & {
+  _id: Id<'battleRivals'>;
+  opponentName: string;
+  avatarUrl: string | null;
+  lastPlayedAt: number;
+};
+
+/** Everyone I have played, most recent first, with my record against each. */
+export const listMyRivals = query({
+  args: {paginationOpts: paginationOptsValidator},
+  handler: async (
+    ctx,
+    {paginationOpts},
+  ): Promise<PaginationResult<BattleRivalItem>> => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return {page: [], isDone: true, continueCursor: ''};
+
+    const paginated = await ctx.db
+      .query('battleRivals')
+      .withIndex('by_user_and_last_played', (q) => q.eq('userId', userId))
+      .order('desc')
+      .paginate(paginationOpts);
+
+    const page = await Promise.all(
+      paginated.page.map(async (rival): Promise<BattleRivalItem> => {
+        const profile = await getProfile(ctx, rival.opponentUserId);
+        return {
+          _id: rival._id,
+          opponentName: profile?.displayName ?? '',
+          avatarUrl: await avatarUrlOf(ctx, profile),
+          ...toRecord(rival),
+          lastPlayedAt: rival.lastPlayedAt,
         };
       }),
     );

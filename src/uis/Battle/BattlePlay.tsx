@@ -21,7 +21,7 @@ import {
   RIVAL_COLOR,
   type MartieMood,
 } from './BattleParts';
-import {Burst, CREAM, INK, Sticker, paperTint} from './Sticker';
+import {Burst, CREAM, INK, SOFT_SHADOW, Sticker, paperTint} from './Sticker';
 import type {BattlePlayer, BattleRoom, BattleRound} from './types';
 
 type Props = {
@@ -130,8 +130,8 @@ function PlayerScore({
   return (
     <Sticker
       // The side whose turn it is lifts off the page in its own color.
-      shadow={active ? color : INK}
-      offset={active ? 5 : 3}
+      shadow={active ? color : SOFT_SHADOW}
+      offset={active ? 3 : 2}
       radius={16}
       style={{flex: 1, transform: [{rotate: alignEnd ? '1.5deg' : '-1.5deg'}]}}
       faceStyle={{backgroundColor: active ? paperTint(color, 0.18) : '#FFFFFF'}}
@@ -268,8 +268,8 @@ function OptionCard({
         {({pressed}) => (
           // Pressing an answer pushes the card down onto its shadow.
           <Sticker
-            shadow={accent ?? INK}
-            offset={pressed ? 1 : 4}
+            shadow={accent ?? SOFT_SHADOW}
+            offset={pressed ? 0 : 3}
             radius={16}
             style={{transform: [{translateY: pressed ? 3 : 0}]}}
             faceStyle={{backgroundColor: accent ? paperTint(accent, 0.16) : '#FFFFFF'}}
@@ -463,7 +463,7 @@ export default function BattlePlay({
       />
 
       <Sticker
-        offset={5}
+        offset={3}
         radius={20}
         style={{marginTop: 8}}
         faceStyle={{backgroundColor: QUESTION_BG}}
@@ -525,7 +525,7 @@ export default function BattlePlay({
       {room.phase === 'reveal' && correctOption ? (
         <Sticker
           shadow={theme.role.success}
-          offset={4}
+          offset={3}
           radius={16}
           faceStyle={{backgroundColor: CREAM}}
         >
@@ -584,7 +584,7 @@ const QuestionTag = styled.View`
   left: 14px;
   padding: 3px 12px;
   border-radius: 10px;
-  border-width: 2px;
+  border-width: 1.5px;
   border-color: ${INK};
 `;
 
@@ -601,7 +601,7 @@ const TimerTrack = styled.View`
   padding: 1px;
   border-radius: 8px;
   overflow: hidden;
-  border-width: 2px;
+  border-width: 1.5px;
   border-color: ${INK};
   background-color: ${CREAM};
 `;
@@ -619,7 +619,7 @@ const LetterBadge = styled.View`
   border-radius: 17px;
   align-items: center;
   justify-content: center;
-  border-width: 2px;
+  border-width: 1.5px;
   border-color: ${INK};
 `;
 
@@ -627,6 +627,6 @@ const PickerTag = styled.View`
   max-width: 96px;
   padding: 3px 8px;
   border-radius: 10px;
-  border-width: 2px;
+  border-width: 1.5px;
   border-color: ${INK};
 `;

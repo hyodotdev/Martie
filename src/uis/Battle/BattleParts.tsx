@@ -149,7 +149,7 @@ export function PlayerAvatar({
   size = 56,
   ringColor,
 }: {
-  player: BattlePlayer;
+  player: Pick<BattlePlayer, 'displayName' | 'avatarUrl'>;
   size?: number;
   ringColor?: string;
 }): JSX.Element {
@@ -284,7 +284,7 @@ const Bubble = styled.View`
   padding: 12px 14px;
   border-radius: 16px;
   background-color: ${CREAM};
-  border-width: 2.5px;
+  border-width: 2px;
   border-color: ${INK};
 `;
 
@@ -295,7 +295,7 @@ const BubbleTail = styled.View`
   width: 12px;
   height: 12px;
   background-color: ${CREAM};
-  border-left-width: 2.5px;
-  border-bottom-width: 2.5px;
+  border-left-width: 2px;
+  border-bottom-width: 2px;
   border-color: ${INK};
 `;

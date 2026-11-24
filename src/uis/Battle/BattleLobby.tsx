@@ -28,7 +28,7 @@ import {IC_MARTIE_SLEEP} from '../../icons';
 import {HeadToHead, MartieHost, PlayerAvatar, RIVAL_COLOR} from './BattleParts';
 import LaunchCountdown from './LaunchCountdown';
 import PlayerPeek from './PlayerPeek';
-import {Burst, CREAM, INK, Sticker, StickerButton} from './Sticker';
+import {Burst, CREAM, INK, SOFT_SHADOW, Sticker, StickerButton} from './Sticker';
 import type {BattlePlayer, BattleRoom} from './types';
 
 const PRESENCE_REFRESH_MS = 5000;
@@ -167,8 +167,8 @@ function PlayerSlot({
         <Sticker
           style={{transform: [{rotate: tilt}]}}
           // A ready player's card casts their own color.
-          shadow={lit ? color : INK}
-          offset={lit ? 6 : 4}
+          shadow={lit ? color : SOFT_SHADOW}
+          offset={lit ? 4 : 3}
           faceStyle={{height: SEAT_HEIGHT}}
         >
           <SeatBody>
@@ -295,7 +295,7 @@ export default function BattleLobby({
   return (
     <Container>
       <MartieHost mood={hasOpponent ? 'smile' : 'basic'} message={mc} size={80} />
-      <Sticker shadow={INK} offset={5} radius={26} faceStyle={{backgroundColor: ARENA_BG}}>
+      <Sticker offset={3} radius={26} faceStyle={{backgroundColor: ARENA_BG}}>
         <ArenaBody>
           <ArenaHeader>
             <Typography.Heading5
@@ -309,7 +309,7 @@ export default function BattleLobby({
             <Sticker
               offset={2}
               radius={10}
-              faceStyle={{borderWidth: 2, paddingVertical: 2, paddingHorizontal: 8}}
+              faceStyle={{borderWidth: 1.5, paddingVertical: 2, paddingHorizontal: 8}}
             >
               <Typography.Body4
                 style={css`
@@ -475,7 +475,7 @@ const SeatBody = styled.View`
 const Stamp = styled.View`
   padding: 3px 10px;
   border-radius: 8px;
-  border-width: 2px;
+  border-width: 1.5px;
   border-color: ${INK};
 `;
 
@@ -488,7 +488,7 @@ const CrownBadge = styled.View`
   border-radius: 14px;
   align-items: center;
   justify-content: center;
-  border-width: 2px;
+  border-width: 1.5px;
   border-color: ${INK};
   background-color: ${CREAM};
 `;
@@ -499,6 +499,6 @@ const MeTag = styled.View`
   align-self: center;
   padding: 0 8px;
   border-radius: 8px;
-  border-width: 2px;
+  border-width: 1.5px;
   border-color: ${INK};
 `;

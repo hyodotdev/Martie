@@ -74,7 +74,7 @@ export default function BattleResult({
     <Container>
       <MartieHost mood={mood} message={mc} size={96} />
 
-      <Sticker offset={5} radius={24} faceStyle={{backgroundColor: '#FFF1C9'}}>
+      <Sticker offset={3} radius={24} faceStyle={{backgroundColor: '#FFF1C9'}}>
         <HeroBody>
           <Burst size={170} color={burstColor}>
             <Typography.Heading1
@@ -107,11 +107,11 @@ export default function BattleResult({
             {headline}
           </Typography.Body1>
           <Sticker
-            offset={3}
+            offset={2}
             radius={12}
             style={{transform: [{rotate: '-3deg'}]}}
             faceStyle={{
-              borderWidth: 2,
+              borderWidth: 1.5,
               paddingHorizontal: 14,
               paddingVertical: 4,
               backgroundColor: CREAM,
@@ -149,7 +149,7 @@ export default function BattleResult({
         </Typography.Body3>
       ) : null}
 
-      <Sticker offset={4} radius={18}>
+      <Sticker offset={3} radius={18}>
         <ScoreBody
           accessibilityLabel={t('battle.score', {
             mine: myScore,

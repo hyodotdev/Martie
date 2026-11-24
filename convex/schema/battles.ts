@@ -130,4 +130,6 @@ export const battleRivalsTable = defineTable({
   opponentUserId: v.id('users'),
   ...recordFields,
   lastPlayedAt: v.number(),
-}).index('by_user_and_opponent', ['userId', 'opponentUserId']);
+})
+  .index('by_user_and_opponent', ['userId', 'opponentUserId'])
+  .index('by_user_and_last_played', ['userId', 'lastPlayedAt']);
