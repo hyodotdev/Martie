@@ -75,6 +75,8 @@ const HORIZON_BLOCKED_ANDROID_PERMISSIONS = [
   'android.permission.READ_MEDIA_VISUAL_USER_SELECTED',
   'android.permission.ACCESS_MEDIA_LOCATION',
   'android.permission.MANAGE_EXTERNAL_STORAGE',
+  // Implied by Horizon SDK manifests that omit targetSdkVersion; Meta rejects it.
+  'android.permission.READ_PHONE_STATE',
 ];
 const DEFAULT_ANDROID_PERMISSIONS = [
   'RECEIVE_BOOT_COMPLETED',
