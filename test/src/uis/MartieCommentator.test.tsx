@@ -1,4 +1,6 @@
 import {act, render, screen} from '@testing-library/react-native';
+import type {ComponentProps, ReactElement, ReactNode} from 'react';
+import {ThemeProvider} from 'kstyled';
 import {StyleSheet} from 'react-native';
 import {useReducedMotion} from 'react-native-reanimated';
 import MartieCommentator from '../../../src/uis/MartieCommentator';
@@ -33,6 +35,23 @@ jest.mock('expo-image', () => ({
   },
 }));
 
+type Theme = ComponentProps<typeof ThemeProvider>['theme'];
+
+// Just the colors the speech bubble reads.
+const theme = {
+  role: {border: '#d9d9d9'},
+  bg: {bubble: '#ffffff'},
+  text: {basic: '#222222', label: '#888888'},
+} as unknown as Theme;
+
+function Themed({children}: {children: ReactNode}): JSX.Element {
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+}
+
+function renderThemed(ui: ReactElement) {
+  return render(ui, {wrapper: Themed});
+}
+
 const POSES = ['talkOpen', 'talkClosed', 'think', 'cheer', 'shock', 'nervous'];
 
 function shownFrame(): string | undefined {
@@ -60,36 +79,55 @@ describe('MartieCommentator', () => {
     jest.useRealTimers();
   });
 
-  it('talks the question in, then settles into the thinking pose', () => {
-    render(<MartieCommentator mood="question" seed="quiz-1" size={150} />);
-    expect(shownFrame()).toBe('talkOpen');
+  // He lands, shows typing dots, then starts his line.
+  function startSpeaking() {
+    act(() => jest.advanceTimersByTime(700));
+    act(() => jest.advanceTimersByTime(550));
+  }
 
+  it('thinks, shows typing dots, then talks the question in', () => {
+    renderThemed(
+      <MartieCommentator mood="question" seed="quiz-1" size={150} />,
+    );
+    expect(shownFrame()).toBe('think');
+    expect(screen.queryByText('•••')).toBeNull();
+
+    act(() => jest.advanceTimersByTime(700));
+    expect(screen.getByText('•••')).toBeTruthy();
+    expect(shownFrame()).toBe('think');
+
+    act(() => jest.advanceTimersByTime(550));
+    expect(screen.queryByText('•••')).toBeNull();
+    expect(shownFrame()).toBe('talkOpen');
     act(() => jest.advanceTimersByTime(130));
     expect(shownFrame()).toBe('talkClosed');
 
-    act(() => jest.advanceTimersByTime(2000));
+    const line = commentaryLine('question', 'quiz-1');
+    for (let i = 0; i <= line.length; i++) {
+      act(() => jest.advanceTimersByTime(38));
+    }
+    expect(untyped()).toBe('');
     expect(shownFrame()).toBe('think');
-    expect(
-      screen.getByLabelText(commentaryLine('question', 'quiz-1')),
-    ).toBeTruthy();
+    expect(screen.getByLabelText(line)).toBeTruthy();
   });
 
   it('types the line out without changing what it reads aloud', () => {
     const line = commentaryLine('correct', 'quiz-2');
-    render(<MartieCommentator mood="correct" seed="quiz-2" size={150} />);
+    renderThemed(<MartieCommentator mood="correct" seed="quiz-2" size={150} />);
     expect(untyped()).toBe(line);
     expect(screen.getByLabelText(line)).toBeTruthy();
 
+    startSpeaking();
     // Each character schedules the next after a render, so step through.
     for (let i = 0; i <= line.length; i++) {
-      act(() => jest.advanceTimersByTime(28));
+      act(() => jest.advanceTimersByTime(38));
     }
     expect(untyped()).toBe('');
     expect(screen.getByLabelText(line)).toBeTruthy();
   });
 
   it('jumps straight to the reaction pose for answers', () => {
-    const {rerender} = render(
+    const {rerender} = renderThemed(
       <MartieCommentator mood="correct" seed="quiz-3" size={150} />,
     );
     expect(shownFrame()).toBe('cheer');
@@ -100,22 +138,24 @@ describe('MartieCommentator', () => {
 
   it('panics with a new line once time runs low', () => {
     const line = commentaryLine('hurry', 'quiz-4');
-    const {rerender} = render(
+    const {rerender} = renderThemed(
       <MartieCommentator mood="question" seed="quiz-4" size={150} />,
     );
-    act(() => jest.advanceTimersByTime(300));
+    startSpeaking();
     const mounts = mockImageMounts;
     rerender(<MartieCommentator mood="hurry" seed="quiz-4" size={150} />);
 
     expect(shownFrame()).toBe('nervous');
     expect(screen.getByLabelText(line)).toBeTruthy();
+    // He is already on screen, so the new line starts with typing dots.
+    expect(screen.getByText('•••')).toBeTruthy();
     expect(untyped()).toBe(line);
     // The frames stay loaded through the pose change.
     expect(mockImageMounts).toBe(mounts);
   });
 
   it('owns up to the clock when time runs out', () => {
-    render(<MartieCommentator mood="timeout" seed="quiz-6" size={150} />);
+    renderThemed(<MartieCommentator mood="timeout" seed="quiz-6" size={150} />);
 
     expect(shownFrame()).toBe('nervous');
     expect(
@@ -123,11 +163,14 @@ describe('MartieCommentator', () => {
     ).toBeTruthy();
   });
 
-  it('skips the lip flap and typing when motion is reduced', () => {
+  it('skips the wait, lip flap and typing when motion is reduced', () => {
     jest.mocked(useReducedMotion).mockReturnValue(true);
-    render(<MartieCommentator mood="question" seed="quiz-5" size={150} />);
+    renderThemed(
+      <MartieCommentator mood="question" seed="quiz-5" size={150} />,
+    );
 
     expect(shownFrame()).toBe('think');
+    expect(screen.queryByText('•••')).toBeNull();
     expect(untyped()).toBe('');
   });
 });
