@@ -193,7 +193,8 @@ beta with the user's normal Apple Account, while purchases in a TestFlight or
 development-signed build go to the Sandbox Apple Account under **Settings →
 Developer → Sandbox Apple Account**. A purchase row passes only when the store
 transaction completes, the app grants the item, and the transaction is
-finished; record the transaction id.
+finished; record the transaction id. To also check the receipt with Martie's
+dev Convex and production IAPKit, run `$purchase-e2e`.
 
 ## Required: Daily Quiz Retention Loop
 
