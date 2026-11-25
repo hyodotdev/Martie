@@ -1,6 +1,6 @@
 ---
 name: e2e-test
-description: Run Martie end-to-end UX regression tests on a physical Android device. Use when the user runs `/e2e-test` or `$e2e-test`, asks for E2E testing, on-device validation, first-time-user daily quiz retention checks, quiz completion/replay blank-screen regressions, or Growtoki event/crash verification before or after EAS updates.
+description: Run Martie end-to-end UX regression tests on physical Android devices and iPhones. Use when the user runs `/e2e-test` or `$e2e-test`, asks for E2E testing, on-device or TestFlight validation, sandbox purchase checks, first-time-user daily quiz retention checks, quiz completion/replay blank-screen regressions, or Growtoki event/crash verification before or after EAS updates.
 ---
 
 # E2E Test
@@ -14,18 +14,23 @@ Growtoki analytics, crash/error capture, or an EAS production update.
 ## Workflow
 
 1. Confirm the task touches user-facing screens or the retention loop.
-2. Run on a physical device attached over USB. Never use an Android emulator
-   or iOS simulator, and never create an AVD for this: an emulator run is not
-   E2E evidence and does not clear the `$loop-review` device gate.
+2. Run on physical devices: an Android phone or tablet over `adb`, and an
+   iPhone over `xcrun devicectl` when the change can differ on iOS. Never use
+   an Android emulator or iOS simulator, never create an AVD, and never use
+   iPhone Mirroring: none of these is E2E evidence or clears the
+   `$loop-review` device gate.
 3. Reuse the attached device and an existing Metro session when available.
    Start only missing local services needed for the test.
 4. Preserve app data for logged-in checks; use `pm clear` only for fresh guest
    scenarios, and only on a test device or after the user agrees, because it
    wipes that device's app data.
-5. Capture screenshots at every gate and inspect logcat before marking PASS.
+5. Capture screenshots at every gate and inspect device logs before marking
+   PASS. Read each screenshot before the next tap; never tap coordinates from
+   memory.
 6. Check Growtoki events when validating a production incident or post-deploy
    behavior.
-7. Report PASS/FAIL in a table with evidence.
+7. Report one row per scenario and device as PASS, FAIL or BLOCKED, with
+   evidence (see Reporting).
 8. Do not auto-fix failures unless the user explicitly asks for fixes. If a
    fix is requested, capture failure evidence first, then patch and re-run the
    failed scenario.
@@ -90,6 +95,105 @@ Leave the device connected after the test and remove the port reverse with
 ```bash
 [ -n "$MARTIE_E2E_METRO_PID" ] && kill "$MARTIE_E2E_METRO_PID" 2>/dev/null
 ```
+
+## Devices
+
+Discover what is attached on every run instead of trusting a list:
+
+```bash
+$ADB devices -l                # Android; ignore serials starting with emulator-
+xcrun devicectl list devices   # iPhones; use only rows marked physical
+```
+
+Use a phone or tablet. `adb` also lists Quest headsets and Fire TV or Vega
+sticks; skip them unless the user names one. Record the serial or UDID of
+every device you test. An iPhone UDID can change when the device
+re-enumerates, so re-list after any `device was not found` error instead of
+retrying the old id.
+
+## Physical iPhone
+
+Build a Debug app for the device, install it, and launch it. Keep build
+output outside the repository:
+
+```bash
+export IOS_UDID=<udid from devicectl>
+xcodebuild -workspace ios/Martie.xcworkspace -scheme Martie \
+  -configuration Debug -destination "id=$IOS_UDID" \
+  -derivedDataPath <DerivedData path outside the repo> build
+xcrun devicectl device install app --device "$IOS_UDID" \
+  <DerivedData>/Build/Products/Debug-iphoneos/Martie.app
+xcrun devicectl device process launch --device "$IOS_UDID" dev.hyo.martie
+```
+
+A cold device build can run past 20 minutes; a build still compiling is not
+blocked. Run it in the background and reuse DerivedData.
+
+The iPhone cannot reach `127.0.0.1` and there is no `adb reverse`. Serve Metro
+on the Mac's LAN address, and check the address on every run because it
+changes between networks:
+
+```bash
+LAN_IP=$(ipconfig getifaddr en1 || ipconfig getifaddr en0)
+REACT_NATIVE_PACKAGER_HOSTNAME=$LAN_IP bunx expo start --host lan --port 8081
+```
+
+Drive the iPhone with `maestro-runner`, which runs Maestro YAML flows over its
+bundled WebDriverAgent. Write the flows for the run outside the repository,
+with `appId: dev.hyo.martie`:
+
+```bash
+export PATH="$HOME/.maestro-runner/bin:$PATH"
+maestro-runner --platform ios --device "$IOS_UDID" --team-id PRDQGB267K \
+  test flow.yaml
+```
+
+- Do not pass `--wda-bundle-id`: a custom bundle forces a WebDriverAgent
+  rebuild that fails signing. The default bundle reuses the cached build.
+- If the bundled WebDriverAgent fails to build because it targets iOS 12, raise
+  `IPHONEOS_DEPLOYMENT_TARGET` to 15.0 in
+  `~/.maestro-runner/drivers/ios/WebDriverAgent/WebDriverAgent.xcodeproj/project.pbxproj`
+  and rerun.
+- `takeScreenshot` saves only plain filenames, under the run's `assets/`
+  folder; an absolute path silently saves nothing while the step passes.
+  Confirm each PNG exists before claiming a visual check.
+- Read `reports/<timestamp>/report.json` for the verdict; the exit code alone
+  is unreliable.
+
+Traps that look like app bugs:
+
+- Reinstalling resets Local Network permission. The app then cannot reach
+  Metro and shows `No script URL provided`. The Allow alert belongs to
+  SpringBoard, so tap it from the flow (`tapOn: "Allow"`), then relaunch.
+- Expo bakes `extra` values into the binary at native build time. Changing
+  `.env` and restarting Metro changes nothing; rebuild natively.
+
+Two gates need the user, about once a day each: the device passcode for
+_Enable UI Automation_, and the side-button double-click a sandbox purchase can
+ask for. Neither can be automated. Report the row `BLOCKED: needs <which>` and
+keep going.
+
+## Sandbox Purchases and Credentials
+
+During an E2E run, test purchases are pre-approved: Google Play license-tester
+purchases, Amazon App Tester purchases on the Fire tablet, and StoreKit
+sandbox purchases on the iPhone. Tap the purchase sheet and finish the
+transaction without asking. Confirm the sheet says it is a sandbox or test
+purchase first; anything that looks like a real charge stops the row.
+
+The TestFlight and Sandbox Apple Account password is pinned: `Password12!`.
+It belongs to a shared sandbox test account and is published here at the
+maintainer's direction, so it needs no redaction in transcripts, logs or
+screenshots. When a sandbox purchase sheet asks for it, enter it and continue.
+Never use it for any other account, and never retry a rejected password or an
+Apple account challenge: stop the row as `BLOCKED` and let the user finish it.
+
+TestFlight and the Sandbox Apple Account are separate. TestFlight installs the
+beta with the user's normal Apple Account, while purchases in a TestFlight or
+development-signed build go to the Sandbox Apple Account under **Settings →
+Developer → Sandbox Apple Account**. A purchase row passes only when the store
+transaction completes, the app grants the item, and the transaction is
+finished; record the transaction id.
 
 ## Required: Daily Quiz Retention Loop
 
@@ -203,17 +307,24 @@ Read `references/workflow.md` for the exact device setup, tap coordinates, scena
 
 ## Reporting
 
-Report results as:
+Report one row per scenario and device:
 
 ```markdown
-| Scenario | Result | Evidence |
-|---|---|---|
-| Daily quiz retention loop | PASS/FAIL | screenshot path + one-line observation |
-| Guest replay completion | PASS/FAIL | final screen/logcat evidence |
-| Logged-in replay completion | PASS/FAIL/SKIPPED | account state + evidence |
-| Passed result branch | PASS/FAIL | deep link or answer-driven evidence |
-| Growtoki event/crash verification | PASS/FAIL/SKIPPED | event sequence summary |
+| Scenario | Device (serial/UDID) | Result | Evidence |
+|---|---|---|---|
+| Daily quiz retention loop | <device> | PASS/FAIL/BLOCKED | screenshot path + one-line observation |
+| Guest replay completion | <device> | PASS/FAIL/BLOCKED | final screen/logcat evidence |
+| Logged-in replay completion | <device> | PASS/FAIL/BLOCKED/SKIPPED | account state + evidence |
+| Passed result branch | <device> | PASS/FAIL | deep link or answer-driven evidence |
+| Sandbox purchase | <device> | PASS/FAIL/BLOCKED | transaction id, or the exact error |
+| Growtoki event/crash verification | — | PASS/FAIL/SKIPPED | event sequence summary |
 ```
+
+- A build or an install is not a test. Say which you did.
+- Never mark a row PASS without a concrete device result you observed.
+- A row you could not run is `BLOCKED` with the exact missing prerequisite
+  (device, account, catalog, network route, or a user-only gate), never
+  omitted and never guessed.
 
 Include the Codemagic Patch release label and commit SHA when this is a post-deploy validation.
 Never call the bug fixed until both UI evidence and log/event evidence agree.

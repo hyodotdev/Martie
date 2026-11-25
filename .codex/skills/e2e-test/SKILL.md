@@ -1,6 +1,6 @@
 ---
 name: e2e-test
-description: Run Martie end-to-end UX regression tests on a physical Android device. Use when the user runs `/e2e-test` or `$e2e-test`, asks for E2E testing, on-device validation, first-time-user daily quiz retention checks, quiz completion/replay blank-screen regressions, or Growtoki event/crash verification before or after EAS updates.
+description: Run Martie end-to-end UX regression tests on physical Android devices and iPhones. Use when the user runs `/e2e-test` or `$e2e-test`, asks for E2E testing, on-device or TestFlight validation, sandbox purchase checks, first-time-user daily quiz retention checks, quiz completion/replay blank-screen regressions, or Growtoki event/crash verification before or after EAS updates.
 ---
 
 # E2E Test (Codex)

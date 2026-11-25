@@ -51,7 +51,7 @@ names, the same `description` triggers, and the same procedure. Only the short
 | --- | --- |
 | `analyze` | Firebase/GA4 funnels, retention, growth experiments |
 | `commit` | Branch checks, conventional commits, push, PR |
-| `e2e-test` | On-device Android UX regression + Growtoki verification |
+| `e2e-test` | On-device Android and iPhone UX regression + Growtoki verification |
 | `grow` | One metric-driven growth round for store ranking |
 | `loop-review` | main → branch → review-self → PR → poll → verified merge |
 | `release-update` | EAS build, store submit, Expo OTA rollout |
