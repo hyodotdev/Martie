@@ -10,12 +10,13 @@
 # Firebase files (base64) and the EXPO_PUBLIC_* values all stay in the EAS
 # project and its `production` environment. They upload to TestFlight and the Play internal
 # track as a draft (`eas submit --profile codemagic`) and never submit for
-# review or roll out. They start only by hand and read only EXPO_TOKEN from the
-# secure `martie_production` group.
+# review or roll out. A `v*` tag starts them (the GitHub Release workflow pushes
+# one after main's CI passes), and they read only EXPO_TOKEN from the secure
+# `martie_production` group.
 #
 # Every workflow runs on mac_mini_m2: the OpenIAP team plan offers no Linux
 # instance, and the Mac image carries the Android SDK as well.
-# Over-the-air updates ship with `bun ota:release` (Codemagic Patch).
+# Over-the-air updates ship from an `ota-*` tag (ota-production, Codemagic Patch).
 
 definitions:
   environment: &environment
