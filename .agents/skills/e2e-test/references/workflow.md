@@ -1,6 +1,6 @@
-# E2E UX Test (Android emulator)
+# E2E UX Test (physical Android device)
 
-End-to-end UX flow validation on the Android emulator. Runs the canonical
+End-to-end UX flow validation on a physical Android device. Runs the canonical
 first-time-user → daily-quiz → result → league flow, taking screenshots at
 each gate and reporting PASS/FAIL with evidence.
 
@@ -15,22 +15,33 @@ that doesn't touch user-facing screens.
 
 ## Prerequisites
 
-- Android emulator AVD `Pixel_Test` exists (or any AVD — replace name
-  below). `Pixel_9_Pro` AVD is broken on this machine, do **not** try it.
+- A physical Android phone or tablet is attached over USB with USB
+  debugging on. **Never use an emulator or simulator**, and never create an
+  AVD: an emulator run is not E2E evidence. If no device is attached, stop
+  and ask the user to connect one.
 - App package: `dev.hyo.martie`, MainActivity: `dev.hyo.martie/.MainActivity`.
-- Dev build installed (or this skill installs it).
+- A debug build is installed (`dumpsys package dev.hyo.martie` lists
+  `DEBUGGABLE`). Installing one over a store build needs an uninstall, which
+  wipes the user's app data, so ask first.
 
 ## Reasonable assumptions you can make
 
-- If `adb devices` already shows `emulator-5554 device`, reuse it.
+- If `adb devices` shows several devices, pick the phone or tablet (its
+  serial never starts with `emulator-`; skip headsets and TV sticks) and
+  export `ANDROID_SERIAL` so every `adb` call targets it.
 - If Metro is not running on port 8081, start it (`bun start`) in the
   background and wait until log line "Logs for your project will appear
   below." appears.
 - App data is wiped at the start of every run via `pm clear` so each run
-  starts from a clean fresh-install state. The user always wants this for
-  E2E.
-- Display→screen scale is **4x** on Pixel_Test (display 320x712, screen
-  1280x2856). Multiply tap coords by 4.
+  starts from a clean fresh-install state. On a physical device this wipes
+  that device's Martie data, so do it only on a test device or after the user
+  agrees.
+- Tap coordinates below were measured on a 1280x2856 screen. Scale them by
+  the device's `adb shell wm size` (x × width/1280, y × height/2856), or
+  read positions from a screenshot.
+- Take screenshots with `adb exec-out screencap -p > <file>.png`. Avoid
+  `uiautomator dump` on quiz screens: the commentator's looping animation
+  keeps the UI from going idle, so it stalls and can return a stale dump.
 - Debug toasts ("Open debugger to view warnings", "[Expo-IAP]
   initConnection failed") may obscure buttons in dev builds — dismiss them
   before tapping by sending `input tap 1160 2440` and `input tap 1160 2640`
@@ -47,11 +58,10 @@ all 7 scenarios from the start so the user sees progress.
 ### 0. Setup
 
 ```bash
-# emulator
-adb devices | grep -q "emulator.*device$" || (
-  emulator @Pixel_Test -no-snapshot-load > /tmp/emulator.log 2>&1 &
-  until adb devices | grep -q "emulator.*device$"; do sleep 3; done
-)
+# physical device only
+adb devices -l | grep -v "^emulator-" | grep " device "
+export ANDROID_SERIAL=<serial>
+adb shell dumpsys package dev.hyo.martie | grep pkgFlags   # must list DEBUGGABLE
 
 # metro (only if not already up)
 curl -sf http://localhost:8081/status >/dev/null || (
@@ -151,8 +161,9 @@ Take screenshot. Expect **both**:
 ### Cleanup
 
 ```bash
-# leave emulator running, but stop the metro we started (don't kill the
-# user's pre-existing metro)
+# leave the device connected, drop the port reverse, and stop the metro we
+# started (don't kill the user's pre-existing metro)
+adb reverse --remove tcp:8081
 [ -n "$METRO_PID" ] && kill "$METRO_PID" 2>/dev/null
 ```
 
@@ -197,4 +208,6 @@ user first.
   blob). Confirm with `adb shell run-as dev.hyo.martie ls
   /data/data/dev.hyo.martie/mmkv` is wiped, or just re-run after `pm
   clear`.
-- **Coordinates drift** if you ever switch AVDs. Re-derive: actual = displayed × (1280/imageWidth).
+- **Coordinates drift** on every device with a different screen size.
+  Re-derive from `wm size` or the screenshot: actual = displayed ×
+  (screenWidth/imageWidth).

@@ -141,8 +141,9 @@ Two things clear the gate, and both are recorded on the PR first:
    waived and why. Record it verbatim on the PR.
 
 Absence of an objection is not a waiver, and the loop never grants itself one.
-Green CI is not a substitute — CI does not launch the emulator, complete a quiz,
-or exercise purchase dialogs.
+Green CI is not a substitute — CI does not run the app on a device, complete a
+quiz, or exercise purchase dialogs. An emulator or simulator run does not clear
+the gate either; `$e2e-test` runs on a physical device.
 
 A change confined to documentation, agent skills, repository automation, or
 seed tooling does not need device regression. Say so explicitly and name the

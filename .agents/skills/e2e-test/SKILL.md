@@ -1,11 +1,11 @@
 ---
 name: e2e-test
-description: Run Martie Android emulator end-to-end UX regression tests. Use when the user runs `/e2e-test` or `$e2e-test`, asks for E2E testing, Android emulator validation, first-time-user daily quiz retention checks, quiz completion/replay blank-screen regressions, or Growtoki event/crash verification before or after EAS updates.
+description: Run Martie end-to-end UX regression tests on a physical Android device. Use when the user runs `/e2e-test` or `$e2e-test`, asks for E2E testing, on-device validation, first-time-user daily quiz retention checks, quiz completion/replay blank-screen regressions, or Growtoki event/crash verification before or after EAS updates.
 ---
 
 # E2E Test
 
-Run the Android emulator checks that protect Martie's core quiz UX. Use
+Run the on-device checks that protect Martie's core quiz UX. Use
 `references/workflow.md` for the canonical first-time-user daily quiz
 retention loop, then run the quiz completion regression below whenever the
 work touches quiz routing, replay, result screens, user cursor/level sync,
@@ -14,10 +14,14 @@ Growtoki analytics, crash/error capture, or an EAS production update.
 ## Workflow
 
 1. Confirm the task touches user-facing screens or the retention loop.
-2. Reuse an existing emulator/Metro session when available.
-3. Start only missing local services needed for the test.
+2. Run on a physical device attached over USB. Never use an Android emulator
+   or iOS simulator, and never create an AVD for this: an emulator run is not
+   E2E evidence and does not clear the `$loop-review` device gate.
+3. Reuse the attached device and an existing Metro session when available.
+   Start only missing local services needed for the test.
 4. Preserve app data for logged-in checks; use `pm clear` only for fresh guest
-   scenarios.
+   scenarios, and only on a test device or after the user agrees, because it
+   wipes that device's app data.
 5. Capture screenshots at every gate and inspect logcat before marking PASS.
 6. Check Growtoki events when validating a production incident or post-deploy
    behavior.
@@ -33,15 +37,15 @@ Growtoki analytics, crash/error capture, or an EAS production update.
 - Bun: `bun` on `PATH`
 - Android package: `dev.hyo.martie`
 - Main activity: `dev.hyo.martie/.MainActivity`
-- AVD: `Pixel_Test`
+- Device: a physical Android phone or tablet. Its `adb devices` serial never
+  starts with `emulator-`. Skip headsets and TV sticks unless the user names
+  one.
 - ADB: `$ANDROID_HOME/platform-tools/adb`
-- Emulator: `$ANDROID_HOME/emulator/emulator`
 
 Use absolute tool paths in shell commands when possible:
 
 ```bash
 export ADB=$ANDROID_HOME/platform-tools/adb
-export EMULATOR=$ANDROID_HOME/emulator/emulator
 export BUN="$(command -v bun)"
 ```
 
@@ -50,11 +54,22 @@ export BUN="$(command -v bun)"
 ```bash
 git status --short --branch
 
-$ADB devices | rg -q "emulator.*device$" || (
-  "$EMULATOR" @Pixel_Test -no-snapshot-load > /tmp/martie-emulator.log 2>&1 &
-  until $ADB devices | rg -q "emulator.*device$"; do sleep 3; done
-)
+# Physical devices only. Pick the phone or tablet and pin it for every call.
+$ADB devices -l | rg -v "^emulator-" | rg " device "
+export ANDROID_SERIAL=<serial>
+$ADB shell getprop ro.product.model
+```
 
+If no physical device is attached, stop and ask the user to connect one. Do
+not fall back to an emulator.
+
+The device needs a debug build, which loads JavaScript and assets from Metro.
+Check with `$ADB shell dumpsys package dev.hyo.martie | rg "pkgFlags"`; it must
+list `DEBUGGABLE`. Install one with `adb install -r` on the debug APK, or with
+`bunx expo run:android --device`. Replacing a store build needs an uninstall,
+which wipes the user's app data, so ask first.
+
+```bash
 curl -sf http://localhost:8081/status >/dev/null || (
   "$BUN" start > /tmp/martie-metro.log 2>&1 &
   export MARTIE_E2E_METRO_PID=$!
@@ -64,8 +79,13 @@ curl -sf http://localhost:8081/status >/dev/null || (
 $ADB reverse tcp:8081 tcp:8081
 ```
 
-Leave the emulator running after the test. Stop Metro only if this workflow
-started it:
+Take screenshots with `$ADB exec-out screencap -p > <file>.png`. Avoid
+`uiautomator dump` on quiz screens: it waits for the UI to go idle, and the
+commentator's looping animation keeps it busy, so it stalls for seconds and
+can return a stale dump.
+
+Leave the device connected after the test and remove the port reverse with
+`$ADB reverse --remove tcp:8081`. Stop Metro only if this workflow started it:
 
 ```bash
 [ -n "$MARTIE_E2E_METRO_PID" ] && kill "$MARTIE_E2E_METRO_PID" 2>/dev/null
@@ -114,7 +134,7 @@ Expected: no matching fatal/addViewAt/ErrorBoundary crash lines for the run.
 
 Run the same failure -> `Replay` -> last `Complete` -> `/quiz-final` path while
 logged in, because user cursor and level sync are auth-sensitive. Preserve app
-data if the emulator is already logged in. If login is needed, use
+data if the device is already logged in. If login is needed, use
 `hyo@hyo.dev`; the fake OTP is printed in Metro/console logs, so inspect the
 logs and enter that code.
 
@@ -179,7 +199,7 @@ Interpretation:
 
 ## Reference
 
-Read `references/workflow.md` for the exact emulator setup, tap coordinates, scenarios, expected UI, and recovery steps.
+Read `references/workflow.md` for the exact device setup, tap coordinates, scenarios, expected UI, and recovery steps.
 
 ## Reporting
 
