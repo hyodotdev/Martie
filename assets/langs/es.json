@@ -182,6 +182,8 @@
     "question1": "¡Ahí va la siguiente pregunta!",
     "question2": "¡Uy, esta es complicada!",
     "question3": "¡Concéntrate! ¡Demuestra lo que sabes!",
+    "timeout1": "¡Se acabó el tiempo! ¡Nos ganó el reloj!",
+    "timeout2": "¡Oh no, sin tiempo!",
     "wrong1": "¡Oh no, por poco!",
     "wrong2": "¡Esa era una trampa!",
     "wrong3": "¡Tranquilo, la próxima la aciertas!"

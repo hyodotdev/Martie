@@ -1,6 +1,18 @@
 import {t} from '../../STRINGS';
 
-export type CommentatorMood = 'question' | 'hurry' | 'correct' | 'wrong';
+export type CommentatorMood =
+  'question' | 'hurry' | 'correct' | 'wrong' | 'timeout';
+
+// The quiz screens answer with this placeholder option when time runs out.
+const TIMEOUT_OPTION_KEY = 'wrong';
+
+export function answerMood(
+  isCorrect: boolean,
+  optionKey: string,
+): CommentatorMood {
+  if (isCorrect) return 'correct';
+  return optionKey === TIMEOUT_OPTION_KEY ? 'timeout' : 'wrong';
+}
 
 /** The same seed always picks the same line, so a re-render never swaps it. */
 export function pickVariant(seed: string, count: number): number {
@@ -35,5 +47,9 @@ export function commentaryLine(mood: CommentatorMood, seed: string): string {
         t('commentator.wrong2'),
         t('commentator.wrong3'),
       ][pickVariant(seed, 3)];
+    case 'timeout':
+      return [t('commentator.timeout1'), t('commentator.timeout2')][
+        pickVariant(seed, 2)
+      ];
   }
 }

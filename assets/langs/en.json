@@ -182,6 +182,8 @@
     "question1": "Here comes the next question!",
     "question2": "Ooh, this one's a tricky one!",
     "question3": "Focus! Show me what you've got!",
+    "timeout1": "Time's up! The clock got us!",
+    "timeout2": "Oh no, out of time!",
     "wrong1": "Oh no, so close!",
     "wrong2": "That one was a trap!",
     "wrong3": "It's okay, you'll get the next one!"

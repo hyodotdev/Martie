@@ -33,6 +33,7 @@ const POSE: Record<CommentatorMood, Frame> = {
   hurry: 'nervous',
   correct: 'cheer',
   wrong: 'shock',
+  timeout: 'nervous',
 };
 
 type Props = {
@@ -47,9 +48,9 @@ type Props = {
  * headset, then reacts in pose, with the line running in a lower third.
  */
 export default function MartieCommentator(props: Props): JSX.Element {
-  // A new mood or question starts the call fresh instead of carrying over
-  // the last one's frame and typed text.
-  return <Commentary key={`${props.seed}:${props.mood}`} {...props} />;
+  // A new question starts the call fresh instead of carrying over the last
+  // one's frame and typed text.
+  return <Commentary key={props.seed} {...props} />;
 }
 
 function Commentary({mood, seed, size}: Props): JSX.Element {
@@ -59,6 +60,15 @@ function Commentary({mood, seed, size}: Props): JSX.Element {
   const [talking, setTalking] = useState(mood === 'question' && !reduceMotion);
   const [mouthOpen, setMouthOpen] = useState(true);
   const [typed, setTyped] = useState(reduceMotion ? chars.length : 0);
+  const [lineMood, setLineMood] = useState(mood);
+
+  // A new mood brings a new line. Resetting here instead of remounting keeps
+  // the frames loaded, so the pose change never flashes blank.
+  if (lineMood !== mood) {
+    setLineMood(mood);
+    setTalking(false);
+    setTyped(reduceMotion ? chars.length : 0);
+  }
 
   const squash = useSharedValue(1);
   const shakeX = useSharedValue(0);
@@ -85,6 +95,10 @@ function Commentary({mood, seed, size}: Props): JSX.Element {
 
   useEffect(() => {
     if (reduceMotion) return;
+    // Stop the last mood's motion before this one starts.
+    squash.value = 1;
+    shakeX.value = 0;
+    tilt.value = 0;
     onAir.value = withRepeat(withTiming(0.25, {duration: 600}), -1, true);
     switch (mood) {
       case 'question':
@@ -118,6 +132,7 @@ function Commentary({mood, seed, size}: Props): JSX.Element {
         );
         break;
       case 'wrong':
+      case 'timeout':
         shakeX.value = withSequence(
           withTiming(-7, {duration: 50}),
           withTiming(7, {duration: 50}),
@@ -174,11 +189,11 @@ function Commentary({mood, seed, size}: Props): JSX.Element {
         ))}
       </Animated.View>
 
-      {/* The broadcast lower third. */}
+      {/* The broadcast lower third. Not a live region: the typing would
+          make screen readers announce it over the question. */}
       <View
         accessible
         accessibilityLabel={line}
-        accessibilityLiveRegion="polite"
         style={[
           css`
             flex-direction: row;

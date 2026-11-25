@@ -182,6 +182,8 @@
     "question1": "Câu hỏi tiếp theo đây!",
     "question2": "Ồ, câu này khó nhằn đấy!",
     "question3": "Tập trung! Đến lúc thể hiện rồi!",
+    "timeout1": "Hết giờ! Đồng hồ thắng rồi!",
+    "timeout2": "Ôi không, hết thời gian rồi!",
     "wrong1": "Ôi, tiếc quá!",
     "wrong2": "Câu này có bẫy đấy!",
     "wrong3": "Không sao, câu sau sẽ đúng thôi!"

@@ -3,9 +3,13 @@ import {StyleSheet} from 'react-native';
 import {useReducedMotion} from 'react-native-reanimated';
 import MartieCommentator from '../../../src/uis/MartieCommentator';
 import {
+  answerMood,
   commentaryLine,
   pickVariant,
 } from '../../../src/uis/MartieCommentator/lines';
+
+// Counts sprite mounts, so a test can tell a pose change from a remount.
+let mockImageMounts = 0;
 
 // Name each frame after its pose so the test can ask which one is showing.
 jest.mock('../../../src/icons', () => ({
@@ -20,7 +24,11 @@ jest.mock('../../../src/icons', () => ({
 }));
 jest.mock('expo-image', () => ({
   Image: ({source, style}: {source: string; style: object}) => {
+    const {useEffect} = jest.requireActual('react');
     const {View} = jest.requireActual('react-native');
+    useEffect(() => {
+      mockImageMounts += 1;
+    }, []);
     return <View testID={source} style={style} />;
   },
 }));
@@ -45,6 +53,7 @@ function untyped(): string {
 describe('MartieCommentator', () => {
   beforeEach(() => {
     jest.useFakeTimers();
+    mockImageMounts = 0;
     jest.mocked(useReducedMotion).mockReturnValue(false);
   });
   afterEach(() => {
@@ -90,14 +99,27 @@ describe('MartieCommentator', () => {
   });
 
   it('panics with a new line once time runs low', () => {
+    const line = commentaryLine('hurry', 'quiz-4');
     const {rerender} = render(
       <MartieCommentator mood="question" seed="quiz-4" size={150} />,
     );
+    act(() => jest.advanceTimersByTime(300));
+    const mounts = mockImageMounts;
     rerender(<MartieCommentator mood="hurry" seed="quiz-4" size={150} />);
 
     expect(shownFrame()).toBe('nervous');
+    expect(screen.getByLabelText(line)).toBeTruthy();
+    expect(untyped()).toBe(line);
+    // The frames stay loaded through the pose change.
+    expect(mockImageMounts).toBe(mounts);
+  });
+
+  it('owns up to the clock when time runs out', () => {
+    render(<MartieCommentator mood="timeout" seed="quiz-6" size={150} />);
+
+    expect(shownFrame()).toBe('nervous');
     expect(
-      screen.getByLabelText(commentaryLine('hurry', 'quiz-4')),
+      screen.getByLabelText(commentaryLine('timeout', 'quiz-6')),
     ).toBeTruthy();
   });
 
@@ -107,6 +129,14 @@ describe('MartieCommentator', () => {
 
     expect(shownFrame()).toBe('think');
     expect(untyped()).toBe('');
+  });
+});
+
+describe('answerMood', () => {
+  it('tells a timeout apart from a wrong pick', () => {
+    expect(answerMood(true, 'quiz_opt1')).toBe('correct');
+    expect(answerMood(false, 'quiz_opt2')).toBe('wrong');
+    expect(answerMood(false, 'wrong')).toBe('timeout');
   });
 });
 

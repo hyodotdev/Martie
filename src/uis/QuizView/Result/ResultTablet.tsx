@@ -8,6 +8,7 @@ import {Button, Typography} from 'cpk-ui';
 import Animated from 'react-native-reanimated';
 import Bubble from '../../Bubble/Bubble';
 import MartieCommentator from '../../MartieCommentator';
+import {answerMood} from '../../MartieCommentator/lines';
 import {t} from '../../../STRINGS';
 import {ScrollView, View} from 'react-native';
 import {ImpactFeedbackStyle} from 'expo-haptics';
@@ -134,7 +135,7 @@ function ResultTablet({
           </Animated.View>
           <Animated.View style={imageAnimatedStyle}>
             <MartieCommentator
-              mood={isCorrect ? 'correct' : 'wrong'}
+              mood={answerMood(isCorrect, selectedOption.key)}
               seed={quiz._id}
               size={200}
             />

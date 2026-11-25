@@ -69,10 +69,15 @@ jest.mock('../../../src/uis/Bubble/Bubble', () => ({
   },
 }));
 
-// Martie's commentary runs its own timers; it has its own tests.
+// Martie's commentary runs its own timers and has its own tests; this only
+// shows which mood he is in.
 jest.mock('../../../src/uis/MartieCommentator', () => ({
   __esModule: true,
-  default: () => null,
+  default: ({mood}: {mood: string}) => {
+    const React = jest.requireActual('react');
+    const {Text} = jest.requireActual('react-native');
+    return React.createElement(Text, null, `martie:${mood}`);
+  },
 }));
 
 jest.mock('../../../src/uis/ButtonMartie', () => ({
@@ -164,6 +169,21 @@ describe('QuizView', () => {
 
     expect(onPressAnswer).toHaveBeenCalledTimes(1);
     expect(onPressAnswer).toHaveBeenCalledWith(baseQuiz.options[0]);
+  });
+
+  it('sends Martie into a panic once time runs low', () => {
+    const props = {
+      quiz: baseQuiz,
+      onPressAnswer: jest.fn(),
+      onContinue: jest.fn(),
+      selectedOption: null,
+      timeSpentMs: 1000,
+    };
+    const {getByText, rerender} = render(<QuizView {...props} />);
+    expect(getByText('martie:question')).toBeTruthy();
+
+    rerender(<QuizView {...props} isTimeRunningOut />);
+    expect(getByText('martie:hurry')).toBeTruthy();
   });
 
   it('releases pending answer state after an async submission error', async () => {
