@@ -126,6 +126,18 @@ describe('MartieCommentator', () => {
     expect(screen.getByLabelText(line)).toBeTruthy();
   });
 
+  it('catches up instead of dragging the line out on a slow device', () => {
+    const line = commentaryLine('correct', 'quiz-7');
+    renderThemed(<MartieCommentator mood="correct" seed="quiz-7" size={150} />);
+    startSpeaking();
+    act(() => jest.advanceTimersByTime(38));
+
+    // The JS thread stalls past the whole line before the next tick lands.
+    jest.setSystemTime(Date.now() + 38 * line.length);
+    act(() => jest.advanceTimersByTime(38));
+    expect(untyped()).toBe('');
+  });
+
   it('jumps straight to the reaction pose for answers', () => {
     const {rerender} = renderThemed(
       <MartieCommentator mood="correct" seed="quiz-3" size={150} />,

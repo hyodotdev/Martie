@@ -1,8 +1,9 @@
-import {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import {useEffect, useRef, useState} from 'react';
+import {View} from 'react-native';
 import {Image} from 'expo-image';
 import {css, styled} from 'kstyled';
 import Animated, {
+  cancelAnimation,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
@@ -99,11 +100,16 @@ function Commentary({mood, seed, size}: Props): JSX.Element {
     return () => clearInterval(flap);
   }, [talking]);
 
-  // One character per tick until the line is out. Timers can run late on a
-  // busy JS thread, so this counts characters, not elapsed time.
+  // Types to the clock, so a slow device that misses ticks shows several
+  // characters at once instead of dragging the line (and the lip flap) out.
+  const typingStart = useRef(0);
   useEffect(() => {
     if (stage !== 'speaking' || typed >= chars.length) return;
-    const next = setTimeout(() => setTyped(typed + 1), TYPE_MS);
+    if (typed === 0) typingStart.current = Date.now();
+    const next = setTimeout(() => {
+      const due = Math.floor((Date.now() - typingStart.current) / TYPE_MS);
+      setTyped(Math.min(chars.length, Math.max(typed + 1, due)));
+    }, TYPE_MS);
     return () => clearTimeout(next);
   }, [stage, typed, chars.length]);
 
@@ -121,6 +127,11 @@ function Commentary({mood, seed, size}: Props): JSX.Element {
       ),
       -1,
     );
+    // The pulse repeats forever, so stop it once he starts typing.
+    return () => {
+      cancelAnimation(dots);
+      dots.value = 1;
+    };
   }, [stage, reduceMotion, dots]);
 
   useEffect(() => {
@@ -244,10 +255,12 @@ function Commentary({mood, seed, size}: Props): JSX.Element {
         <Speech>
           <SpeechText>
             {stage === 'speaking' ? chars.slice(0, typed).join('') : ''}
-            {/* The rest holds the width so the bubble never grows. */}
-            <Text testID="commentator-untyped" style={{color: 'transparent'}}>
+            {/* The rest holds the width so the bubble never grows. Android
+                still draws nested text colored transparent, so it is
+                painted in the bubble's own color instead. */}
+            <Untyped testID="commentator-untyped">
               {stage === 'speaking' ? chars.slice(typed).join('') : line}
-            </Text>
+            </Untyped>
           </SpeechText>
           {stage === 'dots' && (
             <Dots style={dotsStyle}>
@@ -286,6 +299,10 @@ const SpeechText = styled.Text`
   font-size: 14px;
   font-weight: 700;
   text-align: center;
+`;
+
+const Untyped = styled.Text`
+  color: ${({theme}) => theme.bg.bubble};
 `;
 
 const Dots = styled(Animated.View)`
