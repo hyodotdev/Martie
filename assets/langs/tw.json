@@ -172,6 +172,20 @@
     "searchOnGoogle": "在Google上搜尋",
     "userMessageAccessibility": "你說：{{message}}"
   },
+  "commentator": {
+    "correct1": "太完美了！你早就知道吧！",
+    "correct2": "哇，這也答得出來！",
+    "correct3": "果然！直覺真好！",
+    "hurry1": "滴答滴答，時間快到了！",
+    "hurry2": "快快快！選一個吧！",
+    "live": "LIVE",
+    "question1": "來了，下一題！",
+    "question2": "喔，這題不簡單喔！",
+    "question3": "專心！展現實力的時候到了！",
+    "wrong1": "啊，好可惜！",
+    "wrong2": "這題是陷阱！",
+    "wrong3": "沒關係，下一題一定答對！"
+  },
   "common": {
     "adInstruction": "看完廣告即可補充燈泡。關閉按鈕出現後，請關閉廣告。",
     "adLoading": "正在載入廣告...",

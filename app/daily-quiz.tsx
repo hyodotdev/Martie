@@ -593,6 +593,7 @@ function DailyQuizPage(): JSX.Element {
           quiz={currentQuiz}
           timeSpentMs={timeSpentMs}
           allowStudyInDetail={false}
+          isTimeRunningOut={isDanger}
         />
       </Content>
     </Container>

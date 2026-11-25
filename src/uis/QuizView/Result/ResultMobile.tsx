@@ -7,8 +7,7 @@ import {styled, css} from 'kstyled';
 import {Button, Typography} from 'cpk-ui';
 import Animated from 'react-native-reanimated';
 import Bubble from '../../Bubble/Bubble';
-import {Image} from 'expo-image';
-import {IC_MARTIE_SMART, IC_MARTIE_SWEAT} from '../../../icons';
+import MartieCommentator from '../../MartieCommentator';
 import {t} from '../../../STRINGS';
 import {ScrollView, View} from 'react-native';
 import {ImpactFeedbackStyle} from 'expo-haptics';
@@ -126,12 +125,10 @@ function ResultMobile({
             />
           </Animated.View>
           <Animated.View style={imageAnimatedStyle}>
-            <Image
-              source={isCorrect ? IC_MARTIE_SMART : IC_MARTIE_SWEAT}
-              style={css`
-                width: 150px;
-                height: 150px;
-              `}
+            <MartieCommentator
+              mood={isCorrect ? 'correct' : 'wrong'}
+              seed={quiz._id}
+              size={150}
             />
           </Animated.View>
         </Content>

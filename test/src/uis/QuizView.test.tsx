@@ -69,6 +69,12 @@ jest.mock('../../../src/uis/Bubble/Bubble', () => ({
   },
 }));
 
+// Martie's commentary runs its own timers; it has its own tests.
+jest.mock('../../../src/uis/MartieCommentator', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
 jest.mock('../../../src/uis/ButtonMartie', () => ({
   __esModule: true,
   default: ({disabled, onPress, text}: any) => {

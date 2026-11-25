@@ -408,6 +408,7 @@ function QuizPage({
           quiz={currentQuiz}
           timeSpentMs={timeSpentMs}
           isLastQuestion={quizIndex >= quizzes.length - 1}
+          isTimeRunningOut={isDanger}
         />
       </Content>
     </Container>

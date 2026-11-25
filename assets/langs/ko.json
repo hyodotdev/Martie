@@ -172,6 +172,20 @@
     "searchOnGoogle": "구글에서 검색하기",
     "userMessageAccessibility": "내 메시지: {{message}}"
   },
+  "commentator": {
+    "correct1": "완벽해요! 알고 있었군요!",
+    "correct2": "와, 이걸 맞히다니!",
+    "correct3": "역시! 감이 좋은데요?",
+    "hurry1": "째깍째깍, 시간이 얼마 안 남았어요!",
+    "hurry2": "서둘러요! 하나 골라 봐요!",
+    "live": "LIVE",
+    "question1": "자, 다음 문제 나갑니다!",
+    "question2": "오, 이번 문제 만만치 않은데요?",
+    "question3": "집중! 실력 보여줄 시간이에요!",
+    "wrong1": "아앗, 아깝다!",
+    "wrong2": "이건 함정이었어요!",
+    "wrong3": "괜찮아요, 다음 문제는 맞힐 거예요!"
+  },
   "common": {
     "adInstruction": "광고를 끝까지 시청하면 전구가 충전됩니다. 닫기 버튼이 나타나면 광고를 닫아주세요.",
     "adLoading": "광고를 불러오는 중...",

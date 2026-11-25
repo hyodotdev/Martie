@@ -172,6 +172,20 @@
     "searchOnGoogle": "Search on Google",
     "userMessageAccessibility": "You said: {{message}}"
   },
+  "commentator": {
+    "correct1": "Perfect call! You knew it!",
+    "correct2": "Wow, you nailed it!",
+    "correct3": "Yes! Great instincts!",
+    "hurry1": "Tick-tock, time's running out!",
+    "hurry2": "Hurry, hurry! Pick one!",
+    "live": "LIVE",
+    "question1": "Here comes the next question!",
+    "question2": "Ooh, this one's a tricky one!",
+    "question3": "Focus! Show me what you've got!",
+    "wrong1": "Oh no, so close!",
+    "wrong2": "That one was a trap!",
+    "wrong3": "It's okay, you'll get the next one!"
+  },
   "common": {
     "adInstruction": "Watch the ad to completion to recharge your bulbs. Close the ad when the close button appears.",
     "adLoading": "Loading an ad...",

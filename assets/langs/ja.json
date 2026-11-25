@@ -172,6 +172,20 @@
     "searchOnGoogle": "Googleで検索する",
     "userMessageAccessibility": "あなたのメッセージ: {{message}}"
   },
+  "commentator": {
+    "correct1": "完璧！知ってたんですね！",
+    "correct2": "わあ、これを当てるとは！",
+    "correct3": "さすが！いい勘してますね！",
+    "hurry1": "チクタク、時間がなくなってきました！",
+    "hurry2": "急いで！どれか選んで！",
+    "live": "LIVE",
+    "question1": "さあ、次の問題いきます！",
+    "question2": "おっと、今回は手ごわいですよ？",
+    "question3": "集中！実力を見せる時です！",
+    "wrong1": "あぁっ、惜しい！",
+    "wrong2": "これはひっかけでした！",
+    "wrong3": "大丈夫、次はきっと当たります！"
+  },
   "common": {
     "adInstruction": "広告を最後まで視聴すると電球がチャージされます。閉じるボタンが表示されたら広告を閉じてください。",
     "adLoading": "広告を読み込んでいます…",
