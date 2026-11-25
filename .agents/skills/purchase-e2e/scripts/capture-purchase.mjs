@@ -45,7 +45,11 @@ const DUMP = `(() => {
 const target = async () => {
   const response = await fetch(`${metro}/json/list`);
   const pages = await response.json();
-  const page = pages.find((p) => p.appId === 'dev.hyo.martie') ?? pages[0];
+  // METRO_DEVICE picks one app when several devices share Metro, e.g. "iPhone".
+  const device = process.env.METRO_DEVICE ?? '';
+  const page = pages.find(
+    (p) => p.appId === 'dev.hyo.martie' && p.title.includes(device),
+  );
   if (!page) throw new Error('No app is connected to Metro');
   // Metro only accepts inspector clients from its own origin.
   const url = new URL(page.webSocketDebuggerUrl);

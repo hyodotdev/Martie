@@ -107,6 +107,9 @@ says. Recheck `metro.log` after every Metro restart.
    node .agents/skills/purchase-e2e/scripts/capture-purchase.mjs listen
    ```
 
+   When more than one device shares Metro, set `METRO_DEVICE` to part of the
+   app's inspector title (`iPhone`, `KFRASWI`) for both `listen` and `dump`.
+
 4. Tap the 10 Bulbs price. On dev, the payment test-mode dialog appears
    first; choose the store button (it reads **Google Play** on every
    platform), not **Grant bulbs**, which is the mock PG.
@@ -122,8 +125,9 @@ says. Recheck `metro.log` after every Metro restart.
    ```
 
 8. Confirm the newest dev `purchases` row (`npx convex data purchases --limit 1`):
-   right product, `paymentMethod` for the store, Amazon `metadata.sandbox:
-true`. Print ids and fields only, never `transactionId` in full.
+   right product, `paymentMethod` for the store, and `metadata.sandbox: true`
+   (Amazon) or `metadata.appleVerified: true` (Apple). Print ids and fields
+   only, never `transactionId` in full.
 
 A row is `PASS` only when steps 5–8 all hold and `iapkit-verify.mjs` prints
 `PASS` with `"environment":"Sandbox"`.
@@ -137,7 +141,20 @@ A row is `PASS` only when steps 5–8 all hold and `iapkit-verify.mjs` prints
   consumable reads `READY_TO_CONSUME`. If a subscription test hits
   `feature-not-supported`, reset App Tester's purchase data, not its catalog.
 - **Apple:** `purchaseToken` is the JWS. Martie's dev deployment and IAPKit
-  both accept sandbox JWS.
+  both accept sandbox JWS. Prices follow the Sandbox Apple Account's
+  storefront, so a euro or pound price is normal.
+- **iPhone driving:** `maestro-runner` relaunches the app at the start of
+  every flow, which closes an open sheet and drops the receipt listener, and
+  its WebDriverAgent cannot see the StoreKit sheet (another process). Use
+  flows only to sign in and reach the purchase screen. For the purchase
+  itself, keep WebDriverAgent running with `xcodebuild test-without-building`
+  on maestro-runner's cached `.xctestrun`, then tap and screenshot through its
+  HTTP API (the `ServerURLHere` line in its log): price → **Google Play** →
+  check the sheet says "For testing purposes only" → **Purchase**. Typing
+  through WDA drops characters; enter the email and code one character per
+  step. If Apple asks for the Sandbox Apple Account password, follow
+  `$e2e-test`; an agent that may not type passwords hands that one prompt to
+  the user.
 - **Google:** a license tester's purchase is a test purchase; IAPKit maps
   `testPurchase` to `Sandbox`.
 - **Horizon OS:** Martie does not sell on Horizon (the purchase screen shows
@@ -149,7 +166,8 @@ A row is `PASS` only when steps 5–8 all hold and `iapkit-verify.mjs` prints
 
 ## Cleanup
 
-- Stop Metro; remove the `tcp:8081` reverse rule only if this run created it.
+- Stop Metro and any WebDriverAgent you started; remove the `tcp:8081`
+  reverse rule only if this run created it.
 - Delete every capture file.
 - Leave App Tester's catalog, store products and IAPKit keys unchanged.
 - If you replaced a store build, tell the user; reinstall from the store only
@@ -159,7 +177,7 @@ A row is `PASS` only when steps 5–8 all hold and `iapkit-verify.mjs` prints
 
 ```text
 Store       | Device     | Martie grant          | IAPKit verdict              | Result
-App Store   | <udid>     | +10 bulbs, row <id>   | isValid, Sandbox, ENTITLED  | PASS
+App Store   | <udid>     | +10 bulbs, row <id>   | isValid, Sandbox            | PASS
 Google Play | <serial>   | ...                   | ...                         | BLOCKED: no Play device
 Amazon      | <serial>   | +10 bulbs, sandbox    | isValid, Sandbox            | PASS
 Horizon OS  | <serial>   | N/A (store notice)    | N/A                         | N/A
