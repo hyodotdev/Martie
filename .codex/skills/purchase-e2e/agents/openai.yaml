@@ -1,0 +1,4 @@
+interface:
+  display_name: "Purchase E2E"
+  short_description: "Run live sandbox purchases and IAPKit receipt checks on devices"
+  default_prompt: "Use $purchase-e2e to buy a sandbox consumable on the connected iPhone, Play phone and Fire tablet, then verify each receipt with Martie and IAPKit."

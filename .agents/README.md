@@ -54,6 +54,7 @@ names, the same `description` triggers, and the same procedure. Only the short
 | `e2e-test` | On-device Android and iPhone UX regression + Growtoki verification |
 | `grow` | One metric-driven growth round for store ranking |
 | `loop-review` | main → branch → review-self → PR → poll → verified merge |
+| `purchase-e2e` | Live sandbox purchases on devices + IAPKit receipt check |
 | `release-update` | EAS build, store submit, Expo OTA rollout |
 | `render-shorts` | Remotion quiz shorts, thumbnails, upload metadata |
 | `review-pr` | PR review findings and review-comment handling |
