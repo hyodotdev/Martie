@@ -72,7 +72,9 @@ jobs:
               exit 1
             fi
           else
-            last=$(git tag -l "ota-$version-*" | sed "s/^ota-$version-//" | grep -E '^[0-9]+$' | sort -n | tail -1)
+            # The first OTA of a version has no tag to match; grep exits 1
+            # there, which pipefail would turn into a failed release.
+            last=$(git tag -l "ota-$version-*" | sed "s/^ota-$version-//" | { grep -E '^[0-9]+$' || true; } | sort -n | tail -1)
             tag="ota-$version-$(( ${last:-0} + 1 ))"
           fi
           git tag -a "$tag" -m "$MESSAGE"
