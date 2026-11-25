@@ -172,6 +172,21 @@
     "searchOnGoogle": "Buscar en Google",
     "userMessageAccessibility": "Dijiste: {{message}}"
   },
+  "commentator": {
+    "correct1": "¡Perfecto! ¡Lo sabías!",
+    "correct2": "¡Guau, la clavaste!",
+    "correct3": "¡Sí! ¡Qué buen instinto!",
+    "hurry1": "¡Tic tac, se acaba el tiempo!",
+    "hurry2": "¡Rápido, rápido! ¡Elige una!",
+    "question1": "¡Ahí va la siguiente pregunta!",
+    "question2": "¡Uy, esta es complicada!",
+    "question3": "¡Concéntrate! ¡Demuestra lo que sabes!",
+    "timeout1": "¡Se acabó el tiempo! ¡Nos ganó el reloj!",
+    "timeout2": "¡Oh no, sin tiempo!",
+    "wrong1": "¡Oh no, por poco!",
+    "wrong2": "¡Esa era una trampa!",
+    "wrong3": "¡Tranquilo, la próxima la aciertas!"
+  },
   "common": {
     "adInstruction": "Mira el anuncio hasta el final para recargar tus bombillas. Ciérralo cuando aparezca el botón de cerrar.",
     "adLoading": "Cargando anuncio...",

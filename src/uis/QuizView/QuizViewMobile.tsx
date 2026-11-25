@@ -7,8 +7,7 @@ import {styled, css} from 'kstyled';
 import {ScrollView, View} from 'react-native';
 import Animated from 'react-native-reanimated';
 import Bubble from '../Bubble/Bubble';
-import {Image} from 'expo-image';
-import {IC_MARTIE_BASIC} from '../../icons';
+import MartieCommentator from '../MartieCommentator';
 import {ImpactFeedbackStyle} from 'expo-haptics';
 import ButtonMartie from '../ButtonMartie';
 import {QuizViewUIProps} from './types';
@@ -20,6 +19,7 @@ function QuizViewMobile({
   quiz,
   onPressAnswer,
   isAnswerPending = false,
+  isTimeRunningOut = false,
   bubbleAnimatedStyle,
   imageAnimatedStyle,
   buttonAnimatedStyle,
@@ -59,12 +59,10 @@ function QuizViewMobile({
           </Typography.Body3>
         )}
         <Animated.View style={[imageAnimatedStyle]}>
-          <Image
-            source={IC_MARTIE_BASIC}
-            style={css`
-              width: 150px;
-              height: 150px;
-            `}
+          <MartieCommentator
+            mood={isTimeRunningOut ? 'hurry' : 'question'}
+            seed={quiz._id}
+            size={150}
           />
         </Animated.View>
       </ContentArea>

@@ -172,6 +172,21 @@
     "searchOnGoogle": "Bei Google suchen",
     "userMessageAccessibility": "Sie sagten: {{message}}"
   },
+  "commentator": {
+    "correct1": "Perfekt! Du wusstest es!",
+    "correct2": "Wow, voll getroffen!",
+    "correct3": "Ja! Super Instinkt!",
+    "hurry1": "Tick-tack, die Zeit läuft ab!",
+    "hurry2": "Schnell, schnell! Wähl eine!",
+    "question1": "Hier kommt die nächste Frage!",
+    "question2": "Oh, die hier ist knifflig!",
+    "question3": "Konzentration! Zeig, was du kannst!",
+    "timeout1": "Zeit ist um! Die Uhr war schneller!",
+    "timeout2": "Oh nein, keine Zeit mehr!",
+    "wrong1": "Oh nein, so knapp!",
+    "wrong2": "Das war eine Falle!",
+    "wrong3": "Macht nichts, die nächste schaffst du!"
+  },
   "common": {
     "adInstruction": "Sieh dir die Werbung bis zum Ende an, um deine Glühbirnen aufzuladen. Schließe sie, sobald die Schaltfläche zum Schließen erscheint.",
     "adLoading": "Werbung wird geladen...",

@@ -14,6 +14,12 @@ import MartieSweat from '../assets/icons/martie_sweat.png';
 import WordMark from '../assets/icons/wordmark.png';
 import Trophy from '../assets/icons/trophy.png';
 import Pencil from '../assets/icons/pencil.png';
+import MartieMcTalkOpen from '../assets/sprites/martie_mc_talk_open.png';
+import MartieMcTalkClosed from '../assets/sprites/martie_mc_talk_closed.png';
+import MartieMcThink from '../assets/sprites/martie_mc_think.png';
+import MartieMcCheer from '../assets/sprites/martie_mc_cheer.png';
+import MartieMcShock from '../assets/sprites/martie_mc_shock.png';
+import MartieMcNervous from '../assets/sprites/martie_mc_nervous.png';
 
 export const IC_MASK = MASK;
 export const IC_MARTIE = Martie;
@@ -28,6 +34,16 @@ export const IC_MARTIE_SWEAT = MartieSweat;
 export const IC_WORDMARK = WordMark;
 export const IC_TROPHY = Trophy;
 export const IC_PENCIL = Pencil;
+
+// Martie the quiz commentator, one frame per pose.
+export const SPRITE_MARTIE_MC = {
+  talkOpen: MartieMcTalkOpen,
+  talkClosed: MartieMcTalkClosed,
+  think: MartieMcThink,
+  cheer: MartieMcCheer,
+  shock: MartieMcShock,
+  nervous: MartieMcNervous,
+} as const;
 
 export const FONT_NANUM_R = FontNanumR;
 export const FONT_NANUM_B = FontNanumB;

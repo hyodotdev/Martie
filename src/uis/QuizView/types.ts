@@ -10,12 +10,15 @@ export type QuizViewProps = {
   timeSpentMs: number;
   allowStudyInDetail?: boolean;
   isLastQuestion?: boolean;
+  // Sends Martie into a panic while the timer is in its last quarter.
+  isTimeRunningOut?: boolean;
 };
 
 export type QuizViewUIProps = {
   quiz: QuizWithDescriptions;
   onPressAnswer: (option: QuizOptionWithDescription) => void;
   isAnswerPending?: boolean;
+  isTimeRunningOut?: boolean;
   bubbleAnimatedStyle: object;
   imageAnimatedStyle: object;
   buttonAnimatedStyle: object;

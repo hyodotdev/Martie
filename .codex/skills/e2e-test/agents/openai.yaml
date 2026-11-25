@@ -1,4 +1,4 @@
 interface:
   display_name: "E2E Test"
-  short_description: "Run Martie Android quiz regression checks"
-  default_prompt: "Use $e2e-test to run the Android emulator quiz, replay, and Growtoki regression checks."
+  short_description: "Run Martie quiz regression checks on devices"
+  default_prompt: "Use $e2e-test to run the quiz, replay, and Growtoki regression checks on physical Android devices and iPhones."

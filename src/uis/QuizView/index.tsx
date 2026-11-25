@@ -24,6 +24,7 @@ function QuizView({
   timeSpentMs,
   allowStudyInDetail = true,
   isLastQuestion = false,
+  isTimeRunningOut = false,
 }: QuizViewProps): JSX.Element {
   const {
     media: {isTablet},
@@ -158,6 +159,7 @@ function QuizView({
     quiz,
     onPressAnswer: handleAnswerPress,
     isAnswerPending,
+    isTimeRunningOut,
     bubbleAnimatedStyle,
     imageAnimatedStyle,
     buttonAnimatedStyle,

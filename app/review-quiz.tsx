@@ -400,6 +400,7 @@ function ReviewQuizPage(): JSX.Element {
           onPressAnswer={handlePressAnswer}
           quiz={currentReview.quiz as any}
           timeSpentMs={(QUIZ_TIME_IN_SECONDS - timer) * 1000}
+          isTimeRunningOut={isDanger}
         />
       </Content>
     </Container>

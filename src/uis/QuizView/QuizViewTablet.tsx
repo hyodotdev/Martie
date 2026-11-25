@@ -7,8 +7,7 @@ import {styled, css} from 'kstyled';
 import {View, ScrollView} from 'react-native';
 import Animated from 'react-native-reanimated';
 import Bubble from '../Bubble/Bubble';
-import {Image} from 'expo-image';
-import {IC_MARTIE_BASIC} from '../../icons';
+import MartieCommentator from '../MartieCommentator';
 import {ImpactFeedbackStyle} from 'expo-haptics';
 import ButtonMartie from '../ButtonMartie';
 import {QuizViewUIProps} from './types';
@@ -20,6 +19,7 @@ function QuizViewTablet({
   quiz,
   onPressAnswer,
   isAnswerPending = false,
+  isTimeRunningOut = false,
   bubbleAnimatedStyle,
   imageAnimatedStyle,
   buttonAnimatedStyle,
@@ -68,12 +68,10 @@ function QuizViewTablet({
           </Typography.Body3>
         )}
         <Animated.View style={[imageAnimatedStyle]}>
-          <Image
-            source={IC_MARTIE_BASIC}
-            style={css`
-              width: 200px;
-              height: 200px;
-            `}
+          <MartieCommentator
+            mood={isTimeRunningOut ? 'hurry' : 'question'}
+            seed={quiz._id}
+            size={200}
           />
         </Animated.View>
       </ContentArea>
