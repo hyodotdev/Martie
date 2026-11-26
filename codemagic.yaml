@@ -270,6 +270,15 @@ workflows:
       - *install_dependencies
       - *check_release_tag
       - *check_expo_token
+      - name: Check the Codemagic API access
+        script: |
+          set -euo pipefail
+          # The last step starts the Fire OS, Horizon and Vega builds; a bad
+          # token should fail here, before anything reaches Play.
+          test -n "${CODEMAGIC_API_TOKEN:-}" || { echo "CODEMAGIC_API_TOKEN is missing from martie_production"; exit 1; }
+          curl -fsS -o /dev/null -H "x-auth-token: $CODEMAGIC_API_TOKEN" \
+            "https://codemagic.io/api/v3/apps/$CM_PROJECT_ID/workflows"
+          echo "Codemagic API access works"
       - *firebase_from_eas
       - name: Build the signed app bundle with EAS credentials
         script: |
@@ -355,10 +364,13 @@ workflows:
       - *check_expo_token
       - *check_version_code
       - *firebase_from_eas
+      # Read-only: proves the credentials and shows the edit the upload
+      # would change, before the long build. Runs with upload off too.
       - name: Check the Amazon access
         script: |
-          [[ '${{ inputs.upload }}' == true ]] || { echo "Upload is off"; exit 0; }
+          set -euo pipefail
           node scripts/stores/amazon-appstore.mjs check
+          node scripts/stores/amazon-appstore.mjs plan
       - name: Build the signed APK with EAS credentials
         script: |
           set -euo pipefail
