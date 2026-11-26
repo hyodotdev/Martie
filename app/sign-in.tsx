@@ -101,7 +101,7 @@ export default function SignIn(): JSX.Element {
         <KeyboardAvoidingContainer behavior="padding" automaticOffset>
           <Header>
             <CustomPressable
-              onPress={back}
+              onPress={() => back()}
               accessibilityLabel={t('common.cancel')}
               accessibilityRole="button"
               style={css`

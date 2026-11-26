@@ -334,9 +334,8 @@ function App(): JSX.Element | null {
   }, []);
 
   useEffect(() => {
-    Platform.OS === 'android' && StatusBar.setBackgroundColor(theme.bg.basic);
     StatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
-  }, [isDarkMode, theme]);
+  }, [isDarkMode]);
 
   useEffect(() => {
     if (appFontsLoaded && assetLoaded && !isChecking) {

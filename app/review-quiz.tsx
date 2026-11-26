@@ -111,15 +111,11 @@ function ReviewQuizPage(): JSX.Element {
   }, [stopQuizAudio]);
 
   useEffect(() => {
+    // Leaving the screen blurs it, and removing it runs this cleanup.
     const blurSub = navigation.addListener('blur', stopQuizSession);
-    const beforeRemoveSub = navigation.addListener(
-      'beforeRemove',
-      stopQuizSession,
-    );
 
     return () => {
       blurSub();
-      beforeRemoveSub();
       stopQuizSession();
     };
   }, [navigation, stopQuizSession]);

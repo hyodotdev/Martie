@@ -192,7 +192,7 @@ describe('Chat fallback accessibility', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSearchParams.question = undefined;
-    jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
   });
 
   afterEach(() => {

@@ -378,7 +378,7 @@ export function GestureHandlerButton({
       hitSlop={hitSlop}
       testID={testID}
       ref={Platform.select({
-        web: ref as unknown as React.Ref<typeof RectButton>,
+        web: ref as unknown as RectButtonProps['ref'],
         default: undefined,
       })}
     >

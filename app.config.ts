@@ -203,7 +203,6 @@ export default ({config}: ConfigContext): ExpoConfig => ({
         ios: {
           useFrameworks: 'static',
           buildReactNativeFromSource: true,
-          enableSceneSupport: true,
         },
         // https://github.com/invertase/notifee/issues/911#issuecomment-1872530474
         android: {

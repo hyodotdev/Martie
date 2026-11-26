@@ -139,7 +139,7 @@ describe('MartieLanding accessibility', () => {
       configurable: true,
       value: 'web',
     });
-    jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
   });
 
   afterEach(() => {

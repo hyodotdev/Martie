@@ -10,7 +10,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import {ScrollView} from 'react-native';
+import {ScrollView, type ScrollViewInstance} from 'react-native';
 import {ImpactFeedbackStyle} from 'expo-haptics';
 import {captureRef} from 'react-native-view-shot';
 import {shareAsync} from 'expo-sharing';
@@ -70,7 +70,7 @@ function QuizFinal(): JSX.Element {
   const audioLosePlayer = useAudioPlayer(AUDIO_LOSE);
   const {theme} = useCPK();
   const {top} = useSafeAreaInsets();
-  const resultViewRef = useRef<ScrollView>(null);
+  const resultViewRef = useRef<ScrollViewInstance>(null);
   const {bulbCount, updateBulbCount} = useBulbManager();
   const {clearAnswers} = useAnswerStore();
   const {isAuthenticated} = useConvexAuth();

@@ -24,6 +24,9 @@ import {useLocale} from '../../src/hooks/useLocale';
  * _Tabs 폴더 안에 화면 안에 필요한 컴포넌트들을 넣어야 합니다.
  */
 
+// Expo Router reads the tab a deep link lands behind from here.
+export const unstable_settings = {anchor: 'index'};
+
 export default function TabLayout(): JSX.Element {
   const {theme} = useCPK();
   const {setVisible} = useSignInRequireModalStore();
@@ -71,7 +74,6 @@ export default function TabLayout(): JSX.Element {
   return (
     <>
       <Tabs
-        initialRouteName="index"
         safeAreaInsets={{bottom: 0}}
         screenOptions={{
           tabBarActiveTintColor: theme.role.primary,
