@@ -1,5 +1,5 @@
-import {Email} from '@convex-dev/auth/providers/Email';
-import type {GenericActionCtxWithAuthConfig} from '@convex-dev/auth/server';
+import {Email} from '@convex-dev/auth-v1/providers/Email';
+import type {GenericActionCtxWithAuthConfig} from '@convex-dev/auth-v1/server';
 import {alphabet, generateRandomString} from 'oslo/crypto';
 import {sha256 as rawSha256} from '@oslojs/crypto/sha2';
 import {encodeHexLowerCase} from '@oslojs/encoding';

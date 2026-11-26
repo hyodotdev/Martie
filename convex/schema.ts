@@ -1,5 +1,5 @@
 import {defineSchema} from 'convex/server';
-import {authTables} from '@convex-dev/auth/server';
+import {authTables} from '@convex-dev/auth-v1/server';
 
 import {userProfilesTable} from './schema/userProfiles';
 import {imagesTable} from './schema/images';

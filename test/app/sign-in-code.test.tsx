@@ -7,7 +7,11 @@ const mockBack = jest.fn();
 const mockDismissAll = jest.fn();
 const mockNavigate = jest.fn();
 const mockReplace = jest.fn();
-const mockSignIn = jest.fn();
+const mockSignInWithReviewCode = jest.fn();
+const mockSendSignInLink = jest.fn();
+const mockSetSession = jest.fn();
+const mockSavePendingSignInLink = jest.fn();
+const mockToastSuccess = jest.fn();
 const mockCreateUserProfile = jest.fn();
 const mockLogError = jest.fn();
 let mockEmailParam: string | undefined = 'USER%40Example.COM';
@@ -43,6 +47,7 @@ jest.mock('kstyled', () => {
 
 jest.mock('expo-router', () => ({
   Stack: {Screen: () => null},
+  useIsFocused: () => true,
   useLocalSearchParams: () => ({email: mockEmailParam}),
   useRouter: () => ({
     back: mockBack,
@@ -139,12 +144,14 @@ jest.mock('cpk-ui', () => {
     Icon: () => React.createElement(Text),
     Typography: {
       Body2: TextComponent,
+      Body3: TextComponent,
       Heading2: TextComponent,
     },
     useCPK: () => ({
       theme: {
         bg: {basic: '#ffffff'},
         role: {success: '#00aa55'},
+        text: {label: '#777777'},
       },
     }),
   };
@@ -152,17 +159,31 @@ jest.mock('cpk-ui', () => {
 
 jest.mock('@convex-dev/auth/react', () => ({
   useAuthActions: () => ({
-    signIn: mockSignIn,
+    setSession: mockSetSession,
   }),
 }));
 
 jest.mock('convex/react', () => ({
   useConvexAuth: () => ({isAuthenticated: mockIsAuthenticated}),
-  useMutation: () => mockCreateUserProfile,
+  useMutation: (ref: string) =>
+    ref === 'emailAuth.signInWithReviewCode'
+      ? mockSignInWithReviewCode
+      : ref === 'emailAuth.sendSignInLink'
+        ? mockSendSignInLink
+        : mockCreateUserProfile,
+}));
+
+jest.mock('../../src/utils/signInLink', () => ({
+  savePendingSignInLink: (...args: unknown[]) =>
+    mockSavePendingSignInLink(...args),
 }));
 
 jest.mock('../../convex/_generated/api', () => ({
   api: {
+    emailAuth: {
+      sendSignInLink: 'emailAuth.sendSignInLink',
+      signInWithReviewCode: 'emailAuth.signInWithReviewCode',
+    },
     dailyChallenge: {
       mutations: {
         completeDailyChallenge:
@@ -218,7 +239,8 @@ jest.mock('../../src/utils/acquisition', () => ({
 
 jest.mock('@backpackapp-io/react-native-toast', () => ({
   toast: {
-    success: jest.fn(),
+    error: jest.fn(),
+    success: (...args: unknown[]) => mockToastSuccess(...args),
   },
 }));
 
@@ -263,19 +285,42 @@ describe('SignInCode', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/(tabs)');
   });
 
-  it('locks otp verification after the first submit press', async () => {
-    mockSignIn.mockReturnValue(new Promise(() => {}));
+  it('resends the link and keeps the new device secret', async () => {
+    mockSendSignInLink.mockResolvedValue({
+      success: true,
+      browserSecret: 'new-secret',
+    });
 
     const {getByTestId} = await render(<SignInCode />);
+    await fireEvent.press(getByTestId('submit-button'));
 
+    await waitFor(() => {
+      expect(mockSavePendingSignInLink).toHaveBeenCalledWith({
+        email: 'user@example.com',
+        browserSecret: 'new-secret',
+      });
+    });
+    expect(mockSendSignInLink).toHaveBeenCalledWith({
+      email: 'user@example.com',
+      locale: 'en',
+    });
+    expect(mockToastSuccess).toHaveBeenCalledWith('signInLink.resent');
+  });
+
+  it('locks review code verification after the first submit press', async () => {
+    mockSignInWithReviewCode.mockReturnValue(new Promise(() => {}));
+
+    const {getByLabelText, getByTestId} = await render(<SignInCode />);
+
+    await fireEvent.press(getByLabelText('signInLink.useCode'));
     await fireEvent.changeText(getByTestId('code-input'), '12345678');
     await pressWithoutWaiting(
       getByTestId('submit-button'),
       getByTestId('submit-button'),
     );
 
-    expect(mockSignIn).toHaveBeenCalledTimes(1);
-    expect(mockSignIn).toHaveBeenCalledWith('resend-otp', {
+    expect(mockSignInWithReviewCode).toHaveBeenCalledTimes(1);
+    expect(mockSignInWithReviewCode).toHaveBeenCalledWith({
       code: '12345678',
       email: 'user@example.com',
     });
@@ -288,24 +333,52 @@ describe('SignInCode', () => {
     });
   });
 
-  it('labels back navigation for assistive tech', async () => {
+  it('shows an error for a wrong review code', async () => {
+    mockSignInWithReviewCode.mockResolvedValue({
+      status: 'error',
+      error: 'INCORRECT_CODE',
+    });
+
     const {getByLabelText, getByTestId} = await render(<SignInCode />);
 
-    expect(getByTestId('back-button').props.accessibilityRole).toBe('button');
-    expect(getByLabelText('common.back')).toBeTruthy();
-  });
-
-  it('unlocks otp verification when profile creation fails', async () => {
-    mockSignIn.mockResolvedValue({signingIn: true});
-    mockCreateUserProfile.mockRejectedValue(new Error('profile failed'));
-
-    const {getByTestId, rerender} = await render(<SignInCode />);
-
+    await fireEvent.press(getByLabelText('signInLink.useCode'));
     await fireEvent.changeText(getByTestId('code-input'), '12345678');
     await fireEvent.press(getByTestId('submit-button'));
 
     await waitFor(() => {
-      expect(mockSignIn).toHaveBeenCalledTimes(1);
+      expect(getByTestId('code-error').props.children).toBe('signInCode.error');
+    });
+    expect(mockSetSession).not.toHaveBeenCalled();
+  });
+
+  it('labels back navigation for assistive tech', async () => {
+    const {getByLabelText} = await render(<SignInCode />);
+
+    expect(getByLabelText('common.back').props.accessibilityRole).toBe(
+      'button',
+    );
+  });
+
+  it('unlocks review code verification when profile creation fails', async () => {
+    mockSignInWithReviewCode.mockResolvedValue({
+      status: 'complete',
+      tokens: {accessToken: 'a', refreshToken: 'r'},
+    });
+    mockCreateUserProfile.mockRejectedValue(new Error('profile failed'));
+
+    const {getByLabelText, getByTestId, rerender} = await render(
+      <SignInCode />,
+    );
+
+    await fireEvent.press(getByLabelText('signInLink.useCode'));
+    await fireEvent.changeText(getByTestId('code-input'), '12345678');
+    await fireEvent.press(getByTestId('submit-button'));
+
+    await waitFor(() => {
+      expect(mockSetSession).toHaveBeenCalledWith({
+        accessToken: 'a',
+        refreshToken: 'r',
+      });
     });
 
     mockIsAuthenticated = true;
@@ -322,7 +395,7 @@ describe('SignInCode', () => {
     await fireEvent.press(getByTestId('submit-button'));
 
     await waitFor(() => {
-      expect(mockSignIn).toHaveBeenCalledTimes(2);
+      expect(mockSignInWithReviewCode).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -359,7 +432,7 @@ describe('SignInCode', () => {
     expect(logEvent).toHaveBeenCalledTimes(1);
     expect(logEvent).toHaveBeenCalledWith('signup_completed', {
       source: 'shorts_ko',
-      method: 'email_otp',
+      method: 'email_link',
     });
   });
 });

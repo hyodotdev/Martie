@@ -630,6 +630,18 @@
     "error": "Invalid code!",
     "title": "Enter the verification code."
   },
+  "signInLink": {
+    "codeContent": "Enter the sign-in code for {email}.",
+    "content": "We sent a sign-in link to {email}. Open it on this phone to sign in.",
+    "expired": "This link has expired or was already used. Please sign in again.",
+    "otherDevice": "Open the link on the phone where you asked for it.",
+    "resend": "Send the link again",
+    "resent": "We sent a new link.",
+    "retry": "Sign in again",
+    "signingIn": "Signing you in…",
+    "title": "Check your email",
+    "useCode": "Sign in with a code"
+  },
   "submitQuiz": {
     "category": "Category",
     "explanation": "Answer Explanation (Optional)",

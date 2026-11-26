@@ -1,6 +1,6 @@
 import {v} from 'convex/values';
 import {internalMutation} from '../_generated/server';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 import {internal} from '../_generated/api';
 
 const SUB_MONTHLY = 'dev.hyo.martie.premium';

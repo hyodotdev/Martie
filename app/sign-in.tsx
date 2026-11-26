@@ -15,7 +15,6 @@ import {Stack, useRouter} from 'expo-router';
 import {Image} from 'expo-image';
 import {IC_WORDMARK} from '../src/icons';
 import {getLocale, t} from '../src/STRINGS';
-import {useAuthActions} from '@convex-dev/auth/react';
 import {normalizeEmail, validateEmail} from '../src/utils/common';
 import {logError} from '../src/utils/error';
 import {useMutation} from 'convex/react';
@@ -23,10 +22,11 @@ import {api} from '../convex/_generated/api';
 import {toast} from '@backpackapp-io/react-native-toast';
 import {ImpactFeedbackStyle} from 'expo-haptics';
 import {logScreenView} from '../src/utils/analytics';
+import {savePendingSignInLink} from '../src/utils/signInLink';
 
 export default function SignIn(): JSX.Element {
   const {navigate, back} = useRouter();
-  const {signIn} = useAuthActions();
+  const sendSignInLink = useMutation(api.emailAuth.sendSignInLink);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -70,17 +70,23 @@ export default function SignIn(): JSX.Element {
         return;
       }
 
-      // ✅ 2. 로그인 시도
-      await signIn(
-        getLocale() === 'ko'
-          ? 'resend-otp-ko'
-          : getLocale() === 'ja'
-            ? 'resend-otp-ja'
-            : 'resend-otp',
-        {email: normalizedEmail},
-      );
+      // ✅ 2. 로그인 링크 메일 보내기
+      const locale = getLocale();
+      const result = await sendSignInLink({
+        email: normalizedEmail,
+        locale: locale === 'ko' || locale === 'ja' ? locale : 'en',
+      });
+      if (!result.success) {
+        setError(`${t('signIn.emailSentFailed')}`);
+        return;
+      }
+      // The link signs in only on this device, together with its secret.
+      savePendingSignInLink({
+        email: normalizedEmail,
+        browserSecret: result.browserSecret,
+      });
 
-      // ✅ 3. 로그인 성공 시 코드 입력 페이지로 이동
+      // ✅ 3. 메일 확인 안내 페이지로 이동
       navigate({
         pathname: '/sign-in-code',
         params: {email: normalizedEmail},

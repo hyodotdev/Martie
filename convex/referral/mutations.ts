@@ -1,6 +1,6 @@
 import {mutation} from '../_generated/server';
 import {v} from 'convex/values';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 
 const REFERRAL_REWARD_BULBS = 5;
 

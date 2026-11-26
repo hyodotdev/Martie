@@ -1,4 +1,4 @@
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../../../convex/utils/auth';
 import {
   advance,
   buzz,
@@ -28,7 +28,7 @@ import {
 } from '../../../convex/battle/logic';
 import {createFakeCtx, handlerOf, type FakeCtx} from './fakeDb';
 
-jest.mock('@convex-dev/auth/server', () => ({getAuthUserId: jest.fn()}), {
+jest.mock('../../../convex/utils/auth', () => ({getAuthUserId: jest.fn()}), {
   virtual: true,
 });
 

@@ -1,6 +1,6 @@
 import {ConvexError, v} from 'convex/values';
 import {internalMutation, mutation} from '../_generated/server';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 import {enqueueForReview} from '../reviewQueue/helpers';
 import {awardFeather} from '../feather/helpers';
 import {

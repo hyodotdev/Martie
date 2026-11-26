@@ -1,7 +1,7 @@
 import {mutation} from '../_generated/server';
 import type {MutationCtx} from '../_generated/server';
 import {ConvexError, v} from 'convex/values';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 import {v4 as uuidv4} from 'uuid';
 import type {Doc, Id} from '../_generated/dataModel';
 import {isLevelPlayGrantMode} from '../utils/levelPlay';

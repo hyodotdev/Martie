@@ -5,7 +5,7 @@ import {
 } from '../../convex/purchase/mutations';
 import type {Doc} from '../../convex/_generated/dataModel';
 
-jest.mock('@convex-dev/auth/server', () => ({getAuthUserId: jest.fn()}), {
+jest.mock('../../convex/utils/auth', () => ({getAuthUserId: jest.fn()}), {
   virtual: true,
 });
 

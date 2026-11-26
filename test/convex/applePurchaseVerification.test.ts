@@ -1,4 +1,4 @@
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../../convex/utils/auth';
 import {
   VerificationException,
   VerificationStatus,
@@ -7,7 +7,7 @@ import type {JWSTransactionDecodedPayload} from '@apple/app-store-server-library
 import {v5 as uuidv5} from 'uuid';
 import {verifyApplePurchase} from '../../convex/apple';
 
-jest.mock('@convex-dev/auth/server', () => ({getAuthUserId: jest.fn()}), {
+jest.mock('../../convex/utils/auth', () => ({getAuthUserId: jest.fn()}), {
   virtual: true,
 });
 

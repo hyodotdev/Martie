@@ -1,9 +1,9 @@
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../../convex/utils/auth';
 import {google} from 'googleapis';
 import * as iap from '../../convex/iap';
 import {verifyPurchase} from '../../convex/iap';
 
-jest.mock('@convex-dev/auth/server', () => ({getAuthUserId: jest.fn()}), {
+jest.mock('../../convex/utils/auth', () => ({getAuthUserId: jest.fn()}), {
   virtual: true,
 });
 const mockProductGet = jest.fn();

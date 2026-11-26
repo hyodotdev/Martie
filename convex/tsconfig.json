@@ -17,6 +17,8 @@
     "allowSyntheticDefaultImports": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    /* Exposes the Convex Auth 2 APIs it marks internal (custom methods). */
+    "customConditions": ["convex-auth-internal-types"],
     "isolatedModules": true,
     "noEmit": true
   },

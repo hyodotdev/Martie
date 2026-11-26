@@ -1,6 +1,6 @@
 import {v} from 'convex/values';
 import {mutation} from '../_generated/server';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 
 // 간격반복 스케줄 (일 단위)
 const REVIEW_INTERVALS = [1, 3, 7];

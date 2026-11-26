@@ -5,7 +5,7 @@ import type {Doc, Id} from './_generated/dataModel';
 import {google} from 'googleapis';
 import {v} from 'convex/values';
 import {getGoogleServiceAccountAuth} from './iap';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from './utils/auth';
 
 const TOSS_API_BASE = 'https://api.tosspayments.com';
 const TOSS_PAYMENT_METHOD_ALT = 'toss_alternative_billing';

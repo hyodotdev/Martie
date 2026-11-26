@@ -630,6 +630,18 @@
     "error": "¡Código incorrecto!",
     "title": "Por favor, ingresa el código de verificación."
   },
+  "signInLink": {
+    "codeContent": "Ingresa el código de inicio de sesión de {email}.",
+    "content": "Enviamos un enlace de inicio de sesión a {email}. Ábrelo en este teléfono para iniciar sesión.",
+    "expired": "Este enlace caducó o ya se usó. Inicia sesión de nuevo.",
+    "otherDevice": "Abre el enlace en el teléfono desde el que lo pediste.",
+    "resend": "Enviar el enlace de nuevo",
+    "resent": "Enviamos un enlace nuevo.",
+    "retry": "Iniciar sesión de nuevo",
+    "signingIn": "Iniciando sesión…",
+    "title": "Revisa tu correo",
+    "useCode": "Iniciar sesión con un código"
+  },
   "submitQuiz": {
     "category": "Category",
     "explanation": "Answer Explanation (Optional)",

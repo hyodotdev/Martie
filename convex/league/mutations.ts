@@ -1,5 +1,5 @@
 import {internalMutation, mutation} from '../_generated/server';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 
 const LEAGUE_TIERS = ['bronze', 'silver', 'gold', 'diamond', 'master'] as const;
 const GROUP_SIZE = 30;

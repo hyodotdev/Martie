@@ -4,7 +4,14 @@ import React from 'react';
 
 const mockNavigate = jest.fn();
 const mockBack = jest.fn();
-const mockSignIn = jest.fn(() => Promise.resolve());
+type SendSignInLinkResult =
+  | {success: true; browserSecret: string}
+  | {success: false; error: string};
+const mockSendSignInLink = jest.fn(
+  (): Promise<SendSignInLinkResult> =>
+    Promise.resolve({success: true, browserSecret: 'device-secret'}),
+);
+const mockSavePendingSignInLink = jest.fn();
 const mockCheckIsDeletedUser = jest.fn(() =>
   Promise.resolve({isDeleted: false}),
 );
@@ -155,18 +162,21 @@ jest.mock('cpk-ui', () => {
   };
 });
 
-jest.mock('@convex-dev/auth/react', () => ({
-  useAuthActions: () => ({
-    signIn: mockSignIn,
-  }),
+jest.mock('convex/react', () => ({
+  useMutation: (ref: string) =>
+    ref === 'emailAuth.sendSignInLink'
+      ? mockSendSignInLink
+      : mockCheckIsDeletedUser,
 }));
 
-jest.mock('convex/react', () => ({
-  useMutation: () => mockCheckIsDeletedUser,
+jest.mock('../../src/utils/signInLink', () => ({
+  savePendingSignInLink: (...args: unknown[]) =>
+    mockSavePendingSignInLink(...args),
 }));
 
 jest.mock('../../convex/_generated/api', () => ({
   api: {
+    emailAuth: {sendSignInLink: 'emailAuth.sendSignInLink'},
     user: {
       mutations: {
         checkIsDeletedUser: 'user.mutations.checkIsDeletedUser',
@@ -224,10 +234,10 @@ describe('SignIn', () => {
       );
     });
     expect(mockCheckIsDeletedUser).not.toHaveBeenCalled();
-    expect(mockSignIn).not.toHaveBeenCalled();
+    expect(mockSendSignInLink).not.toHaveBeenCalled();
   });
 
-  it('normalizes email before otp request and route params', async () => {
+  it('normalizes email before sending the link and keeps its secret', async () => {
     const {getByTestId} = await render(<SignIn />);
 
     await fireEvent.changeText(getByTestId('email-input'), ' USER@Example.COM ');
@@ -238,13 +248,37 @@ describe('SignIn', () => {
         email: 'USER@Example.COM',
       });
     });
-    expect(mockSignIn).toHaveBeenCalledWith('resend-otp', {
+    expect(mockSendSignInLink).toHaveBeenCalledWith({
       email: 'user@example.com',
+      locale: 'en',
+    });
+    expect(mockSavePendingSignInLink).toHaveBeenCalledWith({
+      email: 'user@example.com',
+      browserSecret: 'device-secret',
     });
     expect(mockNavigate).toHaveBeenCalledWith({
       pathname: '/sign-in-code',
       params: {email: 'user@example.com'},
     });
+  });
+
+  it('stays on the screen when the link cannot be sent', async () => {
+    mockSendSignInLink.mockResolvedValueOnce({
+      success: false,
+      error: 'RATE_LIMITED',
+    });
+    const {getByTestId} = await render(<SignIn />);
+
+    await fireEvent.changeText(getByTestId('email-input'), 'user@example.com');
+    await fireEvent.press(getByTestId('submit-button'));
+
+    await waitFor(() => {
+      expect(getByTestId('email-error').props.children).toBe(
+        'signIn.emailSentFailed',
+      );
+    });
+    expect(mockSavePendingSignInLink).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('labels close and policy links for assistive tech', async () => {

@@ -17,6 +17,8 @@ import SignInRequireModal from '../src/modals/SignInRequireModal';
 import * as SecureStore from 'expo-secure-store';
 import {ConvexAuthProvider} from '@convex-dev/auth/react';
 import {ConvexReactClient} from 'convex/react';
+import {api} from '../convex/_generated/api';
+import {useLegacySessionUpgrade} from '../src/hooks/useLegacySessionUpgrade';
 import ErrorBoundary from 'react-native-error-boundary';
 import DisplayNameModal from '../src/modals/DisplayNameModal';
 import ForceUpdateModal from '../src/modals/ForceUpdateModal';
@@ -103,6 +105,7 @@ function getSourceFromUrl(url: string | null | undefined): string | undefined {
 }
 
 function App(): JSX.Element | null {
+  useLegacySessionUpgrade();
   useProductAnalytics();
   useAlternativeBillingRecovery();
 
@@ -453,11 +456,21 @@ function RootLayout(): JSX.Element | null {
       <RootProvider initialThemeType={isDarkMode ? 'dark' : 'light'}>
         <ConvexAuthProvider
           client={convex}
+          api={{
+            refreshSession: api.emailAuth.refreshSession,
+            signOut: api.emailAuth.signOut,
+            isAuthenticated: api.emailAuth.isAuthenticated,
+          }}
           storage={
             Platform.OS === 'android' || Platform.OS === 'ios'
               ? secureStorage
               : undefined
           }
+          // Convex Auth 0.0.x used the same key names under the bare
+          // deployment URL; `useLegacySessionUpgrade` reads those.
+          storageNamespace={`${process.env.EXPO_PUBLIC_CONVEX_URL}/auth2`}
+          // Martie has no OAuth sign-in to resume from a redirect.
+          ambientSignIns={[]}
         >
           <App />
         </ConvexAuthProvider>

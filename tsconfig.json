@@ -12,6 +12,7 @@
     ],
     "module": "es2015",
     "moduleResolution": "Bundler",
+    "customConditions": ["convex-auth-internal-types"],
     "resolveJsonModule": true,
     "noEmit": true,
     "noUnusedLocals": false,
