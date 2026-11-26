@@ -1,4 +1,5 @@
 import {act, fireEvent, render, waitFor} from '@testing-library/react-native';
+import {pressWithoutWaiting} from '../../pressWithoutWaiting';
 import type {ReactNode} from 'react';
 import React from 'react';
 
@@ -183,8 +184,8 @@ describe('recovery modal accessibility', () => {
     mockGrantRecovery.mockReturnValue(new Promise(() => {}));
   });
 
-  it('announces the sign-in requirement sheet and actions', () => {
-    const {getByLabelText, getByTestId, getByText} = render(
+  it('announces the sign-in requirement sheet and actions', async () => {
+    const {getByLabelText, getByTestId, getByText} = await render(
       <SignInRequireModal />,
     );
 
@@ -202,7 +203,7 @@ describe('recovery modal accessibility', () => {
   });
 
   it('announces the streak recovery sheet and initial action states', async () => {
-    const {findByTestId, getByLabelText, getByText} = render(
+    const {findByTestId, getByLabelText, getByText} = await render(
       <StreakRecoveryModal />,
     );
 
@@ -226,7 +227,7 @@ describe('recovery modal accessibility', () => {
 
   it('reports when streak recovery should block banner ads', async () => {
     const onVisibilityChange = jest.fn();
-    const {findByTestId} = render(
+    const {findByTestId} = await render(
       <StreakRecoveryModal onVisibilityChange={onVisibilityChange} />,
     );
 
@@ -236,11 +237,10 @@ describe('recovery modal accessibility', () => {
   });
 
   it('locks streak recovery acceptance while the grant is pending', async () => {
-    const {findByLabelText, getByLabelText} = render(<StreakRecoveryModal />);
+    const {findByLabelText, getByLabelText} = await render(<StreakRecoveryModal />);
     const acceptButton = await findByLabelText('daily.streakRecoveryAccept');
 
-    fireEvent.press(acceptButton);
-    fireEvent.press(acceptButton);
+    await pressWithoutWaiting(acceptButton, acceptButton);
 
     expect(mockGrantRecovery).toHaveBeenCalledTimes(1);
 
@@ -268,11 +268,11 @@ describe('recovery modal accessibility', () => {
       }),
     );
 
-    const {findByLabelText, unmount} = render(<StreakRecoveryModal />);
+    const {findByLabelText, unmount} = await render(<StreakRecoveryModal />);
     const acceptButton = await findByLabelText('daily.streakRecoveryAccept');
 
-    fireEvent.press(acceptButton);
-    unmount();
+    await pressWithoutWaiting(acceptButton);
+    await unmount();
 
     await act(async () => {
       resolveGrant({currentStreak: 7, success: true});

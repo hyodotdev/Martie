@@ -41,14 +41,29 @@ jest.mock('cpk-ui', () => {
   };
 });
 
+// Gesture Handler 3 delivers presses as native gesture events, which a test
+// renderer cannot send, so the button becomes a plain view with its handlers.
+jest.mock('react-native-gesture-handler', () => {
+  const React = jest.requireActual('react');
+  const {View} = jest.requireActual('react-native');
+  return {
+    RectButton: ({children, onPress, ...props}: any) =>
+      React.createElement(
+        View,
+        {...props, onPress: () => onPress?.(true)},
+        children,
+      ),
+  };
+});
+
 jest.mock('cpk-ui/utils/guards', () => ({
   cloneElemWithDefaultColors: ({element}: {element?: JSX.Element}) => element,
 }));
 
 describe('GestureHandlerButton', () => {
-  it('forwards accessibility props to the press target', () => {
+  it('forwards accessibility props to the press target', async () => {
     const onPress = jest.fn();
-    const {getByLabelText} = render(
+    const {getByLabelText} = await render(
       <GestureHandlerButton
         accessibilityLabel="Update Now"
         accessibilityRole="button"
@@ -61,14 +76,14 @@ describe('GestureHandlerButton', () => {
 
     expect(button.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('preserves external active state handlers', () => {
+  it('preserves external active state handlers', async () => {
     const onActiveStateChange = jest.fn();
-    const {getByLabelText} = render(
+    const {getByLabelText} = await render(
       <GestureHandlerButton
         accessibilityLabel="Update Now"
         onActiveStateChange={onActiveStateChange}
@@ -77,7 +92,7 @@ describe('GestureHandlerButton', () => {
       />,
     );
 
-    fireEvent(getByLabelText('Update Now'), 'activeStateChange', true);
+    await fireEvent(getByLabelText('Update Now'), 'activeStateChange', true);
 
     expect(onActiveStateChange).toHaveBeenCalledWith(true);
   });

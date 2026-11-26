@@ -58,8 +58,8 @@ describe('ButtonMartie', () => {
     jest.clearAllMocks();
   });
 
-  it('announces the visible text as a button by default', () => {
-    const {getByLabelText} = render(
+  it('announces the visible text as a button by default', async () => {
+    const {getByLabelText} = await render(
       <ButtonMartie onPress={mockOnPress} text="Continue" />,
     );
 
@@ -67,7 +67,7 @@ describe('ButtonMartie', () => {
 
     expect(button.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(mockSafeSeekAudioPlayerToStart).toHaveBeenCalledWith(
       mockAudioPlayer,
@@ -76,8 +76,8 @@ describe('ButtonMartie', () => {
     expect(mockOnPress).toHaveBeenCalledTimes(1);
   });
 
-  it('preserves explicit accessibility props and exposes disabled state', () => {
-    const {getByLabelText} = render(
+  it('preserves explicit accessibility props and exposes disabled state', async () => {
+    const {getByLabelText} = await render(
       <ButtonMartie
         accessibilityLabel="Open daily challenge"
         accessibilityRole="link"
@@ -96,15 +96,15 @@ describe('ButtonMartie', () => {
       disabled: true,
     });
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(mockSafeSeekAudioPlayerToStart).not.toHaveBeenCalled();
     expect(mockSafePlayAudioPlayer).not.toHaveBeenCalled();
     expect(mockOnPress).not.toHaveBeenCalled();
   });
 
-  it('lets an explicit disabled prop override nested accessibility state', () => {
-    const {getByLabelText} = render(
+  it('lets an explicit disabled prop override nested accessibility state', async () => {
+    const {getByLabelText} = await render(
       <ButtonMartie
         accessibilityState={{disabled: true}}
         disabled={false}
@@ -117,13 +117,13 @@ describe('ButtonMartie', () => {
 
     expect(button.props.accessibilityState).toEqual({disabled: false});
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(mockOnPress).toHaveBeenCalledTimes(1);
   });
 
-  it('uses touchable accessibility label when no wrapper label is provided', () => {
-    const {getByLabelText} = render(
+  it('uses touchable accessibility label when no wrapper label is provided', async () => {
+    const {getByLabelText} = await render(
       <ButtonMartie
         onPress={mockOnPress}
         text="Continue"

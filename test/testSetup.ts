@@ -3,7 +3,6 @@
  * Something went wrong initializing the native ReactLocalization module
  * https://gist.github.com/MoOx/08b465c3eac9e36e683929532472d1e0
  */
-import mockAsyncStorage from '@react-native-async-storage/async-storage/jest/async-storage-mock';
 import type {GlobalWithFetchMock} from 'jest-fetch-mock';
 
 const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock &
@@ -26,7 +25,9 @@ jest.mock('expo-font', () => {
 jest.mock('expo-audio', () => ({
   useAudioPlayer: jest.fn(),
 }));
-jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
+jest.mock('@react-native-async-storage/async-storage', () =>
+  jest.requireActual('@react-native-async-storage/async-storage/jest'),
+);
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
 
 // const customGlobal: any = global;

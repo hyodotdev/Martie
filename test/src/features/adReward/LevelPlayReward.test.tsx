@@ -54,7 +54,7 @@ const adError = {errorCode: 509, errorMessage: 'no fill', adUnitId: 'reward'};
 const reward = {name: 'bulb', amount: 2};
 const startAd = async () => {
   useAdConsentStore.setState({canRequestAds: true});
-  const result = render(<LevelPlayReward />);
+  const result = await render(<LevelPlayReward />);
   await waitFor(() => expect(LevelPlayRewardedAd).toHaveBeenCalledTimes(1));
   const ad = jest.mocked(LevelPlayRewardedAd).mock.results[0].value;
   const listener = jest.mocked(ad.setListener).mock.calls[0][0];
@@ -72,8 +72,8 @@ describe('LevelPlay rewarded lifecycle', () => {
   });
   afterEach(() => jest.useRealTimers());
 
-  it('waits for consent before initializing or loading an ad', () => {
-    render(<LevelPlayReward />);
+  it('waits for consent before initializing or loading an ad', async () => {
+    await render(<LevelPlayReward />);
     expect(initializeMobileAds).not.toHaveBeenCalled();
     expect(LevelPlayRewardedAd).not.toHaveBeenCalled();
     expect(mockClaimRecharge).not.toHaveBeenCalled();
@@ -81,7 +81,7 @@ describe('LevelPlay rewarded lifecycle', () => {
 
   it('preserves fallback recharge when consent prevents an ad', async () => {
     useAdConsentStore.setState({canRequestAds: false});
-    render(<LevelPlayReward />);
+    await render(<LevelPlayReward />);
     await waitFor(() => expect(mockRouter.back).toHaveBeenCalledTimes(1));
     expect(LevelPlayRewardedAd).not.toHaveBeenCalled();
     expect(mockClaimRecharge).toHaveBeenCalledWith('consent_unavailable');
@@ -89,9 +89,9 @@ describe('LevelPlay rewarded lifecycle', () => {
 
   it('shows a loaded ad, credits completion once, and waits for close before navigating', async () => {
     const {ad, listener} = await startAd();
-    act(() => listener.onAdLoaded(adInfo));
+    await act(() => listener.onAdLoaded(adInfo));
     expect(ad.showAd).toHaveBeenCalledTimes(1);
-    act(() => {
+    await act(() => {
       listener.onAdDisplayed(adInfo);
       listener.onAdRewarded(reward, adInfo);
       listener.onAdRewarded(reward, adInfo);
@@ -105,7 +105,7 @@ describe('LevelPlay rewarded lifecycle', () => {
     );
     expect(LevelPlay.setDynamicUserId).toHaveBeenCalledWith('user-a');
     expect(mockRouter.back).not.toHaveBeenCalled();
-    act(() => listener.onAdClosed?.(adInfo));
+    await act(() => listener.onAdClosed?.(adInfo));
     await waitFor(() => expect(mockRouter.back).toHaveBeenCalledTimes(1));
   });
 
@@ -114,7 +114,7 @@ describe('LevelPlay rewarded lifecycle', () => {
       .mocked(LevelPlay.setMetaData)
       .mockRejectedValueOnce(new Error('bridge'));
     const {listener} = await startAd();
-    act(() => {
+    await act(() => {
       listener.onAdRewarded(reward, adInfo);
       listener.onAdClosed?.(adInfo);
     });
@@ -125,8 +125,8 @@ describe('LevelPlay rewarded lifecycle', () => {
   it('does not grant a reward or navigate while a long ad is playing', async () => {
     const {listener} = await startAd();
     jest.useFakeTimers();
-    act(() => listener.onAdDisplayed(adInfo));
-    act(() => jest.advanceTimersByTime(60000));
+    await act(() => listener.onAdDisplayed(adInfo));
+    await act(() => jest.advanceTimersByTime(60000));
     expect(mockClaimRecharge).not.toHaveBeenCalled();
     expect(mockRouter.back).not.toHaveBeenCalled();
   });
@@ -134,7 +134,7 @@ describe('LevelPlay rewarded lifecycle', () => {
   it('does not reward an ad closed before completion', async () => {
     const {listener} = await startAd();
     jest.useFakeTimers();
-    act(() => {
+    await act(() => {
       listener.onAdDisplayed(adInfo);
       listener.onAdClosed?.(adInfo);
       jest.advanceTimersByTime(1000);
@@ -145,7 +145,7 @@ describe('LevelPlay rewarded lifecycle', () => {
 
   it('accepts a reward callback arriving just after close', async () => {
     const {listener} = await startAd();
-    act(() => {
+    await act(() => {
       listener.onAdClosed?.(adInfo);
       listener.onAdRewarded(reward, adInfo);
     });
@@ -155,7 +155,7 @@ describe('LevelPlay rewarded lifecycle', () => {
 
   it('handles no-fill without a stuck screen or duplicate fallback reward', async () => {
     const {listener} = await startAd();
-    act(() => {
+    await act(() => {
       listener.onAdLoadFailed(adError);
       listener.onAdLoadFailed(adError);
     });
@@ -165,8 +165,8 @@ describe('LevelPlay rewarded lifecycle', () => {
 
   it('ignores callbacks after leaving and removes its native ad', async () => {
     const {result, ad, listener} = await startAd();
-    result.unmount();
-    act(() => {
+    await result.unmount();
+    await act(() => {
       listener.onAdLoaded(adInfo);
       listener.onAdRewarded(reward, adInfo);
     });

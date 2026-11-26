@@ -197,12 +197,12 @@ describe('EnterReferralCode', () => {
     const deferred = createDeferred<{success: true}>();
     mockApplyReferral.mockReturnValue(deferred.promise);
 
-    const {getByTestId} = render(<EnterReferralCode />);
+    const {getByTestId} = await render(<EnterReferralCode />);
 
-    fireEvent.changeText(getByTestId('code-input'), 'ABC-1234');
-    fireEvent.press(getByTestId('submit-button'));
-    fireEvent(getByTestId('code-input'), 'submitEditing');
-    fireEvent.press(getByTestId('submit-button'));
+    await fireEvent.changeText(getByTestId('code-input'), 'ABC-1234');
+    await fireEvent.press(getByTestId('submit-button'));
+    await fireEvent(getByTestId('code-input'), 'submitEditing');
+    await fireEvent.press(getByTestId('submit-button'));
 
     expect(mockApplyReferral).toHaveBeenCalledTimes(1);
     expect(mockApplyReferral).toHaveBeenCalledWith({
@@ -230,10 +230,10 @@ describe('EnterReferralCode', () => {
       .mockResolvedValueOnce({success: false, error: 'invalid_code'})
       .mockResolvedValueOnce({success: false, error: 'self_referral'});
 
-    const {getByTestId} = render(<EnterReferralCode />);
+    const {getByTestId} = await render(<EnterReferralCode />);
 
-    fireEvent.changeText(getByTestId('code-input'), 'wrongcode');
-    fireEvent.press(getByTestId('submit-button'));
+    await fireEvent.changeText(getByTestId('code-input'), 'wrongcode');
+    await fireEvent.press(getByTestId('submit-button'));
 
     await waitFor(() => {
       expect(getByTestId('code-error').props.children).toBe(
@@ -245,7 +245,7 @@ describe('EnterReferralCode', () => {
       });
     });
 
-    fireEvent.press(getByTestId('submit-button'));
+    await fireEvent.press(getByTestId('submit-button'));
 
     await waitFor(() => {
       expect(mockApplyReferral).toHaveBeenCalledTimes(2);

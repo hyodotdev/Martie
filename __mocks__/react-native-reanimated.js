@@ -25,6 +25,9 @@ module.exports = {
     FlatList: View,
   },
   useSharedValue,
+  // Gesture Handler 3 asks whether config values are shared values.
+  isSharedValue: (value) =>
+    typeof value === 'object' && value !== null && typeof value.get === 'function',
   useAnimatedStyle,
   useDerivedValue,
   useAnimatedScrollHandler,

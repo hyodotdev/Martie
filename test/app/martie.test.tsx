@@ -1,7 +1,7 @@
 import {fireEvent, render} from '@testing-library/react-native';
 import React from 'react';
 import type {ReactNode} from 'react';
-import {Linking, Platform, View} from 'react-native';
+import {Linking, Platform} from 'react-native';
 
 import MartieLanding from '../../app/martie';
 
@@ -150,8 +150,8 @@ describe('MartieLanding accessibility', () => {
     });
   });
 
-  it('exposes a heading and external store links', () => {
-    const {getByLabelText, getByText} = render(<MartieLanding />);
+  it('exposes a heading and external store links', async () => {
+    const {getByLabelText, getByText} = await render(<MartieLanding />);
 
     expect(getByText('Daily trivia in 2 minutes').props.accessibilityRole).toBe(
       'header',
@@ -160,9 +160,9 @@ describe('MartieLanding accessibility', () => {
     expect(getByLabelText('Google Play').props.accessibilityRole).toBe('link');
   });
 
-  it('hides decorative landing images from assistive tech', () => {
-    const {UNSAFE_getAllByType} = render(<MartieLanding />);
-    const images = UNSAFE_getAllByType(View).filter(
+  it('hides decorative landing images from assistive tech', async () => {
+    const {container} = await render(<MartieLanding />);
+    const images = container.queryAll(
       (node) =>
         node.props.source === 'wordmark.png' ||
         node.props.source === 'martie-basic.png',
@@ -178,11 +178,11 @@ describe('MartieLanding accessibility', () => {
     }
   });
 
-  it('opens app store URLs with share landing source context', () => {
-    const {getByLabelText} = render(<MartieLanding />);
+  it('opens app store URLs with share landing source context', async () => {
+    const {getByLabelText} = await render(<MartieLanding />);
 
-    fireEvent.press(getByLabelText('App Store'));
-    fireEvent.press(getByLabelText('Google Play'));
+    await fireEvent.press(getByLabelText('App Store'));
+    await fireEvent.press(getByLabelText('Google Play'));
 
     expect(Linking.openURL).toHaveBeenNthCalledWith(
       1,

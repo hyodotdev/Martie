@@ -214,7 +214,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('react-native-mmkv', () => ({
-  MMKV: jest.fn(() => ({
+  createMMKV: jest.fn(() => ({
     getString: jest.fn(),
   })),
   useMMKVNumber: () => [mockVolume, mockSetVolume],
@@ -273,10 +273,10 @@ describe('ReviewQuizPage accessibility', () => {
     mockUseMutation.mockReturnValue(jest.fn(() => Promise.resolve()));
   });
 
-  it('announces the empty review state and return action', () => {
+  it('announces the empty review state and return action', async () => {
     mockUseQuery.mockReturnValue([]);
 
-    const {getByLabelText} = render(<ReviewQuizPage />);
+    const {getByLabelText} = await render(<ReviewQuizPage />);
 
     expect(
       getByLabelText('No mistakes to review!').props.accessibilityRole,
@@ -284,7 +284,7 @@ describe('ReviewQuizPage accessibility', () => {
     expect(getByLabelText('Return').props.accessibilityRole).toBe('button');
   });
 
-  it('announces review progress, timer, and volume controls', () => {
+  it('announces review progress, timer, and volume controls', async () => {
     mockUseQuery.mockReturnValue([
       {
         quiz: reviewQuiz,
@@ -298,7 +298,7 @@ describe('ReviewQuizPage accessibility', () => {
       },
     ]);
 
-    const {getByLabelText} = render(<ReviewQuizPage />);
+    const {getByLabelText} = await render(<ReviewQuizPage />);
 
     expect(
       getByLabelText('Review 1 of 2, stage 2 of 3').props.accessibilityRole,
@@ -315,7 +315,7 @@ describe('ReviewQuizPage accessibility', () => {
     });
   });
 
-  it('uses a consistent high-volume fallback before volume is saved', () => {
+  it('uses a consistent high-volume fallback before volume is saved', async () => {
     mockVolume = undefined;
     mockUseQuery.mockReturnValue([
       {
@@ -325,7 +325,7 @@ describe('ReviewQuizPage accessibility', () => {
       },
     ]);
 
-    const {getByLabelText} = render(<ReviewQuizPage />);
+    const {getByLabelText} = await render(<ReviewQuizPage />);
 
     expect(getByLabelText('Sound volume high').props.accessibilityRole).toBe(
       'button',

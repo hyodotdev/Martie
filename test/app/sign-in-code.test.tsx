@@ -1,4 +1,5 @@
 import {fireEvent, render, waitFor} from '@testing-library/react-native';
+import {pressWithoutWaiting} from '../pressWithoutWaiting';
 import type {ReactNode} from 'react';
 import React from 'react';
 
@@ -204,7 +205,7 @@ jest.mock('../../src/utils/storage', () => ({
     PendingReferralCode: 'PendingReferralCode',
   },
   storage: {
-    delete: jest.fn(),
+    remove: jest.fn(),
     getBoolean: jest.fn(),
     getString: jest.fn(),
     set: jest.fn(),
@@ -240,23 +241,23 @@ describe('SignInCode', () => {
     mockIsAuthenticated = false;
   });
 
-  it('returns to tabs home when the email parameter is missing', () => {
+  it('returns to tabs home when the email parameter is missing', async () => {
     mockEmailParam = undefined;
 
-    render(<SignInCode />);
+    await render(<SignInCode />);
 
     expect(mockReplace).toHaveBeenCalledWith('/(tabs)');
     expect(mockDismissAll).toHaveBeenCalledTimes(1);
   });
 
-  it('uses tabs home for the missing-email navigation fallback', () => {
+  it('uses tabs home for the missing-email navigation fallback', async () => {
     const error = new Error('replace failed');
     mockEmailParam = undefined;
     mockReplace.mockImplementationOnce(() => {
       throw error;
     });
 
-    render(<SignInCode />);
+    await render(<SignInCode />);
 
     expect(mockLogError).toHaveBeenCalledWith(error, 'sign-in-code-no-email');
     expect(mockNavigate).toHaveBeenCalledWith('/(tabs)');
@@ -265,11 +266,13 @@ describe('SignInCode', () => {
   it('locks otp verification after the first submit press', async () => {
     mockSignIn.mockReturnValue(new Promise(() => {}));
 
-    const {getByTestId} = render(<SignInCode />);
+    const {getByTestId} = await render(<SignInCode />);
 
-    fireEvent.changeText(getByTestId('code-input'), '12345678');
-    fireEvent.press(getByTestId('submit-button'));
-    fireEvent.press(getByTestId('submit-button'));
+    await fireEvent.changeText(getByTestId('code-input'), '12345678');
+    await pressWithoutWaiting(
+      getByTestId('submit-button'),
+      getByTestId('submit-button'),
+    );
 
     expect(mockSignIn).toHaveBeenCalledTimes(1);
     expect(mockSignIn).toHaveBeenCalledWith('resend-otp', {
@@ -285,8 +288,8 @@ describe('SignInCode', () => {
     });
   });
 
-  it('labels back navigation for assistive tech', () => {
-    const {getByLabelText, getByTestId} = render(<SignInCode />);
+  it('labels back navigation for assistive tech', async () => {
+    const {getByLabelText, getByTestId} = await render(<SignInCode />);
 
     expect(getByTestId('back-button').props.accessibilityRole).toBe('button');
     expect(getByLabelText('common.back')).toBeTruthy();
@@ -296,17 +299,17 @@ describe('SignInCode', () => {
     mockSignIn.mockResolvedValue({signingIn: true});
     mockCreateUserProfile.mockRejectedValue(new Error('profile failed'));
 
-    const {getByTestId, rerender} = render(<SignInCode />);
+    const {getByTestId, rerender} = await render(<SignInCode />);
 
-    fireEvent.changeText(getByTestId('code-input'), '12345678');
-    fireEvent.press(getByTestId('submit-button'));
+    await fireEvent.changeText(getByTestId('code-input'), '12345678');
+    await fireEvent.press(getByTestId('submit-button'));
 
     await waitFor(() => {
       expect(mockSignIn).toHaveBeenCalledTimes(1);
     });
 
     mockIsAuthenticated = true;
-    rerender(<SignInCode />);
+    await rerender(<SignInCode />);
 
     await waitFor(() => {
       expect(getByTestId('code-error').props.children).toBe('signInCode.error');
@@ -316,7 +319,7 @@ describe('SignInCode', () => {
       });
     });
 
-    fireEvent.press(getByTestId('submit-button'));
+    await fireEvent.press(getByTestId('submit-button'));
 
     await waitFor(() => {
       expect(mockSignIn).toHaveBeenCalledTimes(2);
@@ -327,7 +330,7 @@ describe('SignInCode', () => {
     mockIsAuthenticated = true;
     mockCreateUserProfile.mockResolvedValue({isNew: false});
 
-    render(<SignInCode />);
+    await render(<SignInCode />);
 
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/my'));
     expect(logEvent).not.toHaveBeenCalled();
@@ -342,10 +345,10 @@ describe('SignInCode', () => {
     (getAcquisitionSource as jest.Mock).mockReturnValue('shorts_ko');
     (storage.getBoolean as jest.Mock).mockReturnValue(false);
 
-    const {rerender} = render(<SignInCode />);
+    const {rerender} = await render(<SignInCode />);
 
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/my'));
-    rerender(<SignInCode />);
+    await rerender(<SignInCode />);
     expect(registerAnalyticsSuperProperties).toHaveBeenCalledWith({
       acquisition_source: 'shorts_ko',
     });

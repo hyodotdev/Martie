@@ -146,16 +146,16 @@ const createSections = () => {
 };
 
 describe('TabMy accessibility', () => {
-  it('announces mobile rows, expandable state, and switches', () => {
+  it('announces mobile rows, expandable state, and switches', async () => {
     const {handlers, sections} = createSections();
-    const {getAllByLabelText, getByLabelText} = render(
+    const {getAllByLabelText, getByLabelText} = await render(
       <TabMyMobile sections={sections as any} />,
     );
 
     const purchaseRow = getByLabelText('Purchase');
 
     expect(purchaseRow.props.accessibilityRole).toBe('button');
-    fireEvent.press(purchaseRow);
+    await fireEvent.press(purchaseRow);
     expect(handlers.onPurchase).toHaveBeenCalledTimes(1);
 
     const expandableRow = getByLabelText(
@@ -165,7 +165,7 @@ describe('TabMy accessibility', () => {
     expect(expandableRow.props.accessibilityRole).toBe('button');
     expect(expandableRow.props.accessibilityState).toEqual({expanded: false});
 
-    fireEvent.press(expandableRow);
+    await fireEvent.press(expandableRow);
 
     const expandedRow = getByLabelText(
       'Quiz Creator, Submit and review community quizzes',
@@ -174,25 +174,25 @@ describe('TabMy accessibility', () => {
 
     const subSectionRow = getByLabelText('Submit Quiz');
     expect(subSectionRow.props.accessibilityRole).toBe('button');
-    fireEvent.press(subSectionRow);
+    await fireEvent.press(subSectionRow);
     expect(handlers.onSubmitQuiz).toHaveBeenCalledTimes(1);
 
     const darkModeSwitch = getByLabelText('Dark Mode');
     expect(darkModeSwitch.props.accessibilityRole).toBe('switch');
     expect(darkModeSwitch.props.accessibilityState).toEqual({checked: true});
     expect(getAllByLabelText('Dark Mode')).toHaveLength(1);
-    fireEvent.press(darkModeSwitch);
+    await fireEvent.press(darkModeSwitch);
     expect(handlers.onToggleDarkMode).toHaveBeenCalledTimes(1);
 
     const languageRow = getByLabelText('Language, English');
     expect(languageRow.props.accessibilityRole).toBe('button');
-    fireEvent.press(languageRow);
+    await fireEvent.press(languageRow);
     expect(handlers.onLanguage).toHaveBeenCalledTimes(1);
   });
 
-  it('applies the same accessibility contract on tablet rows', () => {
+  it('applies the same accessibility contract on tablet rows', async () => {
     const {sections} = createSections();
-    const {getByLabelText} = render(<TabMyTablet sections={sections as any} />);
+    const {getByLabelText} = await render(<TabMyTablet sections={sections as any} />);
 
     expect(getByLabelText('Purchase').props.accessibilityRole).toBe('button');
     expect(getByLabelText('Dark Mode').props.accessibilityRole).toBe('switch');

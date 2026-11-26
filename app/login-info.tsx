@@ -144,6 +144,7 @@ export default function LoginInfo(): JSX.Element {
           },
           actions: [
             <Button
+              key="cancel"
               color="light"
               hapticFeedback={ImpactFeedbackStyle.Soft}
               onPress={() => alertDialog.close()}
@@ -156,6 +157,7 @@ export default function LoginInfo(): JSX.Element {
               borderRadius={16}
             />,
             <Button
+              key="withdraw"
               onPress={handleWithdraw}
               hapticFeedback={ImpactFeedbackStyle.Soft}
               loading={isWithdrawing}

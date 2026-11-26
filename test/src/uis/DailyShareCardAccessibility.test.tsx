@@ -104,8 +104,8 @@ jest.mock('../../../src/uis/ButtonMartie', () => ({
   },
 }));
 
-const renderCard = () =>
-  render(
+const renderCard = async () =>
+  await render(
     <ThemeProvider theme={light as any}>
       <DailyShareCard
         challengeNumber={42}
@@ -127,8 +127,8 @@ describe('DailyShareCard accessibility', () => {
     jest.clearAllMocks();
   });
 
-  it('announces the visual result card as one score summary', () => {
-    const {getByLabelText} = renderCard();
+  it('announces the visual result card as one score summary', async () => {
+    const {getByLabelText} = await renderCard();
 
     const summary = getByLabelText(
       "Today's Martie #42, 3/5, 21s, 2 days, Question 1 correct, Question 2 incorrect, Question 3 correct, Question 4 incorrect, Question 5 correct",
@@ -139,7 +139,7 @@ describe('DailyShareCard accessibility', () => {
   });
 
   it('announces each social share destination and keeps platform routing', async () => {
-    const {getByLabelText} = renderCard();
+    const {getByLabelText} = await renderCard();
 
     const twitter = getByLabelText('Share to X');
     const line = getByLabelText('Share to LINE');
@@ -149,7 +149,7 @@ describe('DailyShareCard accessibility', () => {
     expect(line.props.accessibilityRole).toBe('button');
     expect(kakao.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(line);
+    await fireEvent.press(line);
 
     await waitFor(() => {
       expect(shareToSocial).toHaveBeenCalledWith(

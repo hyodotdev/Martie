@@ -82,7 +82,7 @@ describe('useNotificationPermissionFlow', () => {
       [Storage.DidFinishFirstDaily]: false,
     });
 
-    render(<HookHarness />);
+    await render(<HookHarness />);
 
     await waitFor(() => {
       expect(storage.getBoolean).toHaveBeenCalledWith(
@@ -133,7 +133,7 @@ describe('useNotificationPermissionFlow', () => {
       [Storage.NotiPermissionAskedAt]: now - ONE_DAY_MS - 1,
     });
 
-    render(<HookHarness />);
+    await render(<HookHarness />);
 
     await waitFor(() => {
       expect(requestNotificationPermission).toHaveBeenCalledWith(
@@ -155,7 +155,7 @@ describe('useNotificationPermissionFlow', () => {
       [Storage.NotiPermissionAskedAt]: now - ONE_DAY_MS + 1000,
     });
 
-    render(<HookHarness />);
+    await render(<HookHarness />);
 
     await waitFor(() => {
       expect(storage.getNumber).toHaveBeenCalledWith(

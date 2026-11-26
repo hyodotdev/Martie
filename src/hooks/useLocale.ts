@@ -35,7 +35,7 @@ export const useLocale = () => {
   }, []);
 
   const resetToDeviceLocale = useCallback(() => {
-    storage.delete(Storage.Locale);
+    storage.remove(Storage.Locale);
     const deviceLocale = getDeviceLocale();
     setLocaleState(deviceLocale);
 

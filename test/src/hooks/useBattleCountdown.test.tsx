@@ -11,37 +11,37 @@ afterEach(() => {
 });
 
 describe('useBattleCountdown', () => {
-  it('ticks down to zero on the server clock', () => {
-    const {result} = renderHook(() => useBattleCountdown(13_000, 1000));
+  it('ticks down to zero on the server clock', async () => {
+    const {result} = await renderHook(() => useBattleCountdown(13_000, 1000));
     expect(result.current).toBe(2000);
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(1000);
     });
     expect(result.current).toBe(1000);
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(5000);
     });
     expect(result.current).toBe(0);
   });
 
-  it('restarts when the phase deadline changes', () => {
-    const {result, rerender} = renderHook(
+  it('restarts when the phase deadline changes', async () => {
+    const {result, rerender} = await renderHook(
       ({endsAt}: {endsAt: number | null}) => useBattleCountdown(endsAt, 0),
       {initialProps: {endsAt: null as number | null}},
     );
     expect(result.current).toBe(0);
-    rerender({endsAt: 25_000});
+    await rerender({endsAt: 25_000});
     expect(result.current).toBe(15_000);
   });
 });
 
 describe('useNow', () => {
-  it('refreshes on its interval', () => {
-    const {result} = renderHook(() => useNow(5000));
+  it('refreshes on its interval', async () => {
+    const {result} = await renderHook(() => useNow(5000));
     expect(result.current).toBe(10_000);
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(5000);
     });
     expect(result.current).toBe(15_000);

@@ -207,14 +207,14 @@ describe('LoginInfo', () => {
     const deferred = createDeferred<{success: true}>();
     mockDeleteUser.mockReturnValue(deferred.promise);
 
-    const {getByText} = render(<LoginInfo />);
+    const {getByText} = await render(<LoginInfo />);
 
-    fireEvent.press(getByText('loginInfo.withdraw'));
+    await fireEvent.press(getByText('loginInfo.withdraw'));
 
     const withdrawAction = getWithdrawAction();
     let withdrawPromise: Promise<void> | undefined;
 
-    act(() => {
+    await act(() => {
       withdrawPromise = withdrawAction.props.onPress();
     });
 
@@ -240,9 +240,9 @@ describe('LoginInfo', () => {
   });
 
   it('flushes analytics before regular sign out navigation', async () => {
-    const {getByText} = render(<LoginInfo />);
+    const {getByText} = await render(<LoginInfo />);
 
-    fireEvent.press(getByText('loginInfo.doSignOut'));
+    await fireEvent.press(getByText('loginInfo.doSignOut'));
 
     await waitFor(() => {
       expect(mockFlushAnalytics).toHaveBeenCalledTimes(1);
@@ -257,7 +257,7 @@ describe('LoginInfo', () => {
     const deferred = createDeferred<boolean>();
     mockFlushAnalytics.mockReturnValue(deferred.promise);
 
-    const {getByLabelText} = render(<LoginInfo />);
+    const {getByLabelText} = await render(<LoginInfo />);
 
     expect(getByLabelText('loginInfo.doSignOut').props.accessibilityRole).toBe(
       'button',
@@ -266,8 +266,8 @@ describe('LoginInfo', () => {
       getByLabelText('loginInfo.doSignOut').props.accessibilityState,
     ).toEqual({busy: false, disabled: false});
 
-    act(() => {
-      fireEvent.press(getByLabelText('loginInfo.doSignOut'));
+    await act(async () => {
+      await fireEvent.press(getByLabelText('loginInfo.doSignOut'));
     });
 
     expect(
@@ -290,9 +290,9 @@ describe('LoginInfo', () => {
     const error = new Error('sign out failed');
     mockSignOut.mockRejectedValue(error);
 
-    const {getByText} = render(<LoginInfo />);
+    const {getByText} = await render(<LoginInfo />);
 
-    fireEvent.press(getByText('loginInfo.withdraw'));
+    await fireEvent.press(getByText('loginInfo.withdraw'));
 
     const withdrawAction = getWithdrawAction();
 
@@ -313,9 +313,9 @@ describe('LoginInfo', () => {
     const error = new Error('delete failed');
     mockDeleteUser.mockRejectedValue(error);
 
-    const {getByText} = render(<LoginInfo />);
+    const {getByText} = await render(<LoginInfo />);
 
-    fireEvent.press(getByText('loginInfo.withdraw'));
+    await fireEvent.press(getByText('loginInfo.withdraw'));
 
     const withdrawAction = getWithdrawAction();
 

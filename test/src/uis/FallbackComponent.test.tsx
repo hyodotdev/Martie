@@ -23,8 +23,8 @@ describe('FallbackComponent', () => {
     jest.restoreAllMocks();
   });
 
-  it('announces the recovery title and actions', () => {
-    const {getByLabelText, getByText} = render(<FallbackComponent />);
+  it('announces the recovery title and actions', async () => {
+    const {getByLabelText, getByText} = await render(<FallbackComponent />);
 
     expect(getByText('error.title').props.accessibilityRole).toBe('header');
     expect(getByLabelText('error.updateButton').props.accessibilityRole).toBe(
@@ -35,24 +35,24 @@ describe('FallbackComponent', () => {
     );
   });
 
-  it('opens the selected store URL and falls back to the landing page', () => {
+  it('opens the selected store URL and falls back to the landing page', async () => {
     jest
       .spyOn(Platform, 'select')
       .mockImplementationOnce((options) => {
         return (options as {default: string}).default;
       });
 
-    const {getByLabelText} = render(<FallbackComponent />);
+    const {getByLabelText} = await render(<FallbackComponent />);
 
-    fireEvent.press(getByLabelText('error.updateButton'));
+    await fireEvent.press(getByLabelText('error.updateButton'));
 
     expect(Linking.openURL).toHaveBeenCalledWith('https://hyo.dev/martie');
   });
 
   it('reloads the app when trying again', async () => {
-    const {getByLabelText} = render(<FallbackComponent />);
+    const {getByLabelText} = await render(<FallbackComponent />);
 
-    fireEvent.press(getByLabelText('error.tryAgain'));
+    await fireEvent.press(getByLabelText('error.tryAgain'));
 
     await waitFor(() => {
       expect(restartApp).toHaveBeenCalledTimes(1);

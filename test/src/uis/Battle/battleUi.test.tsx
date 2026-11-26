@@ -187,7 +187,7 @@ describe('answer rules on the client', () => {
 describe('BattlePlay', () => {
   it('sends the chosen option for the current question', async () => {
     const onAnswer = jest.fn();
-    render(
+    await render(
       createTestElement(
         <BattlePlay
           room={room()}
@@ -199,13 +199,13 @@ describe('BattlePlay', () => {
       ),
     );
     expect(await screen.findByText('Which planet is red?')).toBeTruthy();
-    fireEvent.press(screen.getByLabelText('Mars'));
+    await fireEvent.press(screen.getByLabelText('Mars'));
     expect(onAnswer).toHaveBeenCalledWith(0, 'mars');
   });
 
   it('locks the options after I missed and the other player answers', async () => {
     const onAnswer = jest.fn();
-    render(
+    await render(
       createTestElement(
         <BattlePlay
           room={room({
@@ -219,7 +219,7 @@ describe('BattlePlay', () => {
         />,
       ),
     );
-    fireEvent.press(await screen.findByLabelText('Mars'));
+    await fireEvent.press(await screen.findByLabelText('Mars'));
     expect(onAnswer).not.toHaveBeenCalled();
   });
 });
@@ -227,7 +227,7 @@ describe('BattlePlay', () => {
 describe('BattleResult', () => {
   it('offers to join the rematch the other player opened', async () => {
     const onJoinRematch = jest.fn();
-    render(
+    await render(
       createTestElement(
         <BattleResult
           room={room({
@@ -246,14 +246,14 @@ describe('BattleResult', () => {
         />,
       ),
     );
-    fireEvent.press(await screen.findByText('Join the rematch'));
+    await fireEvent.press(await screen.findByText('Join the rematch'));
     expect(onJoinRematch).toHaveBeenCalledWith('wxyz2345');
   });
 });
 
 describe('battle records', () => {
   it('shows my lifetime record with win rate and streaks', async () => {
-    render(
+    await render(
       createTestElement(
         <BattleRecordCard
           stats={{wins: 7, losses: 2, draws: 1, streak: 3, bestStreak: 4}}
@@ -278,12 +278,12 @@ describe('battle records', () => {
           onHome={jest.fn()}
         />,
       );
-    const {unmount} = render(finished({wins: 3, losses: 1, draws: 0}));
+    const {unmount} = await render(finished({wins: 3, losses: 1, draws: 0}));
     expect(await screen.findByText('⚔️ Record vs Gil')).toBeTruthy();
     expect(screen.getByText('3W 1L 0D')).toBeTruthy();
-    unmount();
+    await unmount();
 
-    render(finished({wins: 0, losses: 0, draws: 0}));
+    await render(finished({wins: 0, losses: 0, draws: 0}));
     expect(await screen.findByText('Your first match!')).toBeTruthy();
   });
 });
@@ -314,27 +314,27 @@ describe('BattleLobby', () => {
     );
 
   it('keeps seats compact and opens the profile on a tap', async () => {
-    render(lobby());
+    await render(lobby());
     const seat = await screen.findByLabelText('Gil, Offline');
     expect(screen.queryByText('5W 3L 2D')).toBeNull();
 
-    fireEvent.press(seat);
+    await fireEvent.press(seat);
     expect(await screen.findByText('Win rate 50%')).toBeTruthy();
     // The lobby's own head-to-head card plus the one in the profile.
     expect(screen.getAllByText('⚔️ Record vs Gil')).toHaveLength(2);
     // A tapped profile stays open until the backdrop is tapped.
-    fireEvent(seat, 'pressOut');
+    await fireEvent(seat, 'pressOut');
     expect(screen.getByText('Win rate 50%')).toBeTruthy();
-    fireEvent.press(screen.getByLabelText('Close profile'));
+    await fireEvent.press(screen.getByLabelText('Close profile'));
     expect(screen.queryByText('Win rate 50%')).toBeNull();
   });
 
   it('shows a held profile only while the finger stays down', async () => {
-    render(lobby());
+    await render(lobby());
     const seat = await screen.findByLabelText('Gil, Offline');
-    fireEvent(seat, 'longPress');
+    await fireEvent(seat, 'longPress');
     expect(await screen.findByText('Win rate 50%')).toBeTruthy();
-    fireEvent(seat, 'pressOut');
+    await fireEvent(seat, 'pressOut');
     expect(screen.queryByText('Win rate 50%')).toBeNull();
   });
 });
@@ -353,11 +353,11 @@ describe('BattleLobby invite', () => {
           onKick={jest.fn()}
         />,
       );
-    const {unmount} = render(lobby(null));
+    const {unmount} = await render(lobby(null));
     expect(await screen.findByText('Invite a friend')).toBeTruthy();
-    unmount();
+    await unmount();
 
-    render(lobby(room().guest));
+    await render(lobby(room().guest));
     expect(await screen.findByLabelText('Gil, Offline')).toBeTruthy();
     expect(screen.queryByText('Invite a friend')).toBeNull();
   });
@@ -384,21 +384,21 @@ describe('launch countdown', () => {
   it('counts down over the lobby and lets me back out', async () => {
     jest.spyOn(Date, 'now').mockReturnValue(1_000);
     const onReady = jest.fn();
-    render(lobby(5_000, onReady));
+    await render(lobby(5_000, onReady));
     expect(await screen.findByText('Battle starts in')).toBeTruthy();
     expect(screen.getByText('4')).toBeTruthy();
     // The pot shows in the arena and again on the countdown.
     expect(screen.getAllByText('💡2 on the line')).toHaveLength(2);
 
-    fireEvent.press(screen.getByText('Wait! Not yet'));
+    await fireEvent.press(screen.getByText('Wait! Not yet'));
     expect(onReady).toHaveBeenCalledWith(false);
   });
 
   it('starts from the full count when both become ready', async () => {
     jest.spyOn(Date, 'now').mockReturnValue(1_000);
-    const {rerender} = render(lobby(null));
+    const {rerender} = await render(lobby(null));
     (notificationAsync as jest.Mock).mockClear();
-    rerender(lobby(6_000));
+    await rerender(lobby(6_000));
     expect(await screen.findByText('5')).toBeTruthy();
     expect(screen.queryByText('GO!')).toBeNull();
     // The finish buzz must not fire before the clock even starts.
@@ -406,13 +406,13 @@ describe('launch countdown', () => {
   });
 
   it('stays hidden until both are ready', async () => {
-    render(lobby(null));
+    await render(lobby(null));
     expect(await screen.findByText('1:1 BATTLE')).toBeTruthy();
     expect(screen.queryByText('Battle starts in')).toBeNull();
   });
 
   it('opens the match with a GO splash', async () => {
-    render(
+    await render(
       createTestElement(
         <BattlePlay
           room={room({phase: 'countdown', round: null})}
@@ -443,33 +443,33 @@ describe('kicking the guest', () => {
 
   it('lets the host kick from the guest profile card', async () => {
     const onKick = jest.fn();
-    render(lobby('host', onKick));
-    fireEvent.press(await screen.findByLabelText('Gil, Offline'));
-    fireEvent.press(await screen.findByText('Kick out'));
+    await render(lobby('host', onKick));
+    await fireEvent.press(await screen.findByLabelText('Gil, Offline'));
+    await fireEvent.press(await screen.findByText('Kick out'));
     expect(onKick).toHaveBeenCalledTimes(1);
   });
 
   it('shows no kick on a held peek, my own card, or for the guest', async () => {
-    const {unmount} = render(lobby('host'));
+    const {unmount} = await render(lobby('host'));
     const guestSeat = await screen.findByLabelText('Gil, Offline');
-    fireEvent(guestSeat, 'longPress');
+    await fireEvent(guestSeat, 'longPress');
     expect(await screen.findByText('🏆 Record')).toBeTruthy();
     expect(screen.queryByText('Kick out')).toBeNull();
-    fireEvent(guestSeat, 'pressOut');
-    fireEvent.press(screen.getByLabelText('Hana, Me, Host, Offline'));
+    await fireEvent(guestSeat, 'pressOut');
+    await fireEvent.press(screen.getByLabelText('Hana, Me, Host, Offline'));
     expect(await screen.findByText('🏆 My record')).toBeTruthy();
     expect(screen.queryByText('Kick out')).toBeNull();
-    unmount();
+    await unmount();
 
-    render(lobby('guest'));
-    fireEvent.press(await screen.findByLabelText('Hana, Host, Offline'));
+    await render(lobby('guest'));
+    await fireEvent.press(await screen.findByLabelText('Hana, Host, Offline'));
     expect(await screen.findByText('🏆 Record')).toBeTruthy();
     expect(screen.queryByText('Kick out')).toBeNull();
   });
 
   it('spins instead of taking presses while busy', async () => {
     const onPress = jest.fn();
-    const {rerender} = render(
+    const {rerender} = await render(
       createTestElement(
         <StickerButton text="Ready" onPress={onPress} color="#FF5B50" loading />,
       ),
@@ -477,15 +477,15 @@ describe('kicking the guest', () => {
     const button = await screen.findByRole('button');
     expect(button.props.accessibilityState).toMatchObject({busy: true, disabled: true});
     expect(screen.queryByText('Ready')).toBeNull();
-    fireEvent.press(button);
+    await fireEvent.press(button);
     expect(onPress).not.toHaveBeenCalled();
 
-    rerender(
+    await rerender(
       createTestElement(
         <StickerButton text="Ready" onPress={onPress} color="#FF5B50" />,
       ),
     );
-    fireEvent.press(screen.getByText('Ready'));
+    await fireEvent.press(screen.getByText('Ready'));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 

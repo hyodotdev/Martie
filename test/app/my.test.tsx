@@ -197,8 +197,8 @@ describe('My ad privacy choices', () => {
     });
   });
 
-  it('hides the row when UMP does not require a privacy options entry point', () => {
-    const {getByLabelText, queryByLabelText} = render(<My />);
+  it('hides the row when UMP does not require a privacy options entry point', async () => {
+    const {getByLabelText, queryByLabelText} = await render(<My />);
 
     expect(getByLabelText('Dark Mode')).toBeTruthy();
     expect(queryByLabelText('Ad privacy choices')).toBeNull();
@@ -213,9 +213,9 @@ describe('My ad privacy choices', () => {
         AdsConsentPrivacyOptionsRequirementStatus.REQUIRED,
       status: AdsConsentStatus.OBTAINED,
     });
-    const {getByLabelText} = render(<My />);
+    const {getByLabelText} = await render(<My />);
 
-    fireEvent.press(getByLabelText('Ad privacy choices'));
+    await fireEvent.press(getByLabelText('Ad privacy choices'));
 
     await waitFor(() =>
       expect(useAdConsentStore.getState().isMobileAdsReady).toBe(false),

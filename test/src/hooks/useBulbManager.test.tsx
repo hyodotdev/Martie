@@ -44,8 +44,8 @@ beforeEach(() => {
   mockLocalBulbs = undefined;
 });
 
-it('does not initialize a guest balance before authentication resolves', () => {
-  const {result} = renderHook(() => useBulbManager());
+it('does not initialize a guest balance before authentication resolves', async () => {
+  const {result} = await renderHook(() => useBulbManager());
   expect(result.current.isLoading).toBe(true);
   expect(mockSetLocal).not.toHaveBeenCalled();
   expect(mockInitializeServer).not.toHaveBeenCalled();
@@ -55,33 +55,33 @@ it('does not initialize a guest balance before authentication resolves', () => {
 it('waits for the purchased server balance before syncing guest bulbs', async () => {
   mockUser = {_id: 'user-a'};
   mockLocalBulbs = 2;
-  const {result, rerender} = renderHook(() => useBulbManager());
+  const {result, rerender} = await renderHook(() => useBulbManager());
   expect(result.current.isLoading).toBe(true);
   expect(mockSyncServer).not.toHaveBeenCalled();
   mockServerBulbs = 35;
-  await act(async () => rerender({}));
+  await act(async () => await rerender({}));
   expect(result.current.bulbCount).toBe(35);
   expect(mockSyncServer).toHaveBeenCalledWith({localBulbCount: 2});
   expect(mockUpdateServer).not.toHaveBeenCalled();
 });
 
-it('initializes only an unset guest balance and preserves a spent zero balance', () => {
+it('initializes only an unset guest balance and preserves a spent zero balance', async () => {
   mockUser = null;
   mockServerBulbs = null;
-  const {rerender} = renderHook(() => useBulbManager());
+  const {rerender} = await renderHook(() => useBulbManager());
   expect(mockSetLocal).toHaveBeenCalledWith(2);
   mockSetLocal.mockClear();
   mockLocalBulbs = 0;
-  rerender({});
+  await rerender({});
   expect(mockSetLocal).not.toHaveBeenCalled();
   expect(mockUpdateServer).not.toHaveBeenCalled();
 });
 
-it('delegates signed-in initialization to the server without resetting the balance', () => {
+it('delegates signed-in initialization to the server without resetting the balance', async () => {
   mockUser = {_id: 'user-a'};
   mockServerBulbs = 35;
   mockLocalBulbs = 0;
-  const {result} = renderHook(() => useBulbManager());
+  const {result} = await renderHook(() => useBulbManager());
   expect(result.current.bulbCount).toBe(35);
   expect(mockInitializeServer).toHaveBeenCalledTimes(1);
   expect(mockUpdateServer).not.toHaveBeenCalled();

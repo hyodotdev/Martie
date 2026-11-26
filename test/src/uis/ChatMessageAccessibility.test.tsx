@@ -56,8 +56,8 @@ jest.mock('../../../src/STRINGS', () => ({
   }),
 }));
 
-const renderWithTheme = (ui: React.ReactElement) =>
-  render(<ThemeProvider theme={theme as any}>{ui}</ThemeProvider>);
+const renderWithTheme = async (ui: React.ReactElement) =>
+  await render(<ThemeProvider theme={theme as any}>{ui}</ThemeProvider>);
 
 const chatMessage = (override: Partial<ChatMessage>): ChatMessage =>
   ({
@@ -69,8 +69,8 @@ const chatMessage = (override: Partial<ChatMessage>): ChatMessage =>
   }) as ChatMessage;
 
 describe('Chat message accessibility', () => {
-  it('announces human and Martie chat bubbles with speaker context', () => {
-    const {getByLabelText} = renderWithTheme(
+  it('announces human and Martie chat bubbles with speaker context', async () => {
+    const {getByLabelText} = await renderWithTheme(
       <ChatMessageListItem
         item={chatMessage({
           message: 'What is photosynthesis?',
@@ -88,8 +88,8 @@ describe('Chat message accessibility', () => {
     expect(martieMessage.props.accessibilityRole).toBe('text');
   });
 
-  it('announces the temporary Martie reply as busy progress', () => {
-    const {getByLabelText} = renderWithTheme(
+  it('announces the temporary Martie reply as busy progress', async () => {
+    const {getByLabelText} = await renderWithTheme(
       <ChatMessageListItem
         item={chatMessage({
           message: 'Explain this quiz',
@@ -104,8 +104,8 @@ describe('Chat message accessibility', () => {
     expect(thinkingBubble.props.accessibilityState).toEqual({busy: true});
   });
 
-  it('keeps parsed URLs interactive by using separate speaker prefixes', () => {
-    const {getAllByLabelText, queryByLabelText} = renderWithTheme(
+  it('keeps parsed URLs interactive by using separate speaker prefixes', async () => {
+    const {getAllByLabelText, queryByLabelText} = await renderWithTheme(
       <ChatMessageListItem
         item={chatMessage({
           message: 'Read https://example.com',
@@ -125,8 +125,8 @@ describe('Chat message accessibility', () => {
     ).toBeNull();
   });
 
-  it('announces the empty chat placeholder as pending progress', () => {
-    const {getByLabelText} = renderWithTheme(<ChatMessageListEmpty />);
+  it('announces the empty chat placeholder as pending progress', async () => {
+    const {getByLabelText} = await renderWithTheme(<ChatMessageListEmpty />);
 
     const emptyPlaceholder = getByLabelText('Martie is thinking');
 

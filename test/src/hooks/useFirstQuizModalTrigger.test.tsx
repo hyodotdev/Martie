@@ -94,63 +94,63 @@ describe('useFirstQuizModalTrigger', () => {
     jest.useRealTimers();
   });
 
-  it('waits for Convex auth to finish before showing the first daily modal', () => {
+  it('waits for Convex auth to finish before showing the first daily modal', async () => {
     mockIsAuthLoading = true;
 
-    const {rerender} = renderHook(() => useFirstQuizModalTrigger());
+    const {rerender} = await renderHook(() => useFirstQuizModalTrigger());
 
     expect(mockUseQuery).toHaveBeenLastCalledWith(
       'dailyChallenge.queries.getToday',
       'skip',
     );
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(700);
     });
     expect(mockSetVisible).not.toHaveBeenCalled();
     expect(mockSetTriggerPending).toHaveBeenLastCalledWith(true);
 
     mockIsAuthLoading = false;
-    rerender(undefined);
+    await rerender(undefined);
 
     expect(mockUseQuery).toHaveBeenLastCalledWith(
       'dailyChallenge.queries.getToday',
       {language: 'en'},
     );
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(599);
     });
     expect(mockSetVisible).not.toHaveBeenCalled();
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(1);
     });
     expect(mockSetVisible).toHaveBeenCalledWith(true);
     expect(mockSetTriggerPending).toHaveBeenLastCalledWith(false);
   });
 
-  it('skips the first daily modal while a deep-linked quiz route is active', () => {
+  it('skips the first daily modal while a deep-linked quiz route is active', async () => {
     mockPathname = '/daily-quiz';
 
-    renderHook(() => useFirstQuizModalTrigger());
+    await renderHook(() => useFirstQuizModalTrigger());
 
     expect(mockUseQuery).toHaveBeenLastCalledWith(
       'dailyChallenge.queries.getToday',
       'skip',
     );
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(700);
     });
 
     expect(mockSetVisible).not.toHaveBeenCalled();
   });
 
-  it('releases the banner gate when the daily challenge needs no modal', () => {
+  it('releases the banner gate when the daily challenge needs no modal', async () => {
     mockDailyChallenge = {isCompleted: true};
 
-    renderHook(() => useFirstQuizModalTrigger());
+    await renderHook(() => useFirstQuizModalTrigger());
 
     expect(mockSetVisible).not.toHaveBeenCalled();
     expect(mockSetTriggerPending).toHaveBeenLastCalledWith(false);

@@ -32,7 +32,7 @@ jest.mock('../../../src/features/adReward/LevelPlayReward', () => {
       return React.createElement(
         'View',
         {testID: 'levelplay-reward'},
-        'LevelPlay Reward',
+        React.createElement('Text', null, 'LevelPlay Reward'),
       );
     },
   };
@@ -46,7 +46,7 @@ jest.mock('../../../src/uis/CustomLoadingIndicator', () => {
       return React.createElement(
         'View',
         {testID: 'loading-indicator'},
-        'Loading...',
+        React.createElement('Text', null, 'Loading...'),
       );
     },
   };
@@ -63,27 +63,27 @@ describe('AdRewarded', () => {
     jest.clearAllMocks();
   });
 
-  it('renders loading state when user data is undefined', () => {
+  it('renders loading state when user data is undefined', async () => {
     mockUserEmail = undefined;
-    const {getByTestId} = render(<AdRewarded />);
+    const {getByTestId} = await render(<AdRewarded />);
     expect(getByTestId('loading-indicator')).toBeTruthy();
   });
 
-  it('renders LevelPlay for regular logged-in users', () => {
+  it('renders LevelPlay for regular logged-in users', async () => {
     mockUserEmail = 'test@example.com';
-    const {getByTestId} = render(<AdRewarded />);
+    const {getByTestId} = await render(<AdRewarded />);
     expect(getByTestId('levelplay-reward')).toBeTruthy();
   });
 
-  it('renders LevelPlay for reviewer emails', () => {
+  it('renders LevelPlay for reviewer emails', async () => {
     mockUserEmail = 'reviewer@example.com';
-    const {getByTestId} = render(<AdRewarded />);
+    const {getByTestId} = await render(<AdRewarded />);
     expect(getByTestId('levelplay-reward')).toBeTruthy();
   });
 
-  it('renders LevelPlay for non-logged users', () => {
+  it('renders LevelPlay for non-logged users', async () => {
     mockUserEmail = null;
-    const {getByTestId} = render(<AdRewarded />);
+    const {getByTestId} = await render(<AdRewarded />);
     expect(getByTestId('levelplay-reward')).toBeTruthy();
   });
 });

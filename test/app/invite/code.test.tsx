@@ -79,7 +79,7 @@ jest.mock('../../../src/uis/CustomLoadingIndicator', () => {
       return React.createElement(
         'View',
         {testID: 'loading-indicator'},
-        'Loading...',
+        React.createElement('Text', null, 'Loading...'),
       );
     },
   };
@@ -95,20 +95,20 @@ describe('InviteCode (딥링크)', () => {
     useLocalSearchParams.mockReturnValue({code: 'abc12345'});
   });
 
-  it('로딩 인디케이터를 표시한다', () => {
-    const {getByTestId} = render(<InviteCode />);
+  it('로딩 인디케이터를 표시한다', async () => {
+    const {getByTestId} = await render(<InviteCode />);
     expect(getByTestId('loading-indicator')).toBeTruthy();
   });
 
-  it('코드가 없으면 홈으로 리다이렉트한다', () => {
+  it('코드가 없으면 홈으로 리다이렉트한다', async () => {
     useLocalSearchParams.mockReturnValue({code: undefined});
-    render(<InviteCode />);
+    await render(<InviteCode />);
     expect(mockReplace).toHaveBeenCalledWith('/(tabs)');
   });
 
-  it('비로그인 유저는 코드를 저장하고 로그인 화면으로 이동한다', () => {
+  it('비로그인 유저는 코드를 저장하고 로그인 화면으로 이동한다', async () => {
     mockIsAuthenticated = false;
-    render(<InviteCode />);
+    await render(<InviteCode />);
 
     expect(mockStorageSet).toHaveBeenCalledWith(
       'PendingReferralCode',
@@ -120,7 +120,7 @@ describe('InviteCode (딥링크)', () => {
   it('인증 상태 확인 중에는 리퍼럴 처리와 리다이렉트를 기다린다', async () => {
     mockIsAuthenticated = false;
     mockIsAuthLoading = true;
-    const {rerender} = render(<InviteCode />);
+    const {rerender} = await render(<InviteCode />);
 
     expect(mockSetAcquisitionSourceOnce).toHaveBeenCalledWith('referral');
     expect(mockApplyReferral).not.toHaveBeenCalled();
@@ -132,7 +132,7 @@ describe('InviteCode (딥링크)', () => {
 
     mockIsAuthenticated = true;
     mockIsAuthLoading = false;
-    rerender(<InviteCode />);
+    await rerender(<InviteCode />);
 
     await waitFor(() => {
       expect(mockApplyReferral).toHaveBeenCalledWith({
@@ -149,7 +149,7 @@ describe('InviteCode (딥링크)', () => {
   it('로그인 유저는 리퍼럴을 즉시 적용한다', async () => {
     mockIsAuthenticated = true;
     mockApplyReferralResult = {success: true};
-    render(<InviteCode />);
+    await render(<InviteCode />);
 
     await waitFor(() => {
       expect(mockApplyReferral).toHaveBeenCalledWith({
@@ -163,7 +163,7 @@ describe('InviteCode (딥링크)', () => {
   it('이미 리퍼럴을 사용한 경우 토스트를 표시한다', async () => {
     mockIsAuthenticated = true;
     mockApplyReferralResult = {success: false, error: 'already_referred'};
-    render(<InviteCode />);
+    await render(<InviteCode />);
 
     await waitFor(() => {
       expect(mockToastBase).toHaveBeenCalled();
@@ -174,7 +174,7 @@ describe('InviteCode (딥링크)', () => {
   it('자기 자신의 코드는 토스트를 표시한다', async () => {
     mockIsAuthenticated = true;
     mockApplyReferralResult = {success: false, error: 'self_referral'};
-    render(<InviteCode />);
+    await render(<InviteCode />);
 
     await waitFor(() => {
       expect(mockToastBase).toHaveBeenCalled();
@@ -185,7 +185,7 @@ describe('InviteCode (딥링크)', () => {
   it('유효하지 않은 코드는 에러 토스트를 표시한다', async () => {
     mockIsAuthenticated = true;
     mockApplyReferralResult = {success: false, error: 'invalid_code'};
-    render(<InviteCode />);
+    await render(<InviteCode />);
 
     await waitFor(() => {
       expect(mockToastError).toHaveBeenCalled();
@@ -196,7 +196,7 @@ describe('InviteCode (딥링크)', () => {
   it('API 에러 시 에러 토스트를 표시한다', async () => {
     mockIsAuthenticated = true;
     mockApplyReferral.mockRejectedValueOnce(new Error('network error'));
-    render(<InviteCode />);
+    await render(<InviteCode />);
 
     await waitFor(() => {
       expect(mockToastError).toHaveBeenCalled();

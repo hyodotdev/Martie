@@ -46,12 +46,12 @@ describe('BattleEntryCard', () => {
       bestStreak: 4,
     });
     const onPress = jest.fn();
-    render(card(onPress));
+    await render(card(onPress));
     expect(await screen.findByText('7W 2L 1D')).toBeTruthy();
     expect(screen.getByText('Win rate 70%')).toBeTruthy();
     expect(screen.getByText('🔥 3 wins in a row')).toBeTruthy();
 
-    fireEvent.press(screen.getByText('Challenge a friend'));
+    await fireEvent.press(screen.getByText('Challenge a friend'));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
@@ -63,7 +63,7 @@ describe('BattleEntryCard', () => {
       streak: 0,
       bestStreak: 0,
     });
-    render(card());
+    await render(card());
     expect(
       await screen.findByText(
         'Invite a friend and answer first. 10 questions, the winner takes the bulbs.',

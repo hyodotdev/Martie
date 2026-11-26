@@ -93,7 +93,7 @@ jest.mock('expo-audio', () => ({
 }));
 
 jest.mock('react-native-mmkv', () => ({
-  MMKV: jest.fn(() => ({
+  createMMKV: jest.fn(() => ({
     getBoolean: jest.fn(),
     getString: jest.fn(),
     set: jest.fn(),
@@ -206,9 +206,9 @@ describe('QuizPage fallback routing', () => {
   });
 
   it('returns to the tabs home route when no practice quizzes are available', async () => {
-    render(<QuizPage />);
+    await render(<QuizPage />);
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(1000);
     });
 
@@ -238,9 +238,9 @@ describe('QuizPage fallback routing', () => {
       ],
     };
 
-    render(<QuizPage />);
+    await render(<QuizPage />);
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(1000);
     });
 

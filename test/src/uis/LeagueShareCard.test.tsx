@@ -96,8 +96,8 @@ jest.mock('../../../src/uis/ShareCard/SocialShareRow', () => {
   };
 });
 
-const renderWithTheme = (props: any) =>
-  render(
+const renderWithTheme = async (props: any) =>
+  await render(
     <ThemeProvider theme={light as any}>
       <LeagueShareCard {...props} />
     </ThemeProvider>,
@@ -116,34 +116,34 @@ describe('LeagueShareCard', () => {
     jest.clearAllMocks();
   });
 
-  it('카드가 정상 렌더링된다', () => {
-    const {toJSON} = renderWithTheme(defaultProps);
+  it('카드가 정상 렌더링된다', async () => {
+    const {toJSON} = await renderWithTheme(defaultProps);
     expect(toJSON()).toBeTruthy();
   });
 
-  it('티어 이모지를 올바르게 표시한다', () => {
-    const {getByText} = renderWithTheme(defaultProps);
+  it('티어 이모지를 올바르게 표시한다', async () => {
+    const {getByText} = await renderWithTheme(defaultProps);
     expect(getByText('💎', {includeHiddenElements: true})).toBeTruthy();
   });
 
-  it('순위를 올바르게 표시한다', () => {
-    const {getByText} = renderWithTheme(defaultProps);
+  it('순위를 올바르게 표시한다', async () => {
+    const {getByText} = await renderWithTheme(defaultProps);
     expect(getByText('#3', {includeHiddenElements: true})).toBeTruthy();
     expect(getByText('/ 30', {includeHiddenElements: true})).toBeTruthy();
   });
 
-  it('주간 XP를 올바르게 표시한다', () => {
-    const {getByText} = renderWithTheme(defaultProps);
+  it('주간 XP를 올바르게 표시한다', async () => {
+    const {getByText} = await renderWithTheme(defaultProps);
     expect(getByText('250 XP', {includeHiddenElements: true})).toBeTruthy();
   });
 
-  it('유저 이름을 올바르게 표시한다', () => {
-    const {getByText} = renderWithTheme(defaultProps);
+  it('유저 이름을 올바르게 표시한다', async () => {
+    const {getByText} = await renderWithTheme(defaultProps);
     expect(getByText('@TestUser', {includeHiddenElements: true})).toBeTruthy();
   });
 
-  it('리그 공유 카드를 하나의 접근성 요약으로 읽는다', () => {
-    const {getByLabelText} = renderWithTheme(defaultProps);
+  it('리그 공유 카드를 하나의 접근성 요약으로 읽는다', async () => {
+    const {getByLabelText} = await renderWithTheme(defaultProps);
 
     const summary = getByLabelText(
       'Diamond League, Rank 3 of 30, +250 XP, @TestUser',
@@ -153,8 +153,8 @@ describe('LeagueShareCard', () => {
     expect(summary.props.accessibilityRole).toBe('image');
   });
 
-  it('공유 버튼에 리그 카드 맥락을 함께 제공한다', () => {
-    const {getByLabelText} = renderWithTheme(defaultProps);
+  it('공유 버튼에 리그 카드 맥락을 함께 제공한다', async () => {
+    const {getByLabelText} = await renderWithTheme(defaultProps);
 
     const textShareButton = getByLabelText('Share Text, Diamond League');
     const imageShareButton = getByLabelText('Share Image, Diamond League');
@@ -168,8 +168,8 @@ describe('LeagueShareCard', () => {
       .spyOn(Share, 'share')
       .mockResolvedValue({action: 'sharedAction'} as any);
 
-    const {getByLabelText} = renderWithTheme(defaultProps);
-    fireEvent.press(getByLabelText('Share Text, Diamond League'));
+    const {getByLabelText} = await renderWithTheme(defaultProps);
+    await fireEvent.press(getByLabelText('Share Text, Diamond League'));
 
     await waitFor(() => {
       expect(shareSpy).toHaveBeenCalledTimes(1);
@@ -185,8 +185,8 @@ describe('LeagueShareCard', () => {
   });
 
   it('Share Image 버튼을 누르면 이미지를 캡처해서 공유한다', async () => {
-    const {getByLabelText} = renderWithTheme(defaultProps);
-    fireEvent.press(getByLabelText('Share Image, Diamond League'));
+    const {getByLabelText} = await renderWithTheme(defaultProps);
+    await fireEvent.press(getByLabelText('Share Image, Diamond League'));
 
     await waitFor(() => {
       expect(captureRef).toHaveBeenCalledWith(
@@ -199,18 +199,18 @@ describe('LeagueShareCard', () => {
     });
   });
 
-  it('bronze 티어도 올바르게 렌더링된다', () => {
-    const {getByText} = renderWithTheme({...defaultProps, tier: 'bronze'});
+  it('bronze 티어도 올바르게 렌더링된다', async () => {
+    const {getByText} = await renderWithTheme({...defaultProps, tier: 'bronze'});
     expect(getByText('🥉', {includeHiddenElements: true})).toBeTruthy();
   });
 
-  it('master 티어도 올바르게 렌더링된다', () => {
-    const {getByText} = renderWithTheme({...defaultProps, tier: 'master'});
+  it('master 티어도 올바르게 렌더링된다', async () => {
+    const {getByText} = await renderWithTheme({...defaultProps, tier: 'master'});
     expect(getByText('👑', {includeHiddenElements: true})).toBeTruthy();
   });
 
-  it('알 수 없는 티어면 기본 이모지를 사용한다', () => {
-    const {getByText} = renderWithTheme({...defaultProps, tier: 'unknown'});
+  it('알 수 없는 티어면 기본 이모지를 사용한다', async () => {
+    const {getByText} = await renderWithTheme({...defaultProps, tier: 'unknown'});
     expect(getByText('🏆', {includeHiddenElements: true})).toBeTruthy();
   });
 
@@ -219,11 +219,11 @@ describe('LeagueShareCard', () => {
       .spyOn(Share, 'share')
       .mockResolvedValue({action: 'sharedAction'} as any);
 
-    const {getByLabelText} = renderWithTheme({
+    const {getByLabelText} = await renderWithTheme({
       ...defaultProps,
       appUrl: 'https://custom.url',
     });
-    fireEvent.press(getByLabelText('Share Text, Diamond League'));
+    await fireEvent.press(getByLabelText('Share Text, Diamond League'));
 
     await waitFor(() => {
       const shareMessage = shareSpy.mock.calls[0][0].message as string;

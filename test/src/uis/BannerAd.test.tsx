@@ -1,8 +1,8 @@
 import {act, fireEvent, render, waitFor} from '@testing-library/react-native';
+import type {TestInstance} from 'test-renderer';
 import {AppState, Platform, type AppStateStatus} from 'react-native';
 import {ThemeProvider, type DefaultTheme} from 'kstyled';
 import {LevelPlayAdSize} from 'unity-levelplay-mediation';
-import type {ReactTestInstance} from 'react-test-renderer';
 import {light} from '../../../src/theme';
 import BannerAd from '../../../src/uis/BannerAd';
 import {bannerMethods} from '../../../__mocks__/unity-levelplay-mediation';
@@ -13,19 +13,19 @@ jest.mock('react-native-safe-area-context', () => ({
 jest.mock('../../../src/utils/analytics', () => ({logEvent: jest.fn()}));
 jest.mock('../../../src/utils/error', () => ({logError: jest.fn()}));
 
-const layout = (view: ReactTestInstance) =>
+const layout = (view: TestInstance) =>
   fireEvent(view, 'layout', {
     nativeEvent: {layout: {x: 0, y: 0, width: 320, height: 50}},
   });
 
 const setup = async () => {
-  const result = render(
+  const result = await render(
     <ThemeProvider theme={{...light, colors: {}} as DefaultTheme}>
       <BannerAd />
     </ThemeProvider>,
   );
   await waitFor(() => expect(result.getByTestId('banner-ad')).toBeTruthy());
-  layout(result.getByTestId('banner-ad'));
+  await layout(result.getByTestId('banner-ad'));
   return result;
 };
 
@@ -50,7 +50,7 @@ describe('LevelPlay banner', () => {
     const {getByTestId} = await setup();
     expect(bannerMethods.loadAd).toHaveBeenCalledTimes(1);
     expect(getByTestId('banner-container').props.pointerEvents).toBe('none');
-    act(() =>
+    await act(() =>
       getByTestId('banner-ad').props.listener.onAdLoaded({
         adNetwork: 'ironSource',
         adSize: {height: 50},
@@ -65,15 +65,15 @@ describe('LevelPlay banner', () => {
   });
 
   it('waits for the native layout before the first request', async () => {
-    const result = render(
+    const result = await render(
       <ThemeProvider theme={{...light, colors: {}} as DefaultTheme}>
         <BannerAd />
       </ThemeProvider>,
     );
     await waitFor(() => expect(result.getByTestId('banner-ad')).toBeTruthy());
     expect(bannerMethods.loadAd).not.toHaveBeenCalled();
-    layout(result.getByTestId('banner-ad'));
-    layout(result.getByTestId('banner-ad'));
+    await layout(result.getByTestId('banner-ad'));
+    await layout(result.getByTestId('banner-ad'));
     expect(bannerMethods.loadAd).toHaveBeenCalledTimes(1);
   });
 
@@ -81,7 +81,7 @@ describe('LevelPlay banner', () => {
     jest.useFakeTimers();
     await setup();
     expect(bannerMethods.loadAd).toHaveBeenCalledTimes(1);
-    act(() => jest.advanceTimersByTime(60000));
+    await act(() => jest.advanceTimersByTime(60000));
     expect(bannerMethods.loadAd).toHaveBeenCalledTimes(2);
   });
 
@@ -90,13 +90,13 @@ describe('LevelPlay banner', () => {
     jest.useFakeTimers();
     bannerMethods.loadAd.mockClear();
     for (const delay of [3000, 6000, 12000, 24000, 30000]) {
-      act(() =>
+      await act(() =>
         getByTestId('banner-ad').props.listener.onAdLoadFailed({
           errorCode: 509,
           errorMessage: 'no fill',
         }),
       );
-      act(() => jest.advanceTimersByTime(delay));
+      await act(() => jest.advanceTimersByTime(delay));
     }
     expect(bannerMethods.loadAd).toHaveBeenCalledTimes(5);
   });
@@ -104,12 +104,12 @@ describe('LevelPlay banner', () => {
   it('destroys the native banner and cancels pending retry on navigation', async () => {
     const {getByTestId, unmount} = await setup();
     jest.useFakeTimers();
-    act(() =>
+    await act(() =>
       getByTestId('banner-ad').props.listener.onAdLoadFailed({errorCode: 509}),
     );
     bannerMethods.loadAd.mockClear();
-    unmount();
-    act(() => jest.advanceTimersByTime(30000));
+    await unmount();
+    await act(() => jest.advanceTimersByTime(30000));
     expect(bannerMethods.loadAd).not.toHaveBeenCalled();
     expect(bannerMethods.destroy).toHaveBeenCalledTimes(1);
   });
@@ -124,20 +124,20 @@ describe('LevelPlay banner', () => {
       });
     const {getByTestId} = await setup();
     jest.useFakeTimers();
-    act(() =>
+    await act(() =>
       getByTestId('banner-ad').props.listener.onAdLoadFailed({errorCode: 509}),
     );
     bannerMethods.loadAd.mockClear();
-    act(() => changeState('background'));
-    act(() => jest.advanceTimersByTime(30000));
+    await act(() => changeState('background'));
+    await act(() => jest.advanceTimersByTime(30000));
     expect(bannerMethods.loadAd).not.toHaveBeenCalled();
     // A late SDK failure in the background must not start another request.
-    act(() =>
+    await act(() =>
       getByTestId('banner-ad').props.listener.onAdLoadFailed({errorCode: 509}),
     );
-    act(() => jest.advanceTimersByTime(30000));
+    await act(() => jest.advanceTimersByTime(30000));
     expect(bannerMethods.loadAd).not.toHaveBeenCalled();
-    act(() => changeState('active'));
+    await act(() => changeState('active'));
     expect(bannerMethods.pauseAutoRefresh).toHaveBeenCalledTimes(1);
     expect(bannerMethods.resumeAutoRefresh).toHaveBeenCalledTimes(1);
     expect(bannerMethods.loadAd).toHaveBeenCalledTimes(1);
