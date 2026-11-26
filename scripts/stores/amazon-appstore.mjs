@@ -250,7 +250,13 @@ switch (command) {
     const {edit} = await openEdit({create: false});
     const source = edit ?? (await call('GET', '/edits/previous')).body;
     if (!source?.id) {
-      fail('No open or previous edit to read');
+      // Edits made in the Developer Console may not show up here; `upload`
+      // then creates a new edit from the live version.
+      console.log(
+        `No open edit and no previous API edit (${JSON.stringify(source)}); ` +
+          'upload will create a new edit',
+      );
+      break;
     }
     console.log(`${edit ? 'Open' : 'Previous'} edit ${source.id}`);
     await describe(source.id);
