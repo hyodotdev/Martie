@@ -93,7 +93,7 @@ jest.mock('expo-audio', () => ({
 }));
 
 jest.mock('react-native-mmkv', () => ({
-  createMMKV: jest.fn(() => ({
+  MMKV: jest.fn(() => ({
     getBoolean: jest.fn(),
     getString: jest.fn(),
     set: jest.fn(),

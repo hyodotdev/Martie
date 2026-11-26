@@ -74,6 +74,7 @@ export default function TabLayout(): JSX.Element {
   return (
     <>
       <Tabs
+        backBehavior="initialRoute"
         safeAreaInsets={{bottom: 0}}
         screenOptions={{
           tabBarActiveTintColor: theme.role.primary,

@@ -214,7 +214,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('react-native-mmkv', () => ({
-  createMMKV: jest.fn(() => ({
+  MMKV: jest.fn(() => ({
     getString: jest.fn(),
   })),
   useMMKVNumber: () => [mockVolume, mockSetVolume],

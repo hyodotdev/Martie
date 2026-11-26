@@ -21,7 +21,7 @@ const useQuizStore = create<QuizState>()(
         if (cursor) {
           storage.set(Storage.LastQuizCursor, cursor)
         } else {
-          storage.remove(Storage.LastQuizCursor)
+          storage.delete(Storage.LastQuizCursor)
         }
       }),
   })),

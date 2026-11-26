@@ -205,7 +205,7 @@ jest.mock('../../src/utils/storage', () => ({
     PendingReferralCode: 'PendingReferralCode',
   },
   storage: {
-    remove: jest.fn(),
+    delete: jest.fn(),
     getBoolean: jest.fn(),
     getString: jest.fn(),
     set: jest.fn(),

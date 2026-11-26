@@ -112,7 +112,7 @@ export default function SignInCode(): JSX.Element {
                     results: guestDaily.results,
                   });
                 }
-                storage.remove(Storage.GuestDailyResult);
+                storage.delete(Storage.GuestDailyResult);
               } catch (err) {
                 logError(err, 'sync-guest-daily');
               }
@@ -132,7 +132,7 @@ export default function SignInCode(): JSX.Element {
               } catch (err) {
                 logError(err, 'apply-referral');
               }
-              storage.remove(Storage.PendingReferralCode);
+              storage.delete(Storage.PendingReferralCode);
             }
 
             // Close any open modals and go to the My tab at root
@@ -145,7 +145,7 @@ export default function SignInCode(): JSX.Element {
               storage.getString(Storage.PendingBattleCode),
               Date.now(),
             );
-            storage.remove(Storage.PendingBattleCode);
+            storage.delete(Storage.PendingBattleCode);
             if (pendingBattleCode) {
               replace({
                 pathname: '/battle/[code]',
