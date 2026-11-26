@@ -71,6 +71,30 @@ describe('useLegacySessionUpgrade', () => {
     expect(mockDeleteItem).not.toHaveBeenCalled();
   });
 
+  it('reads the web session from localStorage', async () => {
+    Object.defineProperty(Platform, 'OS', {configurable: true, value: 'web'});
+    const localStorageMock = {
+      getItem: jest.fn((key: string) =>
+        key.startsWith('__convexAuthRefreshToken_') ? 'token|session' : null,
+      ),
+      removeItem: jest.fn(),
+    };
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: localStorageMock,
+    });
+    mockUpgrade.mockResolvedValue({status: 'complete', tokens: TOKENS});
+
+    await renderHook(() => useLegacySessionUpgrade());
+
+    await waitFor(() =>
+      expect(localStorageMock.removeItem).toHaveBeenCalledTimes(4),
+    );
+    expect(mockUpgrade).toHaveBeenCalledWith({refreshToken: 'token|session'});
+    expect(mockSetSession).toHaveBeenCalledWith(TOKENS);
+    expect(mockGetItem).not.toHaveBeenCalled();
+  });
+
   it('does nothing without a stored session or while auth loads', async () => {
     mockGetItem.mockResolvedValue(null);
     await renderHook(() => useLegacySessionUpgrade());
