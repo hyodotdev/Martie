@@ -57,6 +57,17 @@ describe('usePlayInAppUpdate', () => {
     await waitFor(() => expect(mockStartUpdate).toHaveBeenCalledWith(false));
   });
 
+  it('resumes an interrupted update even when it is not forced', async () => {
+    mockCheckForUpdate.mockResolvedValue({
+      updateAvailable: true,
+      updateInProgress: true,
+    });
+
+    await renderHook(() => usePlayInAppUpdate(false));
+
+    await waitFor(() => expect(mockStartUpdate).toHaveBeenCalledWith(true));
+  });
+
   it('waits for the force-update version before checking', async () => {
     const {rerender} = await renderHook(
       ({force}: {force: boolean | undefined}) => usePlayInAppUpdate(force),

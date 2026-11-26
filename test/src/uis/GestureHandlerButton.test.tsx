@@ -50,7 +50,12 @@ jest.mock('react-native-gesture-handler', () => {
     RectButton: ({children, onPress, ...props}: any) =>
       React.createElement(
         View,
-        {...props, onPress: () => onPress?.(true)},
+        {
+          ...props,
+          // Tests pass `{pointerInside: false}` to lift the finger outside.
+          onPress: (event?: {pointerInside?: boolean}) =>
+            onPress?.(event?.pointerInside !== false),
+        },
         children,
       ),
   };
@@ -79,6 +84,21 @@ describe('GestureHandlerButton', () => {
     await fireEvent.press(button);
 
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores a press released outside the button', async () => {
+    const onPress = jest.fn();
+    const {getByLabelText} = await render(
+      <GestureHandlerButton
+        accessibilityLabel="Update Now"
+        onPress={onPress}
+        text={<Text>Update Now</Text>}
+      />,
+    );
+
+    await fireEvent.press(getByLabelText('Update Now'), {pointerInside: false});
+
+    expect(onPress).not.toHaveBeenCalled();
   });
 
   it('preserves external active state handlers', async () => {

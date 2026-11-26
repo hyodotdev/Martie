@@ -24,13 +24,7 @@ import {cloneElemWithDefaultColors} from 'cpk-ui/utils/guards';
 // Button 타입 정의
 export type ButtonType = 'text' | 'solid' | 'outlined';
 export type ButtonColorType =
-  | 'primary'
-  | 'secondary'
-  | 'success'
-  | 'danger'
-  | 'warning'
-  | 'info'
-  | 'light';
+  'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light';
 export type ButtonSizeType = 'small' | 'medium' | 'large';
 
 // Props 타입 정의 (RectButtonProps 기반)
@@ -134,30 +128,36 @@ const calculateStyles = ({
       css`
         border-radius: ${borderRadius + 'px'};
         padding: ${padding};
-        background-color: ${isDisabled
-          ? theme.button.disabled.bg
-          : ['text', 'outlined'].includes(type)
-            ? theme.bg.basic
-            : theme.button[color].bg};
-        border-color: ${isDisabled
-          ? theme.bg.disabled
-          : type === 'text'
-            ? 'transparent'
-            : theme.button[color].bg};
+        background-color: ${
+          isDisabled
+            ? theme.button.disabled.bg
+            : ['text', 'outlined'].includes(type)
+              ? theme.bg.basic
+              : theme.button[color].bg
+        };
+        border-color: ${
+          isDisabled
+            ? theme.bg.disabled
+            : type === 'text'
+              ? 'transparent'
+              : theme.button[color].bg
+        };
         border-width: ${type !== 'text' ? '1px' : 0};
-        opacity: ${pressed && !isDisabled
-          ? '0.8'
-          : '1'}; // 눌림 상태에서 opacity 적용
+        opacity: ${
+          pressed && !isDisabled ? '0.8' : '1'
+        }; // 눌림 상태에서 opacity 적용
       `,
       styles?.container,
     ],
     text: [
       css`
-        color: ${isDisabled
-          ? theme.button.disabled.text
-          : type === 'solid' || color === 'light'
-            ? theme.button[color].text
-            : theme.button[color].bg};
+        color: ${
+          isDisabled
+            ? theme.button.disabled.text
+            : type === 'solid' || color === 'light'
+              ? theme.button[color].text
+              : theme.button[color].bg
+        };
       `,
       styles?.text,
     ],
@@ -364,7 +364,8 @@ export function GestureHandlerButton({
     <RectButton
       {...rectButtonProps}
       enabled={!innerDisabled && !loading} // 비활성화 또는 로딩 시 터치 비활성화
-      onPress={onPress} // RectButtonProps에 맞춘 타입
+      // Gesture Handler 3 also ends the press when the finger lifts outside.
+      onPress={(pointerInside) => pointerInside && onPress?.(pointerInside)}
       onActiveStateChange={(active) => {
         setPressed(active); // 눌림 상태 업데이트
         rectButtonProps.onActiveStateChange?.(active);
