@@ -157,6 +157,7 @@ export default ({config}: ConfigContext): ExpoConfig => ({
     ],
     './plugins/withAmazonFireCompatibility',
     './plugins/withIosPodDeploymentTarget',
+    './plugins/withRNFirebaseDisableSPM',
     'expo-asset',
     [
       'expo-iap',
