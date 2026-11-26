@@ -5,6 +5,9 @@ name: Release
 # (codemagic.yaml):
 #   store -> tag v<package.json version> + GitHub Release
 #            -> ios-production and android-production (TestFlight, Play draft)
+#            -> android-production then starts amazon-production,
+#               horizon-production and vega-production (Amazon edit, Horizon
+#               draft, Vega VPKG)
 #   ota   -> annotated tag ota-<version>-<n> -> ota-production (Codemagic Patch)
 # Publishing a GitHub Release for a new v<version> tag by hand starts the same
 # store builds.
