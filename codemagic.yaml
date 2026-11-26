@@ -440,7 +440,7 @@ workflows:
           # The build needs the app id; only the upload needs the secret.
           test -n "${HORIZON_APP_ID:-}" || { echo "HORIZON_APP_ID is missing from martie_production"; exit 1; }
           mkdir -p "$HOME/bin"
-          # macOS build of ovr-platform-util; it updates itself on first run.
+          # Meta's macOS download of ovr-platform-util (universal binary).
           curl -fsSL -o "$HOME/bin/ovr-platform-util" \
             'https://www.oculus.com/download_app/?id=1462426033810370'
           chmod +x "$HOME/bin/ovr-platform-util"
