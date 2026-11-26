@@ -414,6 +414,10 @@ function App(): JSX.Element | null {
             name="sign-in-code"
             options={{presentation: 'modal', headerShown: false}}
           />
+          <Stack.Screen
+            name="sign-in-link"
+            options={{presentation: 'modal', headerShown: false}}
+          />
           {/* The practice quiz replaces itself with this screen. Hiding the
               header here, not only from inside the screen, keeps iOS from
               pushing it with the default header and its raw route title. */}
