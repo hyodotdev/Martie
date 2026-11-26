@@ -1,7 +1,7 @@
 import {fireEvent, render, waitFor} from '@testing-library/react-native';
 import React from 'react';
 import type {ReactNode} from 'react';
-import {Image, Linking} from 'react-native';
+import {Linking} from 'react-native';
 
 import Chat from '../../app/chat';
 import {logError} from '../../src/utils/error';
@@ -192,18 +192,18 @@ describe('Chat fallback accessibility', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSearchParams.question = undefined;
-    jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('announces unsupported AI fallback with an external search link', () => {
+  it('announces unsupported AI fallback with an external search link', async () => {
     mockSearchParams.question = 'What%20is%20ATP%3F';
     setModelStatus({isNotSupported: true});
 
-    const {UNSAFE_getAllByType, getByLabelText, getByText} = render(<Chat />);
+    const {container, getByLabelText, getByText} = await render(<Chat />);
 
     expect(getByText('AI is not supported').props.accessibilityRole).toBe(
       'header',
@@ -212,14 +212,14 @@ describe('Chat fallback accessibility', () => {
     const searchLink = getByLabelText('Search on Google');
     expect(searchLink.props.accessibilityRole).toBe('link');
 
-    const [icon] = UNSAFE_getAllByType(Image);
+    const [icon] = container.queryAll((node) => node.type === 'Image');
     expect(icon.props).toMatchObject({
       accessibilityElementsHidden: true,
       accessible: false,
       importantForAccessibility: 'no',
     });
 
-    fireEvent.press(searchLink);
+    await fireEvent.press(searchLink);
 
     expect(Linking.openURL).toHaveBeenCalledWith(
       'https://www.google.com/search?q=What%20is%20ATP%3F',
@@ -232,9 +232,9 @@ describe('Chat fallback accessibility', () => {
     jest.spyOn(Linking, 'openURL').mockRejectedValue(error);
     setModelStatus({isError: true});
 
-    const {getByLabelText} = render(<Chat />);
+    const {getByLabelText} = await render(<Chat />);
 
-    fireEvent.press(getByLabelText('Search on Google'));
+    await fireEvent.press(getByLabelText('Search on Google'));
 
     await waitFor(() => {
       expect(logError).toHaveBeenCalledWith(
@@ -244,20 +244,20 @@ describe('Chat fallback accessibility', () => {
     });
   });
 
-  it('announces AI capability checks as busy progress', () => {
+  it('announces AI capability checks as busy progress', async () => {
     setModelStatus({isChecking: true});
 
-    const {getByLabelText} = render(<Chat />);
+    const {getByLabelText} = await render(<Chat />);
     const progress = getByLabelText('Checking AI');
 
     expect(progress.props.accessibilityRole).toBe('progressbar');
     expect(progress.props.accessibilityState).toEqual({busy: true});
   });
 
-  it('announces model download progress with a numeric value', () => {
+  it('announces model download progress with a numeric value', async () => {
     setModelStatus({downloadProgress: 0.42, isDownloading: true});
 
-    const {getByLabelText, getByText} = render(<Chat />);
+    const {getByLabelText, getByText} = await render(<Chat />);
 
     expect(getByText('Downloading model').props.accessibilityRole).toBe(
       'header',
@@ -274,11 +274,11 @@ describe('Chat fallback accessibility', () => {
     expect(getByText('42%')).toBeTruthy();
   });
 
-  it('announces setup CTA and runs the model download action', () => {
+  it('announces setup CTA and runs the model download action', async () => {
     const downloadModel = jest.fn();
     setModelStatus({downloadModel, needsSetup: true});
 
-    const {getByLabelText, getByText} = render(<Chat />);
+    const {getByLabelText, getByText} = await render(<Chat />);
 
     expect(getByText('Set up Martie AI').props.accessibilityRole).toBe(
       'header',
@@ -287,7 +287,7 @@ describe('Chat fallback accessibility', () => {
     const downloadButton = getByLabelText('Download model');
     expect(downloadButton.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(downloadButton);
+    await fireEvent.press(downloadButton);
 
     expect(downloadModel).toHaveBeenCalledTimes(1);
   });

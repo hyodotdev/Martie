@@ -1,4 +1,5 @@
 import {act, fireEvent, render, waitFor} from '@testing-library/react-native';
+import {findPressHandler} from '../../pressWithoutWaiting';
 import type {ReactNode} from 'react';
 import React from 'react';
 
@@ -150,10 +151,10 @@ describe('QuizView', () => {
     jest.clearAllMocks();
   });
 
-  it('submits an answer once while the result view is pending', () => {
+  it('submits an answer once while the result view is pending', async () => {
     const onPressAnswer = jest.fn();
 
-    const {getByLabelText} = render(
+    const {getByLabelText} = await render(
       <QuizView
         quiz={baseQuiz}
         onPressAnswer={onPressAnswer}
@@ -164,14 +165,14 @@ describe('QuizView', () => {
     );
 
     const answerButton = getByLabelText('Correct answer');
-    fireEvent.press(answerButton);
-    fireEvent.press(answerButton);
+    await fireEvent.press(answerButton);
+    await fireEvent.press(answerButton);
 
     expect(onPressAnswer).toHaveBeenCalledTimes(1);
     expect(onPressAnswer).toHaveBeenCalledWith(baseQuiz.options[0]);
   });
 
-  it('sends Martie into a panic once time runs low', () => {
+  it('sends Martie into a panic once time runs low', async () => {
     const props = {
       quiz: baseQuiz,
       onPressAnswer: jest.fn(),
@@ -179,10 +180,10 @@ describe('QuizView', () => {
       selectedOption: null,
       timeSpentMs: 1000,
     };
-    const {getByText, rerender} = render(<QuizView {...props} />);
+    const {getByText, rerender} = await render(<QuizView {...props} />);
     expect(getByText('martie:question')).toBeTruthy();
 
-    rerender(<QuizView {...props} isTimeRunningOut />);
+    await rerender(<QuizView {...props} isTimeRunningOut />);
     expect(getByText('martie:hurry')).toBeTruthy();
   });
 
@@ -192,7 +193,7 @@ describe('QuizView', () => {
       .mockRejectedValueOnce(new Error('network failed'))
       .mockImplementationOnce(() => undefined);
 
-    const {getByLabelText} = render(
+    const {getByLabelText} = await render(
       <QuizView
         quiz={baseQuiz}
         onPressAnswer={onPressAnswer}
@@ -203,7 +204,7 @@ describe('QuizView', () => {
     );
 
     const answerButton = getByLabelText('Correct answer');
-    fireEvent.press(answerButton);
+    await fireEvent.press(answerButton);
 
     await waitFor(() => {
       expect(logError).toHaveBeenCalledWith(
@@ -212,7 +213,7 @@ describe('QuizView', () => {
       );
     });
 
-    fireEvent.press(answerButton);
+    await fireEvent.press(answerButton);
 
     expect(onPressAnswer).toHaveBeenCalledTimes(2);
   });
@@ -221,7 +222,7 @@ describe('QuizView', () => {
     const deferred = createDeferred<void>();
     const onContinue = jest.fn(() => deferred.promise);
 
-    const {getByLabelText} = render(
+    const {getByLabelText} = await render(
       <QuizView
         quiz={baseQuiz}
         onPressAnswer={jest.fn()}
@@ -232,8 +233,11 @@ describe('QuizView', () => {
     );
 
     const continueButton = getByLabelText('Continue');
-    fireEvent.press(continueButton);
-    fireEvent.press(continueButton);
+    // Both presses land in the same task, before the guard's microtask.
+    await act(() => {
+      findPressHandler(continueButton)?.();
+      findPressHandler(continueButton)?.();
+    });
 
     expect(onContinue).toHaveBeenCalledTimes(1);
 
@@ -261,7 +265,7 @@ describe('QuizView', () => {
   it('keeps synchronous continue guarded until the next microtask', async () => {
     const onContinue = jest.fn();
 
-    const {getByLabelText} = render(
+    const {getByLabelText} = await render(
       <QuizView
         quiz={baseQuiz}
         onPressAnswer={jest.fn()}
@@ -272,8 +276,11 @@ describe('QuizView', () => {
     );
 
     const continueButton = getByLabelText('Continue');
-    fireEvent.press(continueButton);
-    fireEvent.press(continueButton);
+    // Both presses land in the same task, before the guard's microtask.
+    await act(() => {
+      findPressHandler(continueButton)?.();
+      findPressHandler(continueButton)?.();
+    });
 
     expect(onContinue).toHaveBeenCalledTimes(1);
 
@@ -288,7 +295,7 @@ describe('QuizView', () => {
       });
     });
 
-    fireEvent.press(getByLabelText('Continue'));
+    await fireEvent.press(getByLabelText('Continue'));
 
     expect(onContinue).toHaveBeenCalledTimes(2);
 
@@ -305,7 +312,7 @@ describe('QuizView', () => {
       .mockReturnValueOnce(failedAttempt.promise)
       .mockReturnValueOnce(retryAttempt.promise);
 
-    const {getByLabelText} = render(
+    const {getByLabelText} = await render(
       <QuizView
         quiz={baseQuiz}
         onPressAnswer={jest.fn()}
@@ -315,7 +322,7 @@ describe('QuizView', () => {
       />,
     );
 
-    fireEvent.press(getByLabelText('Continue'));
+    await fireEvent.press(getByLabelText('Continue'));
 
     await act(async () => {
       failedAttempt.reject(new Error('navigation failed'));
@@ -330,7 +337,7 @@ describe('QuizView', () => {
       );
     });
 
-    fireEvent.press(getByLabelText('Continue'));
+    await fireEvent.press(getByLabelText('Continue'));
 
     expect(onContinue).toHaveBeenCalledTimes(2);
   });

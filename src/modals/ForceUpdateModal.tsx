@@ -17,6 +17,7 @@ import {openMartieStore} from '../utils/storeLinks';
 import {useQuery} from 'convex/react';
 import {api} from '../../convex/_generated/api';
 import {appVersion} from '../../config';
+import {usePlayInAppUpdate} from '../hooks/usePlayInAppUpdate';
 
 const MODAL_HEIGHT = 420;
 const BACKDROP_OPACITY = 0.5;
@@ -54,6 +55,12 @@ export default function ForceUpdateModal({
     forceUpdateVersion &&
     appVersion &&
     compareVersions(appVersion, forceUpdateVersion.version) < 0;
+
+  // On Google Play the store's own update screen comes first; this modal
+  // stays as the fallback if the user backs out of a forced update.
+  usePlayInAppUpdate(
+    forceUpdateVersion === undefined ? undefined : Boolean(needsUpdate),
+  );
 
   const showModal = useCallback(() => {
     translateY.value = withTiming(0, {

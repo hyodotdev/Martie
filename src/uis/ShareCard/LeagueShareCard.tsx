@@ -1,5 +1,5 @@
 import React, {useRef, useCallback} from 'react';
-import {View} from 'react-native';
+import {View, type ViewInstance} from 'react-native';
 import {Typography, useCPK} from 'cpk-ui';
 import {styled, css} from 'kstyled';
 import {captureRef} from 'react-native-view-shot';
@@ -31,7 +31,7 @@ export default function LeagueShareCard({
   appUrl = MARTIE_SHARE_URL,
 }: Props): JSX.Element {
   const {theme} = useCPK();
-  const cardRef = useRef<View>(null);
+  const cardRef = useRef<ViewInstance>(null);
 
   const tierEmoji = TIER_EMOJIS[tier] || '🏆';
   const tierColor = TIER_COLORS[tier] || '#888';

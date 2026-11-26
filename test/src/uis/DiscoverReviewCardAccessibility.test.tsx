@@ -62,18 +62,18 @@ jest.mock('../../../src/uis/ButtonMartie', () => ({
   },
 }));
 
-const renderWithTheme = (children: JSX.Element) =>
-  render(<ThemeProvider theme={theme as any}>{children}</ThemeProvider>);
+const renderWithTheme = async (children: JSX.Element) =>
+  await render(<ThemeProvider theme={theme as any}>{children}</ThemeProvider>);
 
 describe('Discover ReviewCard accessibility', () => {
   beforeEach(() => {
     mockButtonMartie.mockClear();
   });
 
-  it('announces the pending review card as one button with count context', () => {
+  it('announces the pending review card as one button with count context', async () => {
     const onPress = jest.fn();
 
-    const {getByLabelText} = renderWithTheme(
+    const {getByLabelText} = await renderWithTheme(
       <ReviewCard pendingCount={3} onPress={onPress} />,
     );
 
@@ -83,7 +83,7 @@ describe('Discover ReviewCard accessibility', () => {
 
     expect(card.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(card);
+    await fireEvent.press(card);
 
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(mockButtonMartie).toHaveBeenCalledWith(
@@ -98,8 +98,8 @@ describe('Discover ReviewCard accessibility', () => {
     );
   });
 
-  it('announces the empty review state as static text', () => {
-    const {getByLabelText} = renderWithTheme(
+  it('announces the empty review state as static text', async () => {
+    const {getByLabelText} = await renderWithTheme(
       <ReviewCard pendingCount={0} onPress={jest.fn()} />,
     );
 

@@ -43,9 +43,9 @@ afterEach(() => {
 
 describe('useBattleRoom', () => {
   it('takes the seat once and syncs the clock from the reply', async () => {
-    const {result, rerender} = renderHook(() => useBattleRoom('abcd2345'));
+    const {result, rerender} = await renderHook(() => useBattleRoom('abcd2345'));
     await waitFor(() => expect(result.current.hasJoined).toBe(true));
-    rerender({});
+    await rerender({});
     expect(mockJoin).toHaveBeenCalledTimes(1);
     expect(mockJoin).toHaveBeenCalledWith({code: 'abcd2345'});
     // Server said 6000 when the device clock read ~1000 (plus waitFor ticks).
@@ -54,7 +54,7 @@ describe('useBattleRoom', () => {
   });
 
   it('beats at once, then on the interval while the room is live', async () => {
-    const {result} = renderHook(() => useBattleRoom('abcd2345'));
+    const {result} = await renderHook(() => useBattleRoom('abcd2345'));
     await waitFor(() => expect(result.current.hasJoined).toBe(true));
     expect(mockHeartbeat).toHaveBeenCalledTimes(1);
     await act(async () => {
@@ -69,25 +69,25 @@ describe('useBattleRoom', () => {
       onChange = handler;
       return {remove: jest.fn()};
     });
-    const {result} = renderHook(() => useBattleRoom('abcd2345'));
+    const {result} = await renderHook(() => useBattleRoom('abcd2345'));
     await waitFor(() => expect(result.current.hasJoined).toBe(true));
     const before = mockHeartbeat.mock.calls.length;
-    act(() => onChange?.('background'));
+    await act(() => onChange?.('background'));
     expect(mockHeartbeat).toHaveBeenCalledTimes(before);
-    act(() => onChange?.('active'));
+    await act(() => onChange?.('active'));
     expect(mockHeartbeat).toHaveBeenCalledTimes(before + 1);
   });
 
-  it('does not join while signed out', () => {
+  it('does not join while signed out', async () => {
     mockAuth = {isAuthenticated: false, isLoading: false};
-    renderHook(() => useBattleRoom('abcd2345'));
+    await renderHook(() => useBattleRoom('abcd2345'));
     expect(mockJoin).not.toHaveBeenCalled();
   });
 
   it('reports why the seat was refused', async () => {
     mockRoom = {status: 'waiting', myRole: null};
     mockJoin.mockResolvedValue({ok: false, reason: 'full'});
-    const {result} = renderHook(() => useBattleRoom('abcd2345'));
+    const {result} = await renderHook(() => useBattleRoom('abcd2345'));
     await waitFor(() => expect(result.current.joinError).toBe('full'));
     await act(async () => {
       jest.advanceTimersByTime(BATTLE_HEARTBEAT_MS);
@@ -96,7 +96,7 @@ describe('useBattleRoom', () => {
   });
 
   it('leave calls the server', async () => {
-    const {result} = renderHook(() => useBattleRoom('abcd2345'));
+    const {result} = await renderHook(() => useBattleRoom('abcd2345'));
     await act(async () => {
       await result.current.leave();
     });

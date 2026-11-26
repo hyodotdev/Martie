@@ -370,65 +370,65 @@ describe('home and header accessibility', () => {
     mockBulbLoading = false;
   });
 
-  it('does not overwrite purchased bulbs while the server balance loads', () => {
+  it('does not overwrite purchased bulbs while the server balance loads', async () => {
     mockBulbCount = 0;
     mockBulbLoading = true;
-    const header = render(<CustomHeader />);
+    const header = await render(<CustomHeader />);
     expect(mockUpdateBulbCount).not.toHaveBeenCalled();
     mockBulbCount = 35;
     mockBulbLoading = false;
-    header.rerender(<CustomHeader />);
+    await header.rerender(<CustomHeader />);
     expect(header.getByLabelText('Charge the bulb, 35 Bulbs')).toBeTruthy();
     expect(mockUpdateBulbCount).not.toHaveBeenCalled();
   });
 
-  it('does not refill an existing zero balance from the header', () => {
+  it('does not refill an existing zero balance from the header', async () => {
     mockBulbCount = 0;
-    render(<CustomHeader />);
+    await render(<CustomHeader />);
     expect(mockUpdateBulbCount).not.toHaveBeenCalled();
   });
 
-  it('announces the Clever Index level card as a button on mobile and tablet', () => {
-    const mobile = render(<TabIndexMobile />);
+  it('announces the Clever Index level card as a button on mobile and tablet', async () => {
+    const mobile = await render(<TabIndexMobile />);
     const mobileCard = mobile.getByLabelText('Clever Index, Lv.0');
 
     expect(mobileCard.props.accessibilityRole).toBe('button');
     expect(mobileCard.props.accessibilityState).toEqual({disabled: false});
 
-    fireEvent.press(mobileCard);
+    await fireEvent.press(mobileCard);
     expect(mockNavigate).toHaveBeenCalledWith('/quiz-level');
 
-    mobile.unmount();
+    await mobile.unmount();
     mockNavigate.mockClear();
 
-    const tablet = render(<TabIndexTablet />);
+    const tablet = await render(<TabIndexTablet />);
     const tabletCard = tablet.getByLabelText('Clever Index, Lv.0');
 
     expect(tabletCard.props.accessibilityRole).toBe('button');
     expect(tabletCard.props.accessibilityState).toEqual({disabled: false});
 
-    fireEvent.press(tabletCard);
+    await fireEvent.press(tabletCard);
     expect(mockNavigate).toHaveBeenCalledWith('/quiz-level');
   });
 
-  it('announces My header badge and display-name edit controls', () => {
-    const {getByLabelText} = render(<MyCustomHeader />);
+  it('announces My header badge and display-name edit controls', async () => {
+    const {getByLabelText} = await render(<MyCustomHeader />);
 
     const badge = getByLabelText('Certified Badge');
     expect(badge.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(badge);
+    await fireEvent.press(badge);
     expect(mockToast).toHaveBeenCalledWith('Thanks for certifying');
 
     const edit = getByLabelText('Change Display Name');
     expect(edit.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(edit);
+    await fireEvent.press(edit);
     expect(mockSetDisplayNameModalVisible).toHaveBeenCalledWith(true);
   });
 
-  it('announces the home bulb recharge button with current count', () => {
-    const {getByLabelText, getByTestId} = render(<CustomHeader />);
+  it('announces the home bulb recharge button with current count', async () => {
+    const {getByLabelText, getByTestId} = await render(<CustomHeader />);
     const bulbButton = getByLabelText('Charge the bulb, 3 Bulbs');
     const wordmark = getByTestId('header-wordmark', {
       includeHiddenElements: true,
@@ -450,7 +450,7 @@ describe('home and header accessibility', () => {
       'no-hide-descendants',
     );
 
-    fireEvent.press(bulbButton);
+    await fireEvent.press(bulbButton);
     expect(mockAlertDialogOpen).toHaveBeenCalledWith(
       expect.objectContaining({
         body: 'The bulb recharges every midnight. You can also get it by watching an ad.',
@@ -459,8 +459,8 @@ describe('home and header accessibility', () => {
     );
   });
 
-  it('announces the Hall of Fame section with rank and feather context', () => {
-    const {getByLabelText} = render(<SectionHeader />);
+  it('announces the Hall of Fame section with rank and feather context', async () => {
+    const {getByLabelText} = await render(<SectionHeader />);
     const hallOfFame = getByLabelText(
       'Hall of Fame, Who knows the most common sense?, Hyo, 3th, 12 Feathers',
     );
@@ -468,17 +468,17 @@ describe('home and header accessibility', () => {
     expect(hallOfFame.props.accessible).toBe(true);
     expect(hallOfFame.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(hallOfFame);
+    await fireEvent.press(hallOfFame);
     expect(mockPush).toHaveBeenCalledWith('/hall-of-fame');
   });
 
-  it('announces article and discover tab titles as headers', () => {
-    const articleHeader = render(<ArticleHeader />);
+  it('announces article and discover tab titles as headers', async () => {
+    const articleHeader = await render(<ArticleHeader />);
     const articleTitle = articleHeader.getByText('Knowledge Blog');
 
     expect(articleTitle.props.accessibilityRole).toBe('header');
 
-    const discoverHeader = render(<DiscoverHeader />);
+    const discoverHeader = await render(<DiscoverHeader />);
     const discoverTitle = discoverHeader.getByText('Discover');
 
     expect(discoverTitle.props.accessibilityRole).toBe('header');

@@ -113,20 +113,22 @@ describe('TabLayout router compatibility', () => {
     mockUpdateUserAnalyticsProperties.mockClear();
   });
 
-  it('uses Expo Router JS tabs for the native tab layout', () => {
+  it('uses Expo Router JS tabs for the native tab layout', async () => {
     const TabLayout = jest.requireActual<{
       default: React.ComponentType;
     }>('../../app/(tabs)/_layout').default;
-    const {getByLabelText} = render(<TabLayout />);
+    const {getByLabelText} = await render(<TabLayout />);
 
     expect(getByLabelText('tab navigator')).toBeTruthy();
     expect(mockTabs).toHaveBeenCalledWith(
-      expect.objectContaining({
-        initialRouteName: 'index',
-        safeAreaInsets: {bottom: 0},
-      }),
+      expect.objectContaining({safeAreaInsets: {bottom: 0}}),
       undefined,
     );
+    expect(
+      jest.requireActual<{unstable_settings: {anchor: string}}>(
+        '../../app/(tabs)/_layout',
+      ).unstable_settings,
+    ).toEqual({anchor: 'index'});
     expect(mockTabsScreen.mock.calls.map(([props]) => props.name)).toEqual([
       'index',
       'articles',

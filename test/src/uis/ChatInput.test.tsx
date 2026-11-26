@@ -50,10 +50,10 @@ jest.mock('../../../src/STRINGS', () => ({
   t: jest.fn((key: string) => key),
 }));
 
-const renderChatInput = (
+const renderChatInput = async (
   props: Partial<React.ComponentProps<typeof ChatInput>> = {},
 ) =>
-  render(
+  await render(
     <ThemeProvider theme={theme as any}>
       <ChatInput
         createChatMessage={jest.fn()}
@@ -65,23 +65,23 @@ const renderChatInput = (
   );
 
 describe('ChatInput', () => {
-  it('announces the send icon button and submits the message', () => {
+  it('announces the send icon button and submits the message', async () => {
     const createChatMessage = jest.fn();
-    const {getByLabelText} = renderChatInput({createChatMessage});
+    const {getByLabelText} = await renderChatInput({createChatMessage});
 
     const sendButton = getByLabelText('common.send');
 
     expect(sendButton.props.accessibilityRole).toBe('button');
     expect(sendButton.props.accessibilityState).toEqual({disabled: false});
 
-    fireEvent.press(sendButton);
+    await fireEvent.press(sendButton);
 
     expect(createChatMessage).toHaveBeenCalledTimes(1);
   });
 
-  it('announces the disabled send state without submitting', () => {
+  it('announces the disabled send state without submitting', async () => {
     const createChatMessage = jest.fn();
-    const {getByLabelText} = renderChatInput({
+    const {getByLabelText} = await renderChatInput({
       createChatMessage,
       disabled: true,
     });
@@ -90,13 +90,13 @@ describe('ChatInput', () => {
 
     expect(sendButton.props.accessibilityState).toEqual({disabled: true});
 
-    fireEvent.press(sendButton);
+    await fireEvent.press(sendButton);
 
     expect(createChatMessage).not.toHaveBeenCalled();
   });
 
-  it('announces response generation as a busy progress indicator', () => {
-    const {getByLabelText, queryByLabelText} = renderChatInput({
+  it('announces response generation as a busy progress indicator', async () => {
+    const {getByLabelText, queryByLabelText} = await renderChatInput({
       loading: true,
     });
 

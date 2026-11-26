@@ -213,10 +213,10 @@ describe('SignIn', () => {
   });
 
   it('validates email before checking deleted accounts', async () => {
-    const {getByTestId} = render(<SignIn />);
+    const {getByTestId} = await render(<SignIn />);
 
-    fireEvent.changeText(getByTestId('email-input'), 'bad-email');
-    fireEvent.press(getByTestId('submit-button'));
+    await fireEvent.changeText(getByTestId('email-input'), 'bad-email');
+    await fireEvent.press(getByTestId('submit-button'));
 
     await waitFor(() => {
       expect(getByTestId('email-error').props.children).toBe(
@@ -228,10 +228,10 @@ describe('SignIn', () => {
   });
 
   it('normalizes email before otp request and route params', async () => {
-    const {getByTestId} = render(<SignIn />);
+    const {getByTestId} = await render(<SignIn />);
 
-    fireEvent.changeText(getByTestId('email-input'), ' USER@Example.COM ');
-    fireEvent.press(getByTestId('submit-button'));
+    await fireEvent.changeText(getByTestId('email-input'), ' USER@Example.COM ');
+    await fireEvent.press(getByTestId('submit-button'));
 
     await waitFor(() => {
       expect(mockCheckIsDeletedUser).toHaveBeenCalledWith({
@@ -247,8 +247,8 @@ describe('SignIn', () => {
     });
   });
 
-  it('labels close and policy links for assistive tech', () => {
-    const {getByLabelText, getByTestId} = render(<SignIn />);
+  it('labels close and policy links for assistive tech', async () => {
+    const {getByLabelText, getByTestId} = await render(<SignIn />);
 
     expect(getByTestId('close-button').props.accessibilityRole).toBe('button');
     expect(getByLabelText('common.cancel')).toBeTruthy();

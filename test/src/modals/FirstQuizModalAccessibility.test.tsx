@@ -135,14 +135,16 @@ describe('FirstQuizModal accessibility', () => {
     mockPathname = '/';
   });
 
-  it('announces the onboarding sheet and first slide controls', () => {
-    const {UNSAFE_getByProps, getByLabelText, getByTestId, getByText} = render(
+  it('announces the onboarding sheet and first slide controls', async () => {
+    const {getByLabelText, getByTestId, getByText} = await render(
       <FirstQuizModal />,
     );
 
     const modal = getByTestId('first-quiz-modal');
     const progress = getByTestId('first-quiz-progress');
-    const illustration = UNSAFE_getByProps({testID: 'first-quiz-illustration'});
+    const illustration = getByTestId('first-quiz-illustration', {
+      includeHiddenElements: true,
+    });
 
     expect(modal.props.accessibilityViewIsModal).toBe(true);
     expect(modal.props.importantForAccessibility).toBe('yes');
@@ -166,12 +168,12 @@ describe('FirstQuizModal accessibility', () => {
 
   it('updates the progress announcement as slides advance', async () => {
     const {getByLabelText, getByTestId, getByText, queryByLabelText, rerender} =
-      render(<FirstQuizModal />);
+      await render(<FirstQuizModal />);
 
     await act(async () => {
       mockButtonPressHandlers.Next();
     });
-    rerender(<FirstQuizModal />);
+    await rerender(<FirstQuizModal />);
 
     expect(getByText('Build a tiny learning streak')).toBeTruthy();
     expect(getByTestId('first-quiz-progress').props.accessibilityValue).toEqual(
@@ -185,7 +187,7 @@ describe('FirstQuizModal accessibility', () => {
     await act(async () => {
       mockButtonPressHandlers.Next();
     });
-    rerender(<FirstQuizModal />);
+    await rerender(<FirstQuizModal />);
 
     expect(getByText('Turn mistakes into memory')).toBeTruthy();
     expect(getByTestId('first-quiz-progress').props.accessibilityValue).toEqual(
@@ -199,28 +201,28 @@ describe('FirstQuizModal accessibility', () => {
     expect(queryByLabelText('Skip')).toBeNull();
   });
 
-  it('does not render the sheet when hidden', () => {
+  it('does not render the sheet when hidden', async () => {
     mockVisible = false;
 
-    const {queryByTestId} = render(<FirstQuizModal />);
+    const {queryByTestId} = await render(<FirstQuizModal />);
 
     expect(queryByTestId('first-quiz-modal')).toBeNull();
   });
 
-  it('hides itself when a deep-linked quiz route is active', () => {
+  it('hides itself when a deep-linked quiz route is active', async () => {
     mockPathname = '/daily-quiz';
 
-    const {queryByTestId} = render(<FirstQuizModal />);
+    const {queryByTestId} = await render(<FirstQuizModal />);
 
     expect(queryByTestId('first-quiz-modal')).toBeNull();
     expect(mockSetVisible).toHaveBeenCalledWith(false);
   });
 
-  it('releases global visibility when the sheet unmounts', () => {
-    const {unmount} = render(<FirstQuizModal />);
+  it('releases global visibility when the sheet unmounts', async () => {
+    const {unmount} = await render(<FirstQuizModal />);
     mockSetVisible.mockClear();
 
-    unmount();
+    await unmount();
 
     expect(mockSetVisible).toHaveBeenCalledWith(false);
   });

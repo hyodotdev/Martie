@@ -244,9 +244,9 @@ describe('DailyQuizPage fallback routing', () => {
   });
 
   it('returns to the tabs home route when the daily quiz payload is empty', async () => {
-    render(<DailyQuizPage />);
+    await render(<DailyQuizPage />);
 
-    act(() => {
+    await act(() => {
       jest.runAllTimers();
     });
 

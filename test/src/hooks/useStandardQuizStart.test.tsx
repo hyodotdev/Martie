@@ -45,7 +45,7 @@ describe('useStandardQuizStart', () => {
       Parameters<UpdateBulbCount>
     >(() => deferred.promise);
     const navigate = jest.fn();
-    const {result} = renderHook(() =>
+    const {result} = await renderHook(() =>
       useStandardQuizStart({
         bulbCount: 2,
         quizCount: 5,
@@ -57,7 +57,7 @@ describe('useStandardQuizStart', () => {
     let firstStart!: Promise<void | undefined>;
     let duplicateStart!: Promise<void | undefined>;
 
-    act(() => {
+    await act(() => {
       firstStart = result.current.startStandardQuiz();
       duplicateStart = result.current.startStandardQuiz();
     });
@@ -84,7 +84,7 @@ describe('useStandardQuizStart', () => {
       Parameters<UpdateBulbCount>
     >(() => Promise.resolve());
     const navigate = jest.fn();
-    const {result} = renderHook(() =>
+    const {result} = await renderHook(() =>
       useStandardQuizStart({
         bulbCount: 0,
         quizCount: 5,
@@ -109,7 +109,7 @@ describe('useStandardQuizStart', () => {
         Parameters<UpdateBulbCount>
       >(() => Promise.resolve());
       const navigate = jest.fn();
-      const {result} = renderHook(() =>
+      const {result} = await renderHook(() =>
         useStandardQuizStart({
           bulbCount,
           quizCount: 5,

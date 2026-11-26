@@ -206,9 +206,9 @@ describe('QuizPage fallback routing', () => {
   });
 
   it('returns to the tabs home route when no practice quizzes are available', async () => {
-    render(<QuizPage />);
+    await render(<QuizPage />);
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(1000);
     });
 
@@ -238,9 +238,9 @@ describe('QuizPage fallback routing', () => {
       ],
     };
 
-    render(<QuizPage />);
+    await render(<QuizPage />);
 
-    act(() => {
+    await act(() => {
       jest.advanceTimersByTime(1000);
     });
 

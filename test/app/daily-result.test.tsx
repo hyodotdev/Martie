@@ -324,8 +324,8 @@ describe('DailyResult', () => {
     jest.useRealTimers();
   });
 
-  it('announces the save progress action with card context', () => {
-    const {getByLabelText} = render(<DailyResult />);
+  it('announces the save progress action with card context', async () => {
+    const {getByLabelText} = await render(<DailyResult />);
 
     const saveProgressButton = getByLabelText(
       "Save my progress. Keep today's result. Sign in to keep this result.",
@@ -333,7 +333,7 @@ describe('DailyResult', () => {
 
     expect(saveProgressButton.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(saveProgressButton);
+    await fireEvent.press(saveProgressButton);
 
     expect(mockLogEvent).toHaveBeenCalledWith('login_prompt_shown', {
       source: 'daily_result_save_progress',
@@ -344,7 +344,7 @@ describe('DailyResult', () => {
   it('announces the join league action with card context', async () => {
     mockIsAuthenticated = true;
 
-    const {getByLabelText} = render(<DailyResult />);
+    const {getByLabelText} = await render(<DailyResult />);
 
     const joinLeagueButton = getByLabelText(
       'Join League. Turn this score into a rank. Join the weekly league.',
@@ -352,20 +352,20 @@ describe('DailyResult', () => {
 
     expect(joinLeagueButton.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(joinLeagueButton);
+    await fireEvent.press(joinLeagueButton);
 
     await waitFor(() => expect(mockJoinLeague).toHaveBeenCalledTimes(1));
     expect(mockPush).toHaveBeenCalledWith('/league');
   });
 
-  it('announces the related article card as a button', () => {
-    const {getByLabelText} = render(<DailyResult />);
+  it('announces the related article card as a button', async () => {
+    const {getByLabelText} = await render(<DailyResult />);
 
     const articleCard = getByLabelText('Learn more about Science');
 
     expect(articleCard.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(articleCard);
+    await fireEvent.press(articleCard);
 
     expect(mockLogEvent).toHaveBeenCalledWith('daily_to_article', {
       article_key: 'science-basics',
@@ -377,7 +377,7 @@ describe('DailyResult', () => {
     });
   });
 
-  it('replaces home instead of going back after a completed daily quiz', () => {
+  it('replaces home instead of going back after a completed daily quiz', async () => {
     mockCanGoBack.mockReturnValue(true);
     mockSearchParams = {
       correctCount: '4',
@@ -386,11 +386,11 @@ describe('DailyResult', () => {
       totalTimeMs: '45000',
     };
 
-    const {getByText} = render(<DailyResult />);
+    const {getByText} = await render(<DailyResult />);
 
-    fireEvent.press(getByText('Return'));
+    await fireEvent.press(getByText('Return'));
 
-    act(() => {
+    await act(() => {
       jest.runOnlyPendingTimers();
     });
 

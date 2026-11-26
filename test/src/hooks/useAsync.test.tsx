@@ -16,12 +16,12 @@ describe('useAsync', () => {
   it('blocks duplicate executions before loading rerenders', async () => {
     const deferred = createDeferred<string>();
     const asyncFunction = jest.fn<Promise<string>, []>(() => deferred.promise);
-    const {result} = renderHook(() => useAsync(asyncFunction));
+    const {result} = await renderHook(() => useAsync(asyncFunction));
 
     let firstCall: Promise<string | undefined>;
     let duplicateCall: Promise<string | undefined>;
 
-    act(() => {
+    await act(() => {
       firstCall = result.current.execute();
       duplicateCall = result.current.execute();
     });
@@ -45,10 +45,10 @@ describe('useAsync', () => {
       .fn<Promise<string>, []>()
       .mockReturnValueOnce(failedAttempt.promise)
       .mockReturnValueOnce(successfulAttempt.promise);
-    const {result} = renderHook(() => useAsync(asyncFunction));
+    const {result} = await renderHook(() => useAsync(asyncFunction));
 
     let firstCall: Promise<string | undefined>;
-    act(() => {
+    await act(() => {
       firstCall = result.current.execute();
     });
 
@@ -60,7 +60,7 @@ describe('useAsync', () => {
     expect(result.current.loading).toBe(false);
 
     let retryCall: Promise<string | undefined>;
-    act(() => {
+    await act(() => {
       retryCall = result.current.execute();
     });
 
@@ -82,11 +82,11 @@ describe('useAsync', () => {
       Promise.resolve('latest'),
     );
     let asyncFunction = firstFunction;
-    const {result, rerender} = renderHook(() => useAsync(asyncFunction));
+    const {result, rerender} = await renderHook(() => useAsync(asyncFunction));
     const initialExecute = result.current.execute;
 
     asyncFunction = latestFunction;
-    rerender(undefined);
+    await rerender(undefined);
 
     expect(result.current.execute).toBe(initialExecute);
 

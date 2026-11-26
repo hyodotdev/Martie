@@ -50,8 +50,8 @@ jest.mock('../../../src/STRINGS', () => ({
 }));
 
 describe('CustomLoadingIndicator accessibility', () => {
-  it('announces the default loading state as a busy progress indicator', () => {
-    const {getByLabelText} = render(<CustomLoadingIndicator />);
+  it('announces the default loading state as a busy progress indicator', async () => {
+    const {getByLabelText} = await render(<CustomLoadingIndicator />);
 
     const indicator = getByLabelText('Loading Martie');
 
@@ -62,8 +62,8 @@ describe('CustomLoadingIndicator accessibility', () => {
     });
   });
 
-  it('uses custom loading text as the progress label', () => {
-    const {getByLabelText} = render(
+  it('uses custom loading text as the progress label', async () => {
+    const {getByLabelText} = await render(
       <CustomLoadingIndicator text="Loading league" />,
     );
 

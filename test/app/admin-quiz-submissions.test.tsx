@@ -323,8 +323,8 @@ describe('AdminQuizSubmissionsPage accessibility', () => {
     });
   });
 
-  it('announces submission stats and filter selection', () => {
-    const {getByLabelText} = render(<AdminQuizSubmissionsPage />);
+  it('announces submission stats and filter selection', async () => {
+    const {getByLabelText} = await render(<AdminQuizSubmissionsPage />);
 
     const stats = getByLabelText('Pending, 2, Approved, 1, Total, 4');
     expect(stats.props.accessibilityRole).toBe('text');
@@ -340,8 +340,8 @@ describe('AdminQuizSubmissionsPage accessibility', () => {
     });
   });
 
-  it('announces each submission row as a navigable summary', () => {
-    const {getByLabelText} = render(<AdminQuizSubmissionsPage />);
+  it('announces each submission row as a navigable summary', async () => {
+    const {getByLabelText} = await render(<AdminQuizSubmissionsPage />);
 
     const approvedRow = getByLabelText(
       'Approved, 2026-07-12, What is a comet?, Science, Ada, Solved by 3 users, 5 attempts',
@@ -351,14 +351,14 @@ describe('AdminQuizSubmissionsPage accessibility', () => {
     const pendingRow = getByLabelText(
       'Under Review, 2026-07-11, Which treaty needs review?, History, curator@example.com',
     );
-    fireEvent.press(pendingRow);
+    await fireEvent.press(pendingRow);
 
     expect(mockNavigate).toHaveBeenCalledWith(
       '/admin-quiz-submissions/submission-pending',
     );
   });
 
-  it('announces the empty state as static text', () => {
+  it('announces the empty state as static text', async () => {
     mockUsePaginatedQuery.mockReturnValue({
       isLoading: false,
       loadMore: jest.fn(),
@@ -366,13 +366,13 @@ describe('AdminQuizSubmissionsPage accessibility', () => {
       status: 'Exhausted',
     });
 
-    const {getByLabelText} = render(<AdminQuizSubmissionsPage />);
+    const {getByLabelText} = await render(<AdminQuizSubmissionsPage />);
 
     const emptyState = getByLabelText('No submitted quizzes here.');
     expect(emptyState.props.accessibilityRole).toBe('text');
   });
 
-  it('announces load-more pagination as a busy progress indicator', () => {
+  it('announces load-more pagination as a busy progress indicator', async () => {
     mockUsePaginatedQuery.mockReturnValue({
       isLoading: true,
       loadMore: jest.fn(),
@@ -380,7 +380,7 @@ describe('AdminQuizSubmissionsPage accessibility', () => {
       status: 'LoadingMore',
     });
 
-    const {getByLabelText} = render(<AdminQuizSubmissionsPage />);
+    const {getByLabelText} = await render(<AdminQuizSubmissionsPage />);
 
     const footerLoader = getByLabelText('Loading Martie');
     expect(footerLoader.props).toMatchObject({
@@ -399,8 +399,8 @@ describe('AdminQuizSubmissionDetailPage accessibility', () => {
     mockApproveSubmission.mockResolvedValue(undefined);
   });
 
-  it('announces the submission summary, section headers, options, and approve action', () => {
-    const {getByLabelText, getByText} = render(
+  it('announces the submission summary, section headers, options, and approve action', async () => {
+    const {getByLabelText, getByText} = await render(
       <AdminQuizSubmissionDetailPage />,
     );
 
@@ -433,7 +433,7 @@ describe('AdminQuizSubmissionDetailPage accessibility', () => {
     });
   });
 
-  it('announces approved performance and review metadata', () => {
+  it('announces approved performance and review metadata', async () => {
     mockUseQuery.mockReturnValue({
       ...detailSubmission,
       answerExplanation: 'Comets are icy bodies orbiting the sun.',
@@ -445,7 +445,7 @@ describe('AdminQuizSubmissionDetailPage accessibility', () => {
       status: 'approved',
     });
 
-    const {getByLabelText, getByText} = render(
+    const {getByLabelText, getByText} = await render(
       <AdminQuizSubmissionDetailPage />,
     );
 
@@ -459,10 +459,10 @@ describe('AdminQuizSubmissionDetailPage accessibility', () => {
     ).toBe('text');
   });
 
-  it('announces a missing submission as static text', () => {
+  it('announces a missing submission as static text', async () => {
     mockUseQuery.mockReturnValue(null);
 
-    const {getByLabelText} = render(<AdminQuizSubmissionDetailPage />);
+    const {getByLabelText} = await render(<AdminQuizSubmissionDetailPage />);
 
     expect(getByLabelText('Submission not found.').props.accessibilityRole).toBe(
       'text',

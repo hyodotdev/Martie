@@ -229,13 +229,13 @@ describe('Discover article accessibility', () => {
     });
   });
 
-  it('announces recommended preview entries and the see more action', () => {
-    const {getByLabelText} = render(<TabDiscoverMobile />);
+  it('announces recommended preview entries and the see more action', async () => {
+    const {getByLabelText} = await render(<TabDiscoverMobile />);
 
     const seeMore = getByLabelText('See more recommended reads');
     expect(seeMore.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(seeMore);
+    await fireEvent.press(seeMore);
     expect(mockNavigate).toHaveBeenCalledWith('/article-list');
 
     const articleCard = getByLabelText(
@@ -243,17 +243,17 @@ describe('Discover article accessibility', () => {
     );
     expect(articleCard.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(articleCard);
+    await fireEvent.press(articleCard);
     expect(mockNavigate).toHaveBeenCalledWith({
       params: {key: 'article-1'},
       pathname: '/article-detail',
     });
   });
 
-  it('announces the discover skeleton as one busy progress indicator', () => {
+  it('announces the discover skeleton as one busy progress indicator', async () => {
     mockUseQuery.mockReturnValue(undefined);
 
-    const {getByLabelText} = render(<TabDiscoverMobile />);
+    const {getByLabelText} = await render(<TabDiscoverMobile />);
 
     const skeleton = getByLabelText('Loading Discover');
 
@@ -264,8 +264,8 @@ describe('Discover article accessibility', () => {
     });
   });
 
-  it('announces article list filters, selection state, and article cards', () => {
-    const {getByLabelText} = render(<TabArticleMobile />);
+  it('announces article list filters, selection state, and article cards', async () => {
+    const {getByLabelText} = await render(<TabArticleMobile />);
 
     const allFilter = getByLabelText('All');
     expect(allFilter.props.accessibilityRole).toBe('button');
@@ -275,7 +275,7 @@ describe('Discover article accessibility', () => {
     expect(scienceFilter.props.accessibilityRole).toBe('button');
     expect(scienceFilter.props.accessibilityState).toEqual({selected: false});
 
-    fireEvent.press(scienceFilter);
+    await fireEvent.press(scienceFilter);
     expect(getByLabelText('Science').props.accessibilityState).toEqual({
       selected: true,
     });
@@ -285,14 +285,14 @@ describe('Discover article accessibility', () => {
     );
     expect(articleCard.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(articleCard);
+    await fireEvent.press(articleCard);
     expect(mockNavigate).toHaveBeenCalledWith({
       params: {key: 'article-1'},
       pathname: '/article-detail',
     });
   });
 
-  it('announces an empty article list as static text', () => {
+  it('announces an empty article list as static text', async () => {
     mockUsePaginatedQuery.mockReturnValue({
       isLoading: false,
       loadMore: jest.fn(),
@@ -300,12 +300,12 @@ describe('Discover article accessibility', () => {
       status: 'Exhausted',
     });
 
-    const {getByText} = render(<TabArticleMobile />);
+    const {getByText} = await render(<TabArticleMobile />);
 
     expect(getByText('No articles yet')).toBeTruthy();
   });
 
-  it('announces the article list skeleton as one busy progress indicator', () => {
+  it('announces the article list skeleton as one busy progress indicator', async () => {
     mockUsePaginatedQuery.mockReturnValue({
       isLoading: true,
       loadMore: jest.fn(),
@@ -313,7 +313,7 @@ describe('Discover article accessibility', () => {
       status: 'LoadingFirstPage',
     });
 
-    const {getByLabelText} = render(<TabArticleMobile />);
+    const {getByLabelText} = await render(<TabArticleMobile />);
 
     const skeleton = getByLabelText('Loading Knowledge Blog');
 

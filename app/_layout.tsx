@@ -334,9 +334,8 @@ function App(): JSX.Element | null {
   }, []);
 
   useEffect(() => {
-    Platform.OS === 'android' && StatusBar.setBackgroundColor(theme.bg.basic);
     StatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
-  }, [isDarkMode, theme]);
+  }, [isDarkMode]);
 
   useEffect(() => {
     if (appFontsLoaded && assetLoaded && !isChecking) {
@@ -373,7 +372,9 @@ function App(): JSX.Element | null {
               canGoBack && (
                 <RectButton
                   hitSlop={{top: 8, left: 8, right: 8, bottom: 8}}
-                  onPress={() => (canGoBack ? back() : replace('/'))}
+                  onPress={(pointerInside) =>
+                    pointerInside && (canGoBack ? back() : replace('/'))
+                  }
                   style={css`
                     padding: 8px;
                     border-radius: 48px;

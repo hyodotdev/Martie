@@ -266,7 +266,7 @@ export default function SignInCode(): JSX.Element {
         <KeyboardAvoidingContainer behavior="padding" automaticOffset>
           <Header>
             <CustomPressable
-              onPress={back}
+              onPress={() => back()}
               accessibilityLabel={t('common.back')}
               accessibilityRole="button"
               style={css`

@@ -16,7 +16,6 @@ import {
   Image,
   ScrollView,
   Alert,
-  InteractionManager,
   ActivityIndicator,
   Pressable,
 } from 'react-native';
@@ -1864,7 +1863,8 @@ function PurchaseWrapper() {
               !subscriptionAlertShown.current
             ) {
               subscriptionAlertShown.current = true;
-              InteractionManager.runAfterInteractions(() => {
+              // Wait for the store sheet to close before alerting.
+              requestIdleCallback(() => {
                 Alert.alert(
                   t('purchase.thankYou'),
                   t('purchase.subscriptionActivated'),

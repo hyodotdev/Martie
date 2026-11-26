@@ -200,8 +200,8 @@ describe('MyQuizzesPage accessibility', () => {
     });
   });
 
-  it('announces the total and submitted quiz rows as readable summaries', () => {
-    const {getByLabelText} = render(<MyQuizzesPage />);
+  it('announces the total and submitted quiz rows as readable summaries', async () => {
+    const {getByLabelText} = await render(<MyQuizzesPage />);
 
     const header = getByLabelText('Total Feathers Earned, 42');
     expect(header.props.accessibilityRole).toBe('text');
@@ -217,7 +217,7 @@ describe('MyQuizzesPage accessibility', () => {
     expect(rejectedRow.props.accessibilityRole).toBe('text');
   });
 
-  it('announces the empty state as static text', () => {
+  it('announces the empty state as static text', async () => {
     mockUsePaginatedQuery.mockReturnValue({
       isLoading: false,
       loadMore: jest.fn(),
@@ -225,13 +225,13 @@ describe('MyQuizzesPage accessibility', () => {
       status: 'Exhausted',
     });
 
-    const {getByLabelText} = render(<MyQuizzesPage />);
+    const {getByLabelText} = await render(<MyQuizzesPage />);
 
     const emptyState = getByLabelText('No quizzes created yet.');
     expect(emptyState.props.accessibilityRole).toBe('text');
   });
 
-  it('announces load-more pagination as a busy progress indicator', () => {
+  it('announces load-more pagination as a busy progress indicator', async () => {
     mockUsePaginatedQuery.mockReturnValue({
       isLoading: true,
       loadMore: jest.fn(),
@@ -239,7 +239,7 @@ describe('MyQuizzesPage accessibility', () => {
       status: 'LoadingMore',
     });
 
-    const {getByLabelText} = render(<MyQuizzesPage />);
+    const {getByLabelText} = await render(<MyQuizzesPage />);
 
     const footerLoader = getByLabelText('Loading Martie');
     expect(footerLoader.props).toMatchObject({
@@ -249,7 +249,7 @@ describe('MyQuizzesPage accessibility', () => {
     });
   });
 
-  it('omits malformed submission dates from accessibility summaries', () => {
+  it('omits malformed submission dates from accessibility summaries', async () => {
     mockUsePaginatedQuery.mockReturnValue({
       isLoading: false,
       loadMore: jest.fn(),
@@ -265,7 +265,7 @@ describe('MyQuizzesPage accessibility', () => {
       status: 'Exhausted',
     });
 
-    const {getByLabelText} = render(<MyQuizzesPage />);
+    const {getByLabelText} = await render(<MyQuizzesPage />);
 
     expect(
       getByLabelText('Under Review, Which fact needs review?').props

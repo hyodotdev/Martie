@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import type {Config} from '@jest/types';
 
 process.env.TZ = 'Asia/Seoul';
@@ -13,7 +14,7 @@ export default async (): Promise<Config.InitialOptions> => {
     },
     transformIgnorePatterns: [
       // Transform ESM in selected node_modules (e.g., immer, zustand middleware)
-      'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|standard-navigation|@unimodules/.*|unimodules|native-base|react-native-svg|cpk-ui|@cpk-ui|immer|zustand|uuid|@codemagic/react-native-patch)',
+      'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|standard-navigation|@unimodules/.*|unimodules|native-base|react-native-svg|cpk-ui|@cpk-ui|immer|zustand|uuid|@codemagic/react-native-patch|@shopify/flash-list)',
     ],
     modulePaths: ['<rootDir>'],
     moduleDirectories: ['node_modules'],

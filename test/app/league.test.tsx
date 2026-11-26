@@ -220,8 +220,8 @@ describe('LeaguePage accessibility', () => {
     });
   });
 
-  it('announces league heading, zones, and member rows', () => {
-    const {getByLabelText, getByTestId, getByText} = render(<LeaguePage />);
+  it('announces league heading, zones, and member rows', async () => {
+    const {getByLabelText, getByTestId, getByText} = await render(<LeaguePage />);
 
     const header = getByLabelText('Diamond League, Rank 2 of 6');
     expect(header.props.accessibilityRole).toBe('header');
@@ -249,16 +249,16 @@ describe('LeaguePage accessibility', () => {
     expect(getByTestId('league-share-card')).toBeTruthy();
   });
 
-  it('renders the not-joined state without a leaderboard', () => {
+  it('renders the not-joined state without a leaderboard', async () => {
     mockUseQuery.mockReturnValue(null);
 
-    const {getByText, queryByTestId} = render(<LeaguePage />);
+    const {getByText, queryByTestId} = await render(<LeaguePage />);
 
     expect(getByText('Join the league to compete!')).toBeTruthy();
     expect(queryByTestId('league-share-card')).toBeNull();
   });
 
-  it('omits demotion labels when the zone would overlap promotion ranks', () => {
+  it('omits demotion labels when the zone would overlap promotion ranks', async () => {
     mockUseQuery.mockReturnValue({
       members: [
         {
@@ -307,7 +307,7 @@ describe('LeaguePage accessibility', () => {
       weeklyXp: 250,
     });
 
-    const {getByLabelText, queryByLabelText, queryByText} = render(
+    const {getByLabelText, queryByLabelText, queryByText} = await render(
       <LeaguePage />,
     );
 

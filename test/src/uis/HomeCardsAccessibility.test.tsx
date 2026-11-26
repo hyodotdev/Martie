@@ -96,14 +96,14 @@ jest.mock('../../../src/uis/ButtonMartie', () => ({
   },
 }));
 
-const renderWithTheme = (children: JSX.Element) =>
-  render(<ThemeProvider theme={theme as any}>{children}</ThemeProvider>);
+const renderWithTheme = async (children: JSX.Element) =>
+  await render(<ThemeProvider theme={theme as any}>{children}</ThemeProvider>);
 
 describe('home card accessibility', () => {
-  it('announces the daily challenge action with category context', () => {
+  it('announces the daily challenge action with category context', async () => {
     const onPress = jest.fn();
 
-    const {getByLabelText} = renderWithTheme(
+    const {getByLabelText} = await renderWithTheme(
       <DailyChallengeCard
         categoryName="Science"
         challengeNumber={42}
@@ -120,15 +120,15 @@ describe('home card accessibility', () => {
 
     expect(card.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(card);
+    await fireEvent.press(card);
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('announces the joined league card with rank and XP context', () => {
+  it('announces the joined league card with rank and XP context', async () => {
     const onPress = jest.fn();
 
-    const {getByLabelText} = renderWithTheme(
+    const {getByLabelText} = await renderWithTheme(
       <LeagueProgressCard
         isLoading={false}
         myRank={3}
@@ -143,13 +143,13 @@ describe('home card accessibility', () => {
 
     expect(card.props.accessibilityRole).toBe('button');
 
-    fireEvent.press(card);
+    await fireEvent.press(card);
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('announces the join league card as a button', () => {
-    const {getByLabelText} = renderWithTheme(
+  it('announces the join league card as a button', async () => {
+    const {getByLabelText} = await renderWithTheme(
       <LeagueProgressCard
         isLoading={false}
         myRank={0}
@@ -165,8 +165,8 @@ describe('home card accessibility', () => {
     expect(card.props.accessibilityRole).toBe('button');
   });
 
-  it('marks the league skeleton as busy progress', () => {
-    const {getByLabelText} = renderWithTheme(
+  it('marks the league skeleton as busy progress', async () => {
+    const {getByLabelText} = await renderWithTheme(
       <LeagueProgressCard
         isLoading={true}
         myRank={0}

@@ -2,7 +2,7 @@ import {styled, css} from 'kstyled';
 import {Stack} from 'expo-router';
 import {Typography, useCPK} from 'cpk-ui';
 import {useRef} from 'react';
-import {View} from 'react-native';
+import {View, type ViewInstance} from 'react-native';
 import {ImpactFeedbackStyle} from 'expo-haptics';
 import {captureRef} from 'react-native-view-shot';
 import {shareAsync} from 'expo-sharing';
@@ -78,7 +78,7 @@ const calculateLevelProgress = (
 };
 
 function QuizLevel(): JSX.Element {
-  const contentRef = useRef<View>(null);
+  const contentRef = useRef<ViewInstance>(null);
   const currentUser = useQuery(api.user.queries.currentUser);
   const {theme} = useCPK();
 

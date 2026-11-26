@@ -260,13 +260,15 @@ describe('QuizFinal', () => {
     jest.useRealTimers();
   });
 
-  it('spends a bulb once when play next level is pressed rapidly', () => {
-    const {getByLabelText} = render(<QuizFinal />);
+  it('spends a bulb once when play next level is pressed rapidly', async () => {
+    const {getByLabelText} = await render(<QuizFinal />);
     const playNextButton = getByLabelText('Play Next Level');
 
-    act(() => {
-      fireEvent.press(playNextButton);
-      fireEvent.press(playNextButton);
+    await act(async () => {
+      await Promise.all([
+        fireEvent.press(playNextButton),
+        fireEvent.press(playNextButton),
+      ]);
     });
 
     expect(mockUpdateBulbCount).toHaveBeenCalledTimes(1);
@@ -279,27 +281,27 @@ describe('QuizFinal', () => {
     });
   });
 
-  it('replaces the tabs home route when done is pressed', () => {
-    const {getByLabelText, getByText} = render(<QuizFinal />);
+  it('replaces the tabs home route when done is pressed', async () => {
+    const {getByLabelText, getByText} = await render(<QuizFinal />);
 
-    fireEvent.press(getByLabelText('Done'));
+    await fireEvent.press(getByLabelText('Done'));
 
     expect(getByText('Loading')).toBeTruthy();
 
-    act(() => {
+    await act(() => {
       jest.runOnlyPendingTimers();
     });
 
     expect(mockReplace).toHaveBeenCalledWith('/(tabs)');
   });
 
-  it('returns home when play next level has no bulbs', () => {
+  it('returns home when play next level has no bulbs', async () => {
     mockBulbCount = 0;
-    const {getByLabelText} = render(<QuizFinal />);
+    const {getByLabelText} = await render(<QuizFinal />);
 
-    fireEvent.press(getByLabelText('Play Next Level'));
+    await fireEvent.press(getByLabelText('Play Next Level'));
 
-    act(() => {
+    await act(() => {
       jest.runOnlyPendingTimers();
     });
 
@@ -310,17 +312,17 @@ describe('QuizFinal', () => {
     expect(mockReplace).toHaveBeenCalledWith('/(tabs)');
   });
 
-  it('keeps replay on the practice quiz route', () => {
+  it('keeps replay on the practice quiz route', async () => {
     mockSearchParams = {
       ...mockSearchParams,
       hasPassed: 'false',
       point: '20',
     };
-    const {getByLabelText} = render(<QuizFinal />);
+    const {getByLabelText} = await render(<QuizFinal />);
 
-    fireEvent.press(getByLabelText('Replay'));
+    await fireEvent.press(getByLabelText('Replay'));
 
-    act(() => {
+    await act(() => {
       jest.runOnlyPendingTimers();
     });
 

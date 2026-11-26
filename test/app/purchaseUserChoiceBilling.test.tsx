@@ -416,6 +416,8 @@ const googlePurchase = {
   productId: BULB_PACK_SKUS[0],
   purchaseToken: 'receipt-test',
   store: 'google',
+  storeId: 'google',
+  transactionId: 'order-test',
   purchaseState: 'purchased',
   transactionDate: 1,
   quantity: 1,

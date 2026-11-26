@@ -106,8 +106,8 @@ describe('ForceUpdateModal', () => {
     mockUseQuery.mockReturnValue({version: '9.0.0'});
   });
 
-  it('announces the required update sheet and action', () => {
-    const {getByLabelText, getByText} = render(<ForceUpdateModal />);
+  it('announces the required update sheet and action', async () => {
+    const {getByLabelText, getByText} = await render(<ForceUpdateModal />);
 
     expect(getByText('forceUpdate.title').props.accessibilityRole).toBe(
       'header',
@@ -117,32 +117,32 @@ describe('ForceUpdateModal', () => {
     ).toBe('button');
   });
 
-  it('opens the Martie store from the update action', () => {
-    const {getByLabelText} = render(<ForceUpdateModal />);
+  it('opens the Martie store from the update action', async () => {
+    const {getByLabelText} = await render(<ForceUpdateModal />);
 
-    fireEvent.press(getByLabelText('forceUpdate.button'));
+    await fireEvent.press(getByLabelText('forceUpdate.button'));
 
     expect(openMartieStore).toHaveBeenCalledTimes(1);
   });
 
-  it('does not render when the installed version is current', () => {
+  it('does not render when the installed version is current', async () => {
     mockUseQuery.mockReturnValue({version: '1.0.0'});
 
-    const {queryByText} = render(<ForceUpdateModal />);
+    const {queryByText} = await render(<ForceUpdateModal />);
 
     expect(queryByText('forceUpdate.title')).toBeNull();
   });
 
-  it('reports whether the sheet should block banner ads', () => {
+  it('reports whether the sheet should block banner ads', async () => {
     const onVisibilityChange = jest.fn();
-    const {rerender} = render(
+    const {rerender} = await render(
       <ForceUpdateModal onVisibilityChange={onVisibilityChange} />,
     );
 
     expect(onVisibilityChange).toHaveBeenLastCalledWith(true);
 
     mockUseQuery.mockReturnValue({version: '1.0.0'});
-    rerender(<ForceUpdateModal onVisibilityChange={onVisibilityChange} />);
+    await rerender(<ForceUpdateModal onVisibilityChange={onVisibilityChange} />);
 
     expect(onVisibilityChange).toHaveBeenLastCalledWith(false);
   });

@@ -58,8 +58,8 @@ describe('Discover RadarChart accessibility', () => {
     {categoryName: 'ART', localizedName: 'Art', winRate: 39.6},
   ];
 
-  it('announces the visual radar chart as one image summary', () => {
-    const {getByLabelText} = render(<RadarChart stats={stats} />);
+  it('announces the visual radar chart as one image summary', async () => {
+    const {getByLabelText} = await render(<RadarChart stats={stats} />);
 
     const chart = getByLabelText(
       'My Knowledge Radar, Science 82%, History 61%, Art 40%',
@@ -68,14 +68,14 @@ describe('Discover RadarChart accessibility', () => {
     expect(chart.props.accessibilityRole).toBe('image');
   });
 
-  it('announces only the rendered capped category set', () => {
+  it('announces only the rendered capped category set', async () => {
     const manyStats = Array.from({length: 10}, (_, index) => ({
       categoryName: `CATEGORY_${index}`,
       localizedName: `Category ${index}`,
       winRate: index * 10,
     }));
 
-    const {getByLabelText, queryByLabelText} = render(
+    const {getByLabelText, queryByLabelText} = await render(
       <RadarChart stats={manyStats} />,
     );
 

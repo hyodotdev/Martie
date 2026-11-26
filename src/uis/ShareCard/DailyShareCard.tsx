@@ -1,5 +1,5 @@
 import React, {useRef, useCallback} from 'react';
-import {View} from 'react-native';
+import {View, type ViewInstance} from 'react-native';
 import {Typography, useCPK} from 'cpk-ui';
 import {styled, css} from 'kstyled';
 import {captureRef} from 'react-native-view-shot';
@@ -28,7 +28,7 @@ export default function DailyShareCard({
   appUrl = MARTIE_SHARE_URL,
 }: Props): JSX.Element {
   const {theme} = useCPK();
-  const cardRef = useRef<View>(null);
+  const cardRef = useRef<ViewInstance>(null);
   const correctCount = results.filter((r) => r.isCorrect).length;
   const timeSeconds = Math.round(totalTimeMs / 1000);
   const resultAccessibilityItems = results.map((result, index) =>
