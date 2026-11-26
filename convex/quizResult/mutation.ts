@@ -1,7 +1,7 @@
 import {ConvexError, v} from 'convex/values';
 import {isCorrectOption, MAX_QUIZ_RESULTS_PER_DAY} from './grading';
 import {mutation} from '../_generated/server';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 import {enqueueForReview} from '../reviewQueue/helpers';
 import {awardFeather} from '../feather/helpers';
 

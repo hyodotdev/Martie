@@ -1,7 +1,7 @@
 import {finalizeApplePurchase} from '../../convex/applePurchases';
 import type {Doc, Id} from '../../convex/_generated/dataModel';
 
-jest.mock('@convex-dev/auth/server', () => ({getAuthUserId: jest.fn()}), {
+jest.mock('../../convex/utils/auth', () => ({getAuthUserId: jest.fn()}), {
   virtual: true,
 });
 

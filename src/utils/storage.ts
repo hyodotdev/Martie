@@ -41,4 +41,7 @@ export const Storage = {
   ProductAnalyticsQueue: 'ProductAnalyticsQueue',
   // Stable non-identifiable user key for Naver Pay (alternative billing tests)
   NaverUserKey: 'NaverUserKey',
+  // The address and device secret of the sign-in link emailed last; the
+  // link signs in only together with this secret.
+  PendingSignInLink: 'PendingSignInLink',
 } as const;

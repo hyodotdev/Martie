@@ -28,6 +28,24 @@ describe('redirectSystemPath', () => {
     ).toBe('/battle/abcd2345');
   });
 
+  it('emailed sign-in links keep their one-time code', () => {
+    expect(
+      redirectSystemPath({
+        initial: true,
+        path: 'https://hyo.dev/martie/sign-in-link?lang=ko&code=a_b-c',
+      }),
+    ).toBe('/sign-in-link?code=a_b-c');
+  });
+
+  it('a sign-in link without a code opens the app tabs', () => {
+    expect(
+      redirectSystemPath({
+        initial: true,
+        path: 'https://hyo.dev/martie/sign-in-link?lang=ko',
+      }),
+    ).toBe('/(tabs)');
+  });
+
   it('generic Martie web landing links route to the app tabs', () => {
     expect(
       redirectSystemPath({

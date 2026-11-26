@@ -8,7 +8,7 @@ jest.mock('../../convex/iap', () => ({
 jest.mock('googleapis', () => ({
   google: {androidpublisher: jest.fn()},
 }));
-jest.mock('@convex-dev/auth/server', () => ({getAuthUserId: jest.fn()}), {
+jest.mock('../../convex/utils/auth', () => ({getAuthUserId: jest.fn()}), {
   virtual: true,
 });
 

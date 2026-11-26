@@ -1,4 +1,4 @@
-import {convexAuth} from '@convex-dev/auth/server';
+import {convexAuth} from '@convex-dev/auth-v1/server';
 import {
   ResendOtpMartieEn,
   ResendOtpMartieJa,

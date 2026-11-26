@@ -630,6 +630,18 @@
     "error": "Mã sai!",
     "title": "Vui lòng nhập mã xác thực."
   },
+  "signInLink": {
+    "codeContent": "Nhập mã đăng nhập cho {email}.",
+    "content": "Chúng tôi đã gửi liên kết đăng nhập đến {email}. Mở liên kết trên điện thoại này để đăng nhập.",
+    "expired": "Liên kết đã hết hạn hoặc đã được sử dụng. Vui lòng đăng nhập lại.",
+    "otherDevice": "Hãy mở liên kết trên điện thoại bạn đã yêu cầu.",
+    "resend": "Gửi lại liên kết",
+    "resent": "Chúng tôi đã gửi liên kết mới.",
+    "retry": "Đăng nhập lại",
+    "signingIn": "Đang đăng nhập…",
+    "title": "Kiểm tra email của bạn",
+    "useCode": "Đăng nhập bằng mã"
+  },
   "submitQuiz": {
     "category": "Category",
     "explanation": "Answer Explanation (Optional)",

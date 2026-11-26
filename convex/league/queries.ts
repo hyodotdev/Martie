@@ -1,4 +1,4 @@
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 import {query} from '../_generated/server';
 
 const GROUP_SIZE = 30;

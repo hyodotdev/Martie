@@ -630,6 +630,18 @@
     "error": "Falscher Code!",
     "title": "Bitte geben Sie den Bestätigungscode ein."
   },
+  "signInLink": {
+    "codeContent": "Gib den Anmeldecode für {email} ein.",
+    "content": "Wir haben einen Anmeldelink an {email} gesendet. Öffne ihn auf diesem Handy, um dich anzumelden.",
+    "expired": "Dieser Link ist abgelaufen oder wurde bereits verwendet. Bitte melde dich erneut an.",
+    "otherDevice": "Öffne den Link auf dem Handy, auf dem du ihn angefordert hast.",
+    "resend": "Link erneut senden",
+    "resent": "Wir haben einen neuen Link gesendet.",
+    "retry": "Erneut anmelden",
+    "signingIn": "Du wirst angemeldet…",
+    "title": "Prüfe deine E-Mails",
+    "useCode": "Mit einem Code anmelden"
+  },
   "submitQuiz": {
     "category": "Category",
     "explanation": "Answer Explanation (Optional)",

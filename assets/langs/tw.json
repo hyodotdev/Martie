@@ -630,6 +630,18 @@
     "error": "驗證碼錯誤！",
     "title": "請輸入驗證碼。"
   },
+  "signInLink": {
+    "codeContent": "請輸入{email}的登入碼。",
+    "content": "我們已將登入連結寄到{email}。在這支手機上開啟連結即可登入。",
+    "expired": "此連結已過期或已被使用，請重新登入。",
+    "otherDevice": "請在提出要求的手機上開啟連結。",
+    "resend": "重新寄送連結",
+    "resent": "已寄出新的連結。",
+    "retry": "重新登入",
+    "signingIn": "正在登入…",
+    "title": "請查看你的電子郵件",
+    "useCode": "使用代碼登入"
+  },
   "submitQuiz": {
     "category": "Category",
     "explanation": "Answer Explanation (Optional)",

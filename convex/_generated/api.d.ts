@@ -39,6 +39,7 @@ import type * as chat_queries from "../chat/queries.js";
 import type * as crons from "../crons.js";
 import type * as dailyChallenge_mutations from "../dailyChallenge/mutations.js";
 import type * as dailyChallenge_queries from "../dailyChallenge/queries.js";
+import type * as emailAuth from "../emailAuth.js";
 import type * as emailTemplates from "../emailTemplates.js";
 import type * as feather_helpers from "../feather/helpers.js";
 import type * as http from "../http.js";
@@ -97,6 +98,7 @@ import type * as types from "../types.js";
 import type * as user_mutations from "../user/mutations.js";
 import type * as user_queries from "../user/queries.js";
 import type * as userCategory_mutation from "../userCategory/mutation.js";
+import type * as utils_auth from "../utils/auth.js";
 import type * as utils_emailList from "../utils/emailList.js";
 import type * as utils_fixedOtp from "../utils/fixedOtp.js";
 import type * as utils_levelPlay from "../utils/levelPlay.js";
@@ -143,6 +145,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   "dailyChallenge/mutations": typeof dailyChallenge_mutations;
   "dailyChallenge/queries": typeof dailyChallenge_queries;
+  emailAuth: typeof emailAuth;
   emailTemplates: typeof emailTemplates;
   "feather/helpers": typeof feather_helpers;
   http: typeof http;
@@ -201,6 +204,7 @@ declare const fullApi: ApiFromModules<{
   "user/mutations": typeof user_mutations;
   "user/queries": typeof user_queries;
   "userCategory/mutation": typeof userCategory_mutation;
+  "utils/auth": typeof utils_auth;
   "utils/emailList": typeof utils_emailList;
   "utils/fixedOtp": typeof utils_fixedOtp;
   "utils/levelPlay": typeof utils_levelPlay;
@@ -236,4 +240,7 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  auth: import("@convex-dev/auth/_generated/component.js").ComponentApi<"auth">;
+  authEmail: import("@convex-dev/auth/components/email/_generated/component.js").ComponentApi<"authEmail">;
+};

@@ -17,24 +17,23 @@ import {
 } from 'cpk-ui';
 import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
 import {useAuthActions} from '@convex-dev/auth/react';
-import {Stack, useLocalSearchParams, useRouter} from 'expo-router';
+import {
+  Stack,
+  useIsFocused,
+  useLocalSearchParams,
+  useRouter,
+} from 'expo-router';
 import {getLocale, t} from '../src/STRINGS';
 import {normalizeEmail} from '../src/utils/common';
 import {logError} from '../src/utils/error';
-import {useConvexAuth, useMutation} from 'convex/react';
+import {useMutation} from 'convex/react';
 import {api} from '../convex/_generated/api';
 import {ImpactFeedbackStyle} from 'expo-haptics';
-import {
-  logEvent,
-  LOG_EVENTS,
-  logScreenView,
-  registerAnalyticsSuperProperties,
-} from '../src/utils/analytics';
+import {logScreenView} from '../src/utils/analytics';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {storage, Storage} from '../src/utils/storage';
-import {decodePendingBattle} from '../src/utils/battle';
 import {toast} from '@backpackapp-io/react-native-toast';
-import {getAcquisitionSource} from '../src/utils/acquisition';
+import {useAfterSignIn} from '../src/hooks/useAfterSignIn';
+import {savePendingSignInLink} from '../src/utils/signInLink';
 
 const MAX_CODE_LENGTH = 8;
 const HOME_ROUTE = '/(tabs)' as const;
@@ -48,138 +47,45 @@ export default function SignInCode(): JSX.Element {
       });
   }, []);
 
-  const {signIn} = useAuthActions();
+  const {setSession} = useAuthActions();
   const {theme} = useCPK();
   const [code, setCode] = useState('');
+  const [showCode, setShowCode] = useState(false);
   const {back, navigate, replace, dismissAll} = useRouter();
   const params = useLocalSearchParams<{email: string}>();
   const email = normalizeEmail(decodeURIComponent(params.email || ''));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const createUserProfile = useMutation(api.user.mutations.createUserProfile);
-  const applyReferral = useMutation(api.referral.mutations.applyReferral);
-  const completeDailyChallenge = useMutation(
-    api.dailyChallenge.mutations.completeDailyChallenge,
+  const [resending, setResending] = useState(false);
+  const sendSignInLink = useMutation(api.emailAuth.sendSignInLink);
+  const signInWithReviewCode = useMutation(
+    api.emailAuth.signInWithReviewCode,
   );
-  const {isAuthenticated} = useConvexAuth();
-  const didHandleAuthenticatedRef = useRef(false);
   const isSubmittingRef = useRef(false);
 
-  // Handle navigation after authentication with improved error handling
   useEffect(() => {
-    if (!email) {
-      try {
-        replace(HOME_ROUTE);
-        dismissAll();
-      } catch (err) {
-        logError(err, 'sign-in-code-no-email');
-        navigate(HOME_ROUTE);
-      }
-      return;
+    if (email) return;
+    try {
+      replace(HOME_ROUTE);
+      dismissAll();
+    } catch (err) {
+      logError(err, 'sign-in-code-no-email');
+      navigate(HOME_ROUTE);
     }
+  }, [email, replace, dismissAll, navigate]);
 
-    if (isAuthenticated && !didHandleAuthenticatedRef.current) {
-      didHandleAuthenticatedRef.current = true;
-      setLoading(true);
-      createUserProfile({email})
-        .then(async (profile) => {
-          if (profile) {
-            const source = getAcquisitionSource() ?? 'organic';
-            registerAnalyticsSuperProperties({acquisition_source: source});
-
-            if (
-              profile.isNew &&
-              !storage.getBoolean(Storage.DidFireSignupCompleted)
-            ) {
-              storage.set(Storage.DidFireSignupCompleted, true);
-              logEvent(LOG_EVENTS.SIGNUP_COMPLETED, {
-                source,
-                method: 'email_otp',
-              });
-            }
-
-            // 비로그인 상태에서 풀었던 데일리 퀴즈 결과 서버 동기화
-            const guestDailyRaw = storage.getString(Storage.GuestDailyResult);
-            if (guestDailyRaw) {
-              try {
-                const guestDaily = JSON.parse(guestDailyRaw);
-                const today = new Date().toISOString().split('T')[0];
-                if (
-                  guestDaily.date === today &&
-                  Array.isArray(guestDaily.results)
-                ) {
-                  await completeDailyChallenge({
-                    results: guestDaily.results,
-                  });
-                }
-                storage.delete(Storage.GuestDailyResult);
-              } catch (err) {
-                logError(err, 'sync-guest-daily');
-              }
-            }
-
-            // Apply pending referral code if exists
-            const pendingCode = storage.getString(Storage.PendingReferralCode);
-            if (pendingCode) {
-              try {
-                const result = await applyReferral({
-                  referralCode: pendingCode,
-                });
-                if (result.success) {
-                  toast.success(t('referral.reward', {count: 5}));
-                  logEvent('referral_applied');
-                }
-              } catch (err) {
-                logError(err, 'apply-referral');
-              }
-              storage.delete(Storage.PendingReferralCode);
-            }
-
-            // Close any open modals and go to the My tab at root
-            try {
-              dismissAll();
-            } catch {}
-
-            // A battle link opened while signed out resumes in its room.
-            const pendingBattleCode = decodePendingBattle(
-              storage.getString(Storage.PendingBattleCode),
-              Date.now(),
-            );
-            storage.delete(Storage.PendingBattleCode);
-            if (pendingBattleCode) {
-              replace({
-                pathname: '/battle/[code]',
-                params: {code: pendingBattleCode},
-              });
-              return;
-            }
-            replace('/my');
-          } else {
-            setError(t('signInCode.error'));
-            isSubmittingRef.current = false;
-            setLoading(false);
-            didHandleAuthenticatedRef.current = false;
-          }
-        })
-        .catch((err) => {
-          logError(err, 'create-profile');
-          setError(t('signInCode.error'));
-          isSubmittingRef.current = false;
-          setLoading(false);
-          didHandleAuthenticatedRef.current = false;
-        });
-      // Note: We're not using finally here to keep loading true when navigating
-    }
-  }, [
-    email,
-    isAuthenticated,
-    navigate,
-    replace,
-    createUserProfile,
-    completeDailyChallenge,
-    applyReferral,
-    dismissAll,
-  ]);
+  // The emailed link opens `sign-in-link` on top of this screen, and that
+  // screen finishes the sign-in; this one finishes a review code sign-in.
+  const isFocused = useIsFocused();
+  useAfterSignIn({
+    method: showCode ? 'email_otp' : 'email_link',
+    enabled: isFocused,
+    onFailed: () => {
+      setError(t('signInCode.error'));
+      isSubmittingRef.current = false;
+      setLoading(false);
+    },
+  });
 
   const handleChangeText: ComponentProps<typeof EditText>['onChangeText'] = (
     text,
@@ -188,6 +94,31 @@ export default function SignInCode(): JSX.Element {
     setCode(text.replace(/[^0-9]/g, ''));
   };
 
+  const handleResend = async () => {
+    if (resending) return;
+    setResending(true);
+    try {
+      const locale = getLocale();
+      const result = await sendSignInLink({
+        email,
+        locale: locale === 'ko' || locale === 'ja' ? locale : 'en',
+      });
+      if (!result.success) {
+        toast.error(t('signIn.emailSentFailed'));
+        return;
+      }
+      savePendingSignInLink({email, browserSecret: result.browserSecret});
+      toast.success(t('signInLink.resent'));
+    } catch (err) {
+      logError(err, 'sign-in-link-resend');
+      toast.error(t('signIn.emailSentFailed'));
+    } finally {
+      setResending(false);
+    }
+  };
+
+  // App Review cannot open an emailed link, so its allow-listed emails sign
+  // in with a fixed code instead.
   const handleSubmit = async () => {
     if (loading || isSubmittingRef.current || code.length !== MAX_CODE_LENGTH)
       return;
@@ -197,32 +128,18 @@ export default function SignInCode(): JSX.Element {
     setError('');
 
     try {
-      const {signingIn} = await signIn(
-        getLocale() === 'ko'
-          ? 'resend-otp-ko'
-          : getLocale() === 'ja'
-            ? 'resend-otp-ja'
-            : 'resend-otp',
-        {email, code},
-      );
-
-      if (!signingIn) {
+      const result = await signInWithReviewCode({email, code});
+      if (result.status !== 'complete') {
         setError(t('signInCode.error'));
         isSubmittingRef.current = false;
         setLoading(false);
+        return;
       }
-      // Don't set loading to false on success, let the useEffect handle it
+      // Keep loading on success: `useAfterSignIn` leaves the screen.
+      await setSession(result.tokens);
     } catch (error: unknown) {
       logError(error, 'sign-in-code');
-
-      if (
-        error instanceof Error &&
-        error.message.includes('Could not verify code')
-      ) {
-        setError(t('signInCode.error'));
-      } else {
-        setError(t('error.message'));
-      }
+      setError(t('error.message'));
       isSubmittingRef.current = false;
       setLoading(false);
     }
@@ -283,54 +200,97 @@ export default function SignInCode(): JSX.Element {
                 gap: 34px;
               `}
             >
-              <Typography.Heading2>{t('signInCode.title')}</Typography.Heading2>
+              <Typography.Heading2>
+                {showCode ? t('signInCode.title') : t('signInLink.title')}
+              </Typography.Heading2>
               <Typography.Body2>
-                {renderLocalizedTexts(t('signInCode.content'))}
+                {renderLocalizedTexts(
+                  showCode ? t('signInLink.codeContent') : t('signInLink.content'),
+                )}
               </Typography.Body2>
 
-              <InputContainer>
-                <EditText
-                  placeholder="00000000"
-                  autoCapitalize="none"
-                  decoration="boxed"
-                  maxLength={MAX_CODE_LENGTH}
-                  error={error}
-                  textInputProps={{
-                    keyboardType: 'number-pad',
-                    autoFocus: true,
-                    autoCorrect: false,
-                  }}
-                  onChangeText={handleChangeText}
-                  onSubmitEditing={handleSubmit}
-                  styles={{
-                    container: css`
-                      margin-top: -2px;
-                      border-radius: 12px;
-                    `,
-                    error: css`
-                      margin-top: 8px;
-                    `,
-                  }}
-                  value={code}
-                />
-              </InputContainer>
+              {showCode ? (
+                <InputContainer>
+                  <EditText
+                    placeholder="00000000"
+                    autoCapitalize="none"
+                    decoration="boxed"
+                    maxLength={MAX_CODE_LENGTH}
+                    error={error}
+                    textInputProps={{
+                      keyboardType: 'number-pad',
+                      autoFocus: true,
+                      autoCorrect: false,
+                    }}
+                    onChangeText={handleChangeText}
+                    onSubmitEditing={handleSubmit}
+                    styles={{
+                      container: css`
+                        margin-top: -2px;
+                        border-radius: 12px;
+                      `,
+                      error: css`
+                        margin-top: 8px;
+                      `,
+                    }}
+                    value={code}
+                  />
+                </InputContainer>
+              ) : null}
             </View>
 
             <Footer>
-              <Button
-                hapticFeedback={ImpactFeedbackStyle.Soft}
-                styles={{
-                  container: css`
-                    height: 56px;
-                    border-width: 0;
-                  `,
-                }}
-                loading={loading}
-                borderRadius={16}
-                text={t('common.complete')}
-                onPress={handleSubmit}
-                disabled={loading || code.length !== MAX_CODE_LENGTH}
-              />
+              {showCode ? (
+                <Button
+                  hapticFeedback={ImpactFeedbackStyle.Soft}
+                  styles={{
+                    container: css`
+                      height: 56px;
+                      border-width: 0;
+                    `,
+                  }}
+                  loading={loading}
+                  borderRadius={16}
+                  text={t('common.complete')}
+                  onPress={handleSubmit}
+                  disabled={loading || code.length !== MAX_CODE_LENGTH}
+                />
+              ) : (
+                <>
+                  <Button
+                    hapticFeedback={ImpactFeedbackStyle.Soft}
+                    styles={{
+                      container: css`
+                        height: 56px;
+                        border-width: 0;
+                      `,
+                    }}
+                    loading={resending}
+                    borderRadius={16}
+                    text={t('signInLink.resend')}
+                    onPress={handleResend}
+                  />
+                  <CustomPressable
+                    onPress={() => setShowCode(true)}
+                    accessibilityLabel={t('signInLink.useCode')}
+                    accessibilityRole="button"
+                    style={css`
+                      align-self: center;
+                      margin-top: 16px;
+                      padding: 8px;
+                    `}
+                  >
+                    <Typography.Body3
+                      style={css`
+                        color: ${theme.text.label};
+                        text-decoration-line: underline;
+                      `}
+                    >
+                      {t('signInLink.useCode')}
+                    </Typography.Body3>
+                  </CustomPressable>
+                </>
+              )}
             </Footer>
           </Content>
         </KeyboardAvoidingContainer>

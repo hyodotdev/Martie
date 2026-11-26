@@ -630,6 +630,18 @@
     "error": "Code incorrect !",
     "title": "Veuillez saisir le code de vérification."
   },
+  "signInLink": {
+    "codeContent": "Saisis le code de connexion de {email}.",
+    "content": "Nous avons envoyé un lien de connexion à {email}. Ouvre-le sur ce téléphone pour te connecter.",
+    "expired": "Ce lien a expiré ou a déjà été utilisé. Connecte-toi à nouveau.",
+    "otherDevice": "Ouvre le lien sur le téléphone depuis lequel tu l’as demandé.",
+    "resend": "Renvoyer le lien",
+    "resent": "Nous avons envoyé un nouveau lien.",
+    "retry": "Se reconnecter",
+    "signingIn": "Connexion en cours…",
+    "title": "Consulte tes e-mails",
+    "useCode": "Se connecter avec un code"
+  },
   "submitQuiz": {
     "category": "Category",
     "explanation": "Answer Explanation (Optional)",

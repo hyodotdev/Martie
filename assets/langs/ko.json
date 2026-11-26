@@ -630,6 +630,18 @@
     "error": "잘못된 코드예요!",
     "title": "인증 코드를 입력해 주세요."
   },
+  "signInLink": {
+    "codeContent": "{email}의 로그인 코드를 입력해 주세요.",
+    "content": "{email}로 로그인 링크를 보냈어요. 이 휴대폰에서 링크를 열면 바로 로그인돼요.",
+    "expired": "링크가 만료됐거나 이미 사용됐어요. 다시 로그인해 주세요.",
+    "otherDevice": "로그인을 요청한 휴대폰에서 링크를 열어주세요.",
+    "resend": "링크 다시 보내기",
+    "resent": "새 링크를 보냈어요.",
+    "retry": "다시 로그인하기",
+    "signingIn": "로그인하고 있어요…",
+    "title": "메일함을 확인해 주세요",
+    "useCode": "코드로 로그인하기"
+  },
   "submitQuiz": {
     "category": "카테고리",
     "explanation": "정답 설명 (선택)",

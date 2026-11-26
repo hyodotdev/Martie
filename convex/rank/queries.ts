@@ -1,7 +1,7 @@
 import {paginationOptsValidator} from 'convex/server';
 import {query} from '../_generated/server';
 import {v} from 'convex/values';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 import {Doc} from '../_generated/dataModel';
 
 type RankDoc = Doc<'ranks'>;

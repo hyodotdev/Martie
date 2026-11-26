@@ -1,6 +1,6 @@
 import {v} from 'convex/values';
 import {mutation} from '../_generated/server';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 import {assertAdmin} from './helpers';
 
 /**

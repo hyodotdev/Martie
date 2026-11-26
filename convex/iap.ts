@@ -1,5 +1,5 @@
 'use node';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from './utils/auth';
 import {ConvexError, v} from 'convex/values';
 import {google} from 'googleapis';
 import {internal} from './_generated/api';

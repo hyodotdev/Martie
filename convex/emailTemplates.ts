@@ -176,3 +176,112 @@ export const emailTemplatesMartie: Record<Locale, EmailTemplate> = {
     `,
   },
 };
+interface SignInLinkTemplate {
+  subject: string;
+  text: (link: string) => string;
+  html: (link: string) => string;
+}
+
+interface SignInLinkCopy {
+  lang: Locale;
+  subject: string;
+  heading: string;
+  lead: string;
+  button: string;
+  fallback: string;
+  tip: string;
+  ignore: string;
+}
+
+const signInLinkCopy: Record<Locale, SignInLinkCopy> = {
+  en: {
+    lang: 'en',
+    subject: 'Your Martie sign-in link',
+    heading: 'Sign in to Martie',
+    lead: 'Tap the button on the phone where you asked for this email.',
+    button: 'Sign in to Martie',
+    fallback: 'If the button does not work, open this link on that phone:',
+    tip: 'This link expires in 10 minutes and works only in the Martie app on the phone that requested it. Never share it with anyone.',
+    ignore: "If you didn't request this email, please ignore it.",
+  },
+  ko: {
+    lang: 'ko',
+    subject: 'Martie 로그인 링크',
+    heading: '마티에 로그인하기',
+    lead: '이 메일을 요청한 휴대폰에서 아래 버튼을 눌러주세요.',
+    button: '마티 로그인',
+    fallback: '버튼이 동작하지 않으면 그 휴대폰에서 이 링크를 열어주세요:',
+    tip: '이 링크는 10분 후 만료되며, 요청한 휴대폰의 마티 앱에서만 동작해요. 다른 사람과 절대 공유하지 마세요.',
+    ignore: '이 메일을 요청하지 않았다면 무시하셔도 됩니다.',
+  },
+  ja: {
+    lang: 'ja',
+    subject: 'マティのログインリンク',
+    heading: 'マティにログイン',
+    lead: 'このメールをリクエストしたスマートフォンで下のボタンをタップしてください。',
+    button: 'マティにログイン',
+    fallback:
+      'ボタンが動作しない場合は、そのスマートフォンでこのリンクを開いてください：',
+    tip: 'このリンクは10分で期限切れとなり、リクエストしたスマートフォンのマティアプリでのみ使えます。他の人と共有しないでください。',
+    ignore: 'このメールに心当たりがない場合は、無視してください。',
+  },
+};
+
+const signInLinkTemplate = (copy: SignInLinkCopy): SignInLinkTemplate => ({
+  subject: copy.subject,
+  text: (link: string) =>
+    `${copy.heading}\n\n${copy.lead}\n\n${link}\n\n${copy.tip}\n\n${copy.ignore}`,
+  html: (link: string) => `
+      <!DOCTYPE html>
+      <html lang="${copy.lang}">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${copy.subject}</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f5f5f5; padding: 40px 0;">
+          <tr>
+            <td align="center">
+              <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);">
+                <tr>
+                  <td style="padding: 48px 48px 24px 48px; text-align: center;">
+                    <h2 style="margin: 0 0 24px 0; font-size: 36px; font-weight: 700; color: #252565;">Martie</h2>
+                    <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700; color: #1a1a1a;">${copy.heading}</h1>
+                    <p style="margin: 0; font-size: 16px; color: #666666;">${copy.lead}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 0 48px 48px 48px;">
+                    <div style="background-color: #f8f9fa; border-radius: 12px; padding: 32px; text-align: center;">
+                      <a href="${link}" style="display: inline-block; background-color: #252565; color: #ffffff; font-size: 18px; font-weight: 700; text-decoration: none; padding: 16px 32px; border-radius: 12px;">${copy.button}</a>
+                      <p style="margin: 24px 0 8px 0; font-size: 13px; color: #666666;">${copy.fallback}</p>
+                      <p style="margin: 0; font-size: 13px; color: #252565; word-break: break-all;">${link}</p>
+                    </div>
+                    <div style="margin-top: 32px; padding: 24px; background-color: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                      <p style="margin: 0; font-size: 14px; color: #92400e;">${copy.tip}</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 24px 48px; border-top: 1px solid #e5e7eb;">
+                    <p style="margin: 0; font-size: 12px; color: #9ca3af; text-align: center; line-height: 1.5;">
+                      ${copy.ignore}<br>
+                      © 2024 Martie. All rights reserved.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `,
+});
+
+export const signInLinkTemplatesMartie: Record<Locale, SignInLinkTemplate> = {
+  en: signInLinkTemplate(signInLinkCopy.en),
+  ko: signInLinkTemplate(signInLinkCopy.ko),
+  ja: signInLinkTemplate(signInLinkCopy.ja),
+};

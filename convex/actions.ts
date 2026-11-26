@@ -1,7 +1,7 @@
 import {mutation} from './_generated/server';
 import {internal} from './_generated/api';
 import {v} from 'convex/values';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from './utils/auth';
 
 export const sendInquiry = mutation({
   args: v.object({

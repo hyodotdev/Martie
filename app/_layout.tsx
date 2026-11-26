@@ -17,6 +17,12 @@ import SignInRequireModal from '../src/modals/SignInRequireModal';
 import * as SecureStore from 'expo-secure-store';
 import {ConvexAuthProvider} from '@convex-dev/auth/react';
 import {ConvexReactClient} from 'convex/react';
+import {api} from '../convex/_generated/api';
+import {useLegacySessionUpgrade} from '../src/hooks/useLegacySessionUpgrade';
+import {
+  authStorageNamespace,
+  type KeyValueStorage,
+} from '../src/utils/legacySession';
 import ErrorBoundary from 'react-native-error-boundary';
 import DisplayNameModal from '../src/modals/DisplayNameModal';
 import ForceUpdateModal from '../src/modals/ForceUpdateModal';
@@ -80,6 +86,19 @@ const secureStorage = {
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
   unsavedChangesWarning: false,
 });
+
+const isNativeApp = Platform.OS === 'android' || Platform.OS === 'ios';
+
+// Where Convex Auth keeps the session: secure storage in the app, and its
+// default, localStorage, on the web.
+const authStorage: KeyValueStorage = isNativeApp
+  ? secureStorage
+  : {
+      getItem: async (key) => globalThis.localStorage?.getItem(key) ?? null,
+      setItem: async (key, value) =>
+        globalThis.localStorage?.setItem(key, value),
+      removeItem: async (key) => globalThis.localStorage?.removeItem(key),
+    };
 
 function pickFirstQueryValue(
   value: string | string[] | undefined,
@@ -395,6 +414,10 @@ function App(): JSX.Element | null {
             name="sign-in-code"
             options={{presentation: 'modal', headerShown: false}}
           />
+          <Stack.Screen
+            name="sign-in-link"
+            options={{presentation: 'modal', headerShown: false}}
+          />
           {/* The practice quiz replaces itself with this screen. Hiding the
               header here, not only from inside the screen, keeps iOS from
               pushing it with the default header and its raw route title. */}
@@ -442,6 +465,12 @@ const Content = styled.View`
 
 function RootLayout(): JSX.Element | null {
   const isDarkMode = storage.getBoolean(Storage.ThemeType);
+  // The splash stays up until the session from before 2.8.0 is traded.
+  const isAuthStorageReady = useLegacySessionUpgrade({
+    convexUrl: process.env.EXPO_PUBLIC_CONVEX_URL!,
+    storage: authStorage,
+  });
+  if (!isAuthStorageReady) return null;
 
   return (
     <GestureHandlerRootView
@@ -453,11 +482,19 @@ function RootLayout(): JSX.Element | null {
       <RootProvider initialThemeType={isDarkMode ? 'dark' : 'light'}>
         <ConvexAuthProvider
           client={convex}
-          storage={
-            Platform.OS === 'android' || Platform.OS === 'ios'
-              ? secureStorage
-              : undefined
-          }
+          api={{
+            refreshSession: api.emailAuth.refreshSession,
+            signOut: api.emailAuth.signOut,
+            isAuthenticated: api.emailAuth.isAuthenticated,
+          }}
+          storage={isNativeApp ? secureStorage : undefined}
+          // Convex Auth 0.0.x used the same key names under the bare
+          // deployment URL; `useLegacySessionUpgrade` trades those.
+          storageNamespace={authStorageNamespace(
+            process.env.EXPO_PUBLIC_CONVEX_URL!,
+          )}
+          // Martie has no OAuth sign-in to resume from a redirect.
+          ambientSignIns={[]}
         >
           <App />
         </ConvexAuthProvider>

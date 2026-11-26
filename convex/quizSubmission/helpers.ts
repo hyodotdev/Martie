@@ -1,6 +1,6 @@
 import type {MutationCtx, QueryCtx} from '../_generated/server';
 import type {Id} from '../_generated/dataModel';
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../utils/auth';
 import {isAdminEmail} from '../utils/emailList';
 
 /**

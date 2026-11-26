@@ -1,8 +1,8 @@
-import {getAuthUserId} from '@convex-dev/auth/server';
+import {getAuthUserId} from '../../convex/utils/auth';
 import {verifyAmazonPurchase} from '../../convex/amazon';
 import {isCorrectOption} from '../../convex/quizResult/grading';
 
-jest.mock('@convex-dev/auth/server', () => ({getAuthUserId: jest.fn()}), {
+jest.mock('../../convex/utils/auth', () => ({getAuthUserId: jest.fn()}), {
   virtual: true,
 });
 
