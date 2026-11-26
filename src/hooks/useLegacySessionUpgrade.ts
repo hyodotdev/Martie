@@ -1,83 +1,48 @@
-import {useEffect, useRef} from 'react';
-import {Platform} from 'react-native';
-import * as SecureStore from 'expo-secure-store';
-import {useAuthActions} from '@convex-dev/auth/react';
-import {useConvexAuth, useMutation} from 'convex/react';
+import {useEffect, useState} from 'react';
+import {ConvexHttpClient} from 'convex/browser';
 import {api} from '../../convex/_generated/api';
 import {logError} from '../utils/error';
+import {
+  upgradeLegacySession,
+  type KeyValueStorage,
+} from '../utils/legacySession';
 
-// Convex Auth 0.0.x (apps before 2.8.0) kept its session under these keys,
-// suffixed by the deployment URL without its punctuation: in secure storage
-// on iOS and Android, and in localStorage on the web.
-const legacyKey = (key: string): string =>
-  `${key}_${(process.env.EXPO_PUBLIC_CONVEX_URL ?? '').replace(/[^a-zA-Z0-9]/g, '')}`;
-
-const LEGACY_REFRESH_TOKEN_KEY = legacyKey('__convexAuthRefreshToken');
-const LEGACY_KEYS = [
-  LEGACY_REFRESH_TOKEN_KEY,
-  legacyKey('__convexAuthJWT'),
-  legacyKey('__convexAuthOAuthVerifier'),
-  legacyKey('__convexAuthServerStateFetchTime'),
-];
-
-type LegacyStorage = {
-  getItem: (key: string) => Promise<string | null>;
-  removeItem: (key: string) => Promise<void>;
-};
-
-const webLocalStorage = (): Storage | null => {
-  try {
-    return globalThis.localStorage ?? null;
-  } catch {
-    return null;
-  }
-};
-
-const getLegacyStorage = (): LegacyStorage =>
-  Platform.OS === 'web'
-    ? {
-        getItem: async (key) => webLocalStorage()?.getItem(key) ?? null,
-        removeItem: async (key) => webLocalStorage()?.removeItem(key),
-      }
-    : {
-        getItem: SecureStore.getItemAsync,
-        removeItem: SecureStore.deleteItemAsync,
-      };
+// Offline, the first launch of 2.8.0 starts signed out rather than hang on
+// the splash; the old session stays and the next launch retries.
+const UPGRADE_TIMEOUT_MS = 10 * 1000;
 
 /**
- * On the first launch after updating to 2.8.0, trade the session kept by
- * Convex Auth 0.0.x for a Convex Auth 2 one, so the update signs nobody out.
- * A network failure keeps the old keys, so the next launch retries.
+ * Whether Convex Auth 2 may load: true once the session kept by Convex Auth
+ * 0.0.x (if any) has been traded, so the app never starts signed out for a
+ * moment and shows its guest screens.
  */
-export function useLegacySessionUpgrade(): void {
-  const {isLoading, isAuthenticated} = useConvexAuth();
-  const {setSession} = useAuthActions();
-  const upgradeLegacySession = useMutation(api.emailAuth.upgradeLegacySession);
-  const startedRef = useRef(false);
+export function useLegacySessionUpgrade({
+  convexUrl,
+  storage,
+}: {
+  convexUrl: string;
+  storage: KeyValueStorage;
+}): boolean {
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (isLoading || startedRef.current) return;
-    startedRef.current = true;
+    const timeout = setTimeout(() => setReady(true), UPGRADE_TIMEOUT_MS);
+    upgradeLegacySession({
+      convexUrl,
+      storage,
+      upgrade: (refreshToken) =>
+        new ConvexHttpClient(convexUrl).mutation(
+          api.emailAuth.upgradeLegacySession,
+          {refreshToken},
+        ),
+    })
+      .catch((error) => logError(error, 'legacy-session-upgrade'))
+      .finally(() => {
+        clearTimeout(timeout);
+        setReady(true);
+      });
+    return () => clearTimeout(timeout);
+  }, [convexUrl, storage]);
 
-    const legacyStorage = getLegacyStorage();
-    void (async () => {
-      try {
-        const refreshToken = await legacyStorage.getItem(
-          LEGACY_REFRESH_TOKEN_KEY,
-        );
-        if (!refreshToken) return;
-        if (!isAuthenticated) {
-          const result = await upgradeLegacySession({refreshToken});
-          if (result.status === 'complete') {
-            await setSession(result.tokens);
-          }
-        }
-        await Promise.all(
-          LEGACY_KEYS.map((key) => legacyStorage.removeItem(key)),
-        );
-      } catch (error) {
-        logError(error, 'legacy-session-upgrade');
-      }
-    })();
-  }, [isLoading, isAuthenticated, setSession, upgradeLegacySession]);
+  return ready;
 }
