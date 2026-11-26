@@ -157,7 +157,7 @@ export default ({config}: ConfigContext): ExpoConfig => ({
     ],
     './plugins/withAmazonFireCompatibility',
     './plugins/withIosPodDeploymentTarget',
-    './plugins/withRNFirebaseDisableSPM',
+    './plugins/withStaticAdPods',
     'expo-asset',
     [
       'expo-iap',
@@ -202,7 +202,7 @@ export default ({config}: ConfigContext): ExpoConfig => ({
       'expo-build-properties',
       {
         ios: {
-          useFrameworks: 'static',
+          useFrameworks: 'dynamic',
           buildReactNativeFromSource: true,
         },
         // https://github.com/invertase/notifee/issues/911#issuecomment-1872530474
