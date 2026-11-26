@@ -466,6 +466,7 @@ function RootLayout(): JSX.Element | null {
     convexUrl: process.env.EXPO_PUBLIC_CONVEX_URL!,
     storage: authStorage,
   });
+  if (!isAuthStorageReady) return null;
 
   return (
     <GestureHandlerRootView
@@ -475,26 +476,24 @@ function RootLayout(): JSX.Element | null {
       `}
     >
       <RootProvider initialThemeType={isDarkMode ? 'dark' : 'light'}>
-        {isAuthStorageReady ? (
-          <ConvexAuthProvider
-            client={convex}
-            api={{
-              refreshSession: api.emailAuth.refreshSession,
-              signOut: api.emailAuth.signOut,
-              isAuthenticated: api.emailAuth.isAuthenticated,
-            }}
-            storage={isNativeApp ? secureStorage : undefined}
-            // Convex Auth 0.0.x used the same key names under the bare
-            // deployment URL; `useLegacySessionUpgrade` trades those.
-            storageNamespace={authStorageNamespace(
-              process.env.EXPO_PUBLIC_CONVEX_URL!,
-            )}
-            // Martie has no OAuth sign-in to resume from a redirect.
-            ambientSignIns={[]}
-          >
-            <App />
-          </ConvexAuthProvider>
-        ) : undefined}
+        <ConvexAuthProvider
+          client={convex}
+          api={{
+            refreshSession: api.emailAuth.refreshSession,
+            signOut: api.emailAuth.signOut,
+            isAuthenticated: api.emailAuth.isAuthenticated,
+          }}
+          storage={isNativeApp ? secureStorage : undefined}
+          // Convex Auth 0.0.x used the same key names under the bare
+          // deployment URL; `useLegacySessionUpgrade` trades those.
+          storageNamespace={authStorageNamespace(
+            process.env.EXPO_PUBLIC_CONVEX_URL!,
+          )}
+          // Martie has no OAuth sign-in to resume from a redirect.
+          ambientSignIns={[]}
+        >
+          <App />
+        </ConvexAuthProvider>
       </RootProvider>
     </GestureHandlerRootView>
   );
