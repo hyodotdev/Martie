@@ -85,6 +85,19 @@
         "buildType": "apk"
       }
     },
+    "amazon-codemagic": {
+      "extends": "amazon",
+      "environment": "production",
+      "autoIncrement": false,
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "horizon-codemagic": {
+      "extends": "horizon",
+      "environment": "production",
+      "autoIncrement": false
+    },
     "production": {
       "channel": "production",
       "autoIncrement": true,

@@ -1,6 +1,6 @@
 ---
 name: release-update
-description: Build, verify, submit, and publish Martie releases through EAS Build, Codemagic Patch OTA updates, Google Play, and App Store Connect. Use when the user runs `/release-update` or `$release-update`, asks to release or deploy Martie, upload IPA/AAB artifacts, submit store builds for review, add release notes, choose between a native build and OTA update, or finish a version rollout after review and E2E.
+description: Build, verify, submit, and publish Martie releases through EAS Build, Codemagic Patch OTA updates, Google Play, App Store Connect, the Amazon Appstore (Fire OS, Vega OS), and the Meta Horizon Store. Use when the user runs `/release-update` or `$release-update`, asks to release or deploy Martie, upload IPA/AAB artifacts, submit store builds for review, add release notes, choose between a native build and OTA update, or finish a version rollout after review and E2E.
 ---
 
 # Release Update (Codex)

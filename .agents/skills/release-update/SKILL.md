@@ -1,6 +1,6 @@
 ---
 name: release-update
-description: Build, verify, submit, and publish Martie releases through EAS Build, Codemagic Patch OTA updates, Google Play, and App Store Connect. Use when the user runs `/release-update` or `$release-update`, asks to release or deploy Martie, upload IPA/AAB artifacts, submit store builds for review, add release notes, choose between a native build and OTA update, or finish a version rollout after review and E2E.
+description: Build, verify, submit, and publish Martie releases through EAS Build, Codemagic Patch OTA updates, Google Play, App Store Connect, the Amazon Appstore (Fire OS, Vega OS), and the Meta Horizon Store. Use when the user runs `/release-update` or `$release-update`, asks to release or deploy Martie, upload IPA/AAB artifacts, submit store builds for review, add release notes, choose between a native build and OTA update, or finish a version rollout after review and E2E.
 ---
 
 # Release Update
@@ -14,8 +14,12 @@ Report upload, review, approval, and public release as separate states.
    branch/PR, and `$update-version`.
 2. Confirm the semantic version, remote iOS build number, remote Android version
    code, target channels/tracks, and store application identifiers.
-3. Build release notes from the actual PR diff and user-facing behavior. Keep
-   them concise and localized where store metadata requires it.
+3. Build release notes from the actual PR diff and user-facing behavior, and
+   commit them as `release-notes/<version>.json` before tagging (format in
+   `release-notes/README.md`): `en` plus every store listing language (today
+   ko and ja; the other `assets/langs` codes are welcome), at most 500
+   characters each. `bun run test:stores` validates the file. Without it,
+   every store falls back to the tag message in one language.
 4. Preserve unrelated changes and existing credentials. Never print secrets.
 
 ## Choose Native Build Or OTA
@@ -75,12 +79,54 @@ Record the Patch release labels, deployment, binary version and messages
    versions and `production` environment, check the bundle targets
    `martie-server.hyo.dev` (and the Play upload key), then upload to TestFlight
    and the Play internal track as a draft. They never submit for review.
+   When the Play upload succeeds, `android-production` starts
+   `amazon-production`, `horizon-production` and `vega-production` through the
+   Codemagic API with the same tag and the versionCode it just uploaded (see
+   "Fire OS, Horizon And Vega" below).
    The EAS cloud scripts (`bun eas:prod:android`, `bun eas:prod:ios`) remain a
    fallback only.
 5. Inspect the build artifacts (Codemagic artifacts or EAS build metadata).
    Verify Android is a readable AAB with the expected package/version and iOS is
    an IPA archive with the expected bundle/version. A successful EAS status
    alone does not replace artifact inspection.
+
+## Fire OS, Horizon And Vega
+
+All three ship the EAS remote Android versionCode that `android-production`
+bumped for Play, so one release uses one code everywhere (2.8.0 was 118). Their
+EAS profiles (`amazon-codemagic`, `horizon-codemagic`) read that code without
+bumping it. Each workflow takes a `version_code` input: the chain passes the
+exact code; a manual run with `0` uses the current remote code and any other
+value must match it. Run them by hand only after `android-production` bumped
+the code for this version, or they reuse the previous release's code.
+
+- `amazon-production`: universal armeabi-v7a + arm64 APK (the App Submission
+  API takes no AABs), checked for the upload key and versionCode, then
+  `scripts/stores/amazon-appstore.mjs upload`: replaces the binary in the open
+  edit (keeping its device targeting, re-applied from the previous binary if
+  Amazon dropped any), sets the tag message as release notes on every listing,
+  and validates. The edit stays open; the `submit` input commits it, which is
+  the review submission. The API returns 412 while a version is in review, so
+  ship the next version only after the previous one is live.
+  `node scripts/stores/amazon-appstore.mjs plan` (read-only) shows the open or
+  previous edit's binaries, targeted devices and listings.
+- `horizon-production`: arm64 APK with targetSdk 34 and no READ_PHONE_STATE,
+  uploaded by `ovr-platform-util upload-quest-build`. `release` input: `draft`
+  (default; store channel, unreleased: publish it in the Meta dashboard),
+  `alpha` (ALPHA test channel) or `live`. A store-channel upload of a
+  published app goes live with no Meta review, so `live` needs the same
+  go-ahead as a store submission. Meta has no API to submit for review.
+- `vega-production`: Vega SDK (pinned `VEGA_SDK_VERSION`) builds
+  `apps/vega/build/armv7-release/vega_armv7.vpkg` with the package.json version
+  and the versionCode as build number. The App Submission API does not take
+  VPKGs, so add it to the Vega OS release track in the Developer Console.
+- `upload: false` builds and checks a binary without uploading (dry runs).
+- `martie_production` needs CODEMAGIC_API_TOKEN, AMAZON_CLIENT_ID,
+  AMAZON_CLIENT_SECRET (App Submission API security profile), HORIZON_APP_ID
+  and HORIZON_APP_SECRET besides EXPO_TOKEN.
+
+Report each store's state separately: uploaded to an open edit / draft /
+ALPHA, submitted, in review, live.
 
 ## Merge And Build From The Released Commit
 
@@ -106,7 +152,17 @@ Record the Patch release labels, deployment, binary version and messages
    and submit for App Review using an available authenticated API or the store
    UI. Do not claim App Review submission from an EAS upload alone.
 5. Add release notes before requesting review. Never overwrite unrelated
-   localized metadata.
+   localized metadata. Amazon and Horizon get them on upload. For the others,
+   with the maintenance kit's credentials:
+   - Google Play: `GOOGLE_PLAY_SERVICE_ACCOUNT_FILE=<kit Play service account>
+node scripts/stores/google-play-notes.mjs apply --version-code <code>`
+     (add `--dry-run` first). It sets each listing language's notes on the
+     draft release that holds the code and refuses a release users can
+     already see unless `--allow-live`.
+   - App Store: `node scripts/stores/release-notes.mjs asc-changes` writes a
+     change file (What's New for en-US, ko, ja) for the kit's `asc prepare`;
+     show the plan, then `asc apply --approve <hash>` once the App Store
+     version exists.
 6. If credentials, agreements, compliance answers, 2FA, or a manual product
    choice blocks submission, stop at the exact boundary and preserve completed
    uploads.

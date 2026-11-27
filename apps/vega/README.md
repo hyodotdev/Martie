@@ -37,6 +37,15 @@ Override the Vega build number when needed:
 VEGA_BUILD_NUMBER=101 bun run eas:prod:vega
 ```
 
+## Release
+
+Codemagic's `vega-production` workflow builds the release VPKG for every
+store tag (`android-production` starts it after the Play upload), using the
+`package.json` version and the Android versionCode as the build number. The
+Amazon App Submission API does not accept VPKGs, so upload
+`vega_armv7.vpkg` from the workflow artifacts to the Vega OS release track
+in the Developer Console.
+
 ## Notes
 
 - The Vega package id is `dev.hyo.martie`, matching the Fire OS package id so

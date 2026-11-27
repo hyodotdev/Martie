@@ -24,6 +24,7 @@
     "lint:all": "bun lint && bun lint:i18n",
     "build:web": "expo export --platform web",
     "test": "jest --runInBand",
+    "test:stores": "node --test 'scripts/stores/*.test.mjs'",
     "ota:release": "scripts/ota-release.zsh all",
     "ota:release:ios": "scripts/ota-release.zsh ios",
     "ota:release:android": "scripts/ota-release.zsh android",

@@ -43,3 +43,6 @@ jobs:
 
       - name: Test
         run: bun run test --coverage --silent
+
+      - name: Test store scripts
+        run: bun run test:stores
