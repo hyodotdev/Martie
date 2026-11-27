@@ -14,8 +14,12 @@ Report upload, review, approval, and public release as separate states.
    branch/PR, and `$update-version`.
 2. Confirm the semantic version, remote iOS build number, remote Android version
    code, target channels/tracks, and store application identifiers.
-3. Build release notes from the actual PR diff and user-facing behavior. Keep
-   them concise and localized where store metadata requires it.
+3. Build release notes from the actual PR diff and user-facing behavior, and
+   commit them as `release-notes/<version>.json` before tagging (format in
+   `release-notes/README.md`): `en` plus every store listing language (today
+   ko and ja; the other `assets/langs` codes are welcome), at most 500
+   characters each. `bun run test:stores` validates the file. Without it,
+   every store falls back to the tag message in one language.
 4. Preserve unrelated changes and existing credentials. Never print secrets.
 
 ## Choose Native Build Or OTA
@@ -148,7 +152,17 @@ ALPHA, submitted, in review, live.
    and submit for App Review using an available authenticated API or the store
    UI. Do not claim App Review submission from an EAS upload alone.
 5. Add release notes before requesting review. Never overwrite unrelated
-   localized metadata.
+   localized metadata. Amazon and Horizon get them on upload. For the others,
+   with the maintenance kit's credentials:
+   - Google Play: `GOOGLE_PLAY_SERVICE_ACCOUNT_FILE=<kit Play service account>
+node scripts/stores/google-play-notes.mjs apply --version-code <code>`
+     (add `--dry-run` first). It sets each listing language's notes on the
+     draft release that holds the code and refuses a release users can
+     already see unless `--allow-live`.
+   - App Store: `node scripts/stores/release-notes.mjs asc-changes` writes a
+     change file (What's New for en-US, ko, ja) for the kit's `asc prepare`;
+     show the plan, then `asc apply --approve <hash>` once the App Store
+     version exists.
 6. If credentials, agreements, compliance answers, 2FA, or a manual product
    choice blocks submission, stop at the exact boundary and preserve completed
    uploads.

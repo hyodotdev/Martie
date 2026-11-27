@@ -9,8 +9,9 @@
 // `check` proves the credentials work. `plan` reads the open (or a new) edit
 // and prints what `upload` would change, writing nothing. `upload` replaces
 // the binary in the edit, which keeps its device targeting, re-applies the
-// previous targeting if Amazon dropped any of it, sets the release notes on
-// every listing and validates the edit. Only `--submit` commits the edit,
+// previous targeting if Amazon dropped any of it, sets each listing's release
+// notes in its language (release-notes/<version>.json, falling back to
+// --notes-file) and validates the edit. Only `--submit` commits the edit,
 // which sends it to Amazon review.
 //
 // Reads AMAZON_CLIENT_ID and AMAZON_CLIENT_SECRET (the App Submission API
@@ -19,6 +20,8 @@
 import {readFileSync} from 'node:fs';
 import {basename} from 'node:path';
 import {parseArgs} from 'node:util';
+
+import {loadNotes, notesFor} from './release-notes.mjs';
 
 const API = 'https://developer.amazon.com/api/appstore/v1';
 const APP_ID = process.env.AMAZON_APP_ID || 'dev.hyo.martie';
@@ -153,7 +156,9 @@ async function upload() {
   if (!values.file.endsWith('.apk')) {
     fail('The App Submission API accepts APKs only');
   }
-  const notes = readFileSync(values['notes-file'], 'utf8').trim();
+  const fallback = readFileSync(values['notes-file'], 'utf8');
+  const version = JSON.parse(readFileSync('package.json', 'utf8')).version;
+  const notes = loadNotes(version);
   const apk = readFileSync(values.file);
 
   const {edit, created} = await openEdit({create: true});
@@ -208,7 +213,7 @@ async function upload() {
     const path = `/edits/${edit.id}/listings/${language}`;
     const {body: listing, etag} = await call('GET', path);
     await call('PUT', path, {
-      ...json({...listing, recentChanges: notes}),
+      ...json({...listing, recentChanges: notesFor(language, notes, fallback)}),
       headers: {'Content-Type': 'application/json', 'If-Match': etag},
     });
     console.log(`Release notes set for ${language}`);

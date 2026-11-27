@@ -86,7 +86,8 @@ definitions:
         fi
         echo "VERSION_CODE=$code" >> "$CM_ENV"
         echo "Building versionCode $code"
-    # The tag message (the GitHub Release note), or the commit subject.
+    # The tag message (the GitHub Release note), or the commit subject: the
+    # fallback for languages release-notes/<version>.json does not cover.
     # Codemagic sets CM_TAG only for tag webhooks, not for the builds
     # android-production starts through the API, so look the tag up too.
     - &release_notes
@@ -493,6 +494,9 @@ workflows:
           set -euo pipefail
           [[ '${{ inputs.upload }}' == [Tt]rue ]] || { echo "Upload is off"; exit 0; }
           test -n "${HORIZON_APP_SECRET:-}" || { echo "HORIZON_APP_SECRET is missing from martie_production"; exit 1; }
+          # One language only: the English notes, or the tag message.
+          notes=$(node scripts/stores/release-notes.mjs text en-US \
+            --fallback-file build/release-notes.txt)
           release='${{ inputs.release }}'
           case "$release" in
             draft) args=(--channel store --draft) ;;
@@ -503,7 +507,7 @@ workflows:
           ovr-platform-util upload-quest-build \
             --app-id "$HORIZON_APP_ID" --app-secret "$HORIZON_APP_SECRET" \
             --apk build/martie-horizon.apk --age-group TEENS_AND_ADULTS \
-            --notes "$(cat build/release-notes.txt)" "${args[@]}"
+            --notes "$notes" "${args[@]}"
     artifacts:
       - build/*.apk
 
