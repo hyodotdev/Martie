@@ -9,7 +9,7 @@ import {
   streakToday,
   streakYesterday,
 } from '../utils/streakDate';
-import {isCorrectOption} from '../quizResult/grading';
+import {displayedOptions, isCorrectOption} from '../quizResult/grading';
 
 /**
  * 스트릭 복구용 무료 프리즈 1개 부여 (PMF sprint #70).
@@ -202,7 +202,10 @@ export const completeDailyChallenge = mutation({
         isCorrect:
           !!quiz &&
           submitted.isCorrect &&
-          isCorrectOption(quiz.options, submitted.selectedOptionIndex),
+          isCorrectOption(
+            displayedOptions(quiz._id, quiz.options),
+            submitted.selectedOptionIndex,
+          ),
         timeSpentMs: Math.max(0, Math.min(submitted.timeSpentMs, 600_000)),
       });
     }

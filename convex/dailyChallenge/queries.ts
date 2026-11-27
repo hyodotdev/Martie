@@ -9,6 +9,7 @@ import {
   streakToday,
   streakYesterday,
 } from '../utils/streakDate';
+import {displayedOptions} from '../quizResult/grading';
 
 /**
  * 오늘의 퀴즈 조회
@@ -91,9 +92,7 @@ export const getToday = query({
     }
 
     const enrichedQuizzes = validQuizzes.map((quiz) => {
-      const shuffledOptions = [...quiz!.options].sort(
-        () => Math.random() - 0.5,
-      );
+      const shuffledOptions = displayedOptions(quiz!._id, quiz!.options);
       const creator = quiz!.creatorUserId
         ? creatorMap.get(quiz!.creatorUserId)
         : undefined;
