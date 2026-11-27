@@ -4,6 +4,7 @@ import {v} from 'convex/values';
 import {paginationOptsValidator} from 'convex/server';
 import type {Id} from '../_generated/dataModel';
 import {getQuizLanguageMap} from '../quizLanguage/helpers';
+import {displayedOptions} from '../quizResult/grading';
 
 // src/constants.ts에 있는 QUIZ_LIMIT와 동일한 값 이어야 함
 const CLIENT_QUIZ_LIMIT = 10;
@@ -247,9 +248,7 @@ export const getQuizzesPaginated = query({
 
       // 퀴즈 데이터 보강
       const enrichedItems = paginatedResult.page.map((quiz) => {
-        const shuffledOptions = [...quiz.options].sort(
-          () => Math.random() - 0.5,
-        );
+        const shuffledOptions = displayedOptions(quiz._id, quiz.options);
         const creator = quiz.creatorUserId
           ? creatorMap.get(quiz.creatorUserId)
           : undefined;

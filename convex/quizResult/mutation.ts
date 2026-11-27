@@ -1,5 +1,9 @@
 import {ConvexError, v} from 'convex/values';
-import {isCorrectOption, MAX_QUIZ_RESULTS_PER_DAY} from './grading';
+import {
+  displayedOptions,
+  isCorrectOption,
+  MAX_QUIZ_RESULTS_PER_DAY,
+} from './grading';
 import {mutation} from '../_generated/server';
 import {getAuthUserId} from '../utils/auth';
 import {enqueueForReview} from '../reviewQueue/helpers';
@@ -24,7 +28,11 @@ export const saveQuizResult = mutation({
 
     // Grade on the server. A client "wrong" (e.g. a timeout) stays wrong.
     const isCorrect =
-      args.isCorrect && isCorrectOption(quiz.options, selectedOptionIndex);
+      args.isCorrect &&
+      isCorrectOption(
+        displayedOptions(quiz._id, quiz.options),
+        selectedOptionIndex,
+      );
 
     const recentToday = await ctx.db
       .query('quizResults')

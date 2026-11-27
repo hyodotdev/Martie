@@ -2,6 +2,7 @@ import {getAuthUserId} from '../utils/auth';
 import {query} from '../_generated/server';
 import {v} from 'convex/values';
 import {getQuizLanguageMap} from '../quizLanguage/helpers';
+import {displayedOptions} from '../quizResult/grading';
 
 const REVIEW_SESSION_LIMIT = 20;
 
@@ -45,9 +46,7 @@ export const getPendingReviews = query({
 
         const langMap = await getQuizLanguageMap(ctx, quizKeys, language);
 
-        const shuffledOptions = [...quiz.options].sort(
-          () => Math.random() - 0.5,
-        );
+        const shuffledOptions = displayedOptions(quiz._id, quiz.options);
 
         return {
           reviewId: review._id,
