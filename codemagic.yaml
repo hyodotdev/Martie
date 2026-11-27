@@ -87,13 +87,16 @@ definitions:
         echo "VERSION_CODE=$code" >> "$CM_ENV"
         echo "Building versionCode $code"
     # The tag message (the GitHub Release note), or the commit subject.
+    # Codemagic sets CM_TAG only for tag webhooks, not for the builds
+    # android-production starts through the API, so look the tag up too.
     - &release_notes
       name: Write the release notes
       script: |
         set -euo pipefail
         git fetch --quiet --tags origin
+        tag=${CM_TAG:-$(git tag --points-at HEAD -l 'v*' | tail -1)}
         notes=""
-        [[ -n "${CM_TAG:-}" ]] && notes=$(git tag -l --format='%(contents)' "$CM_TAG")
+        [[ -n "$tag" ]] && notes=$(git tag -l --format='%(contents)' "$tag")
         [[ -n "$notes" ]] || notes=$(git log -1 --format=%s)
         mkdir -p build
         printf '%s\n' "$notes" > build/release-notes.txt
