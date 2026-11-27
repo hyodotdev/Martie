@@ -395,9 +395,9 @@ workflows:
       - name: Upload to the Amazon Appstore edit
         script: |
           set -euo pipefail
-          [[ '${{ inputs.upload }}' == true ]] || { echo "Upload is off"; exit 0; }
+          [[ '${{ inputs.upload }}' == [Tt]rue ]] || { echo "Upload is off"; exit 0; }
           args=(upload --file build/martie-amazon.apk --notes-file build/release-notes.txt)
-          [[ "${{ inputs.submit }}" == true ]] && args+=(--submit)
+          [[ '${{ inputs.submit }}' == [Tt]rue ]] && args+=(--submit)
           node scripts/stores/amazon-appstore.mjs "${args[@]}"
     artifacts:
       - build/*.apk
@@ -488,7 +488,7 @@ workflows:
       - name: Upload to the Horizon Store
         script: |
           set -euo pipefail
-          [[ '${{ inputs.upload }}' == true ]] || { echo "Upload is off"; exit 0; }
+          [[ '${{ inputs.upload }}' == [Tt]rue ]] || { echo "Upload is off"; exit 0; }
           test -n "${HORIZON_APP_SECRET:-}" || { echo "HORIZON_APP_SECRET is missing from martie_production"; exit 1; }
           release='${{ inputs.release }}'
           case "$release" in
